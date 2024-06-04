@@ -1,13 +1,13 @@
 extends Node
 
 const pokeball0 = preload("res://spr/ghost.png")
-const pokeball1 = preload("res://spr/block.png")
-const pokeball2 = preload("res://spr/block.png")
-const pokeball3 = preload("res://spr/block.png")
-const pokeball4 = preload("res://spr/block.png")
-const pokeball5 = preload("res://spr/block.png")
-const pokeball6 = preload("res://spr/block.png")
-const pokeball7 = preload("res://spr/block.png")
+const pokeball1 = preload("res://spr/block.png") #I
+const pokeball2 = preload("res://spr/block.png") #J
+const pokeball3 = preload("res://spr/block.png") #L
+const pokeball4 = preload("res://spr/block.png") #O
+const pokeball5 = preload("res://spr/block.png") #T
+const pokeball6 = preload("res://spr/block.png") #Z
+const pokeball7 = preload("res://spr/block.png") #S
 
 func getTextureForColorIndex(index):
 	match (index):

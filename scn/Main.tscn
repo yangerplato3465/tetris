@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://0sifyyptxqvw" path="res://spr/nextPiece.png" id="8"]
 [ext_resource type="Texture2D" uid="uid://dsdhsn18wdlr6" path="res://spr/grid.png" id="9"]
 [ext_resource type="FontFile" path="res://fonts/UniFont.tres" id="10"]
-[ext_resource type="AudioStream" uid="uid://dtj161d601ncu" path="res://audio/Tetris.wav" id="11"]
+[ext_resource type="Texture2D" uid="uid://6k85snnlv5j4" path="res://spr/tile_0087.png" id="11_a2rgw"]
 [ext_resource type="Texture2D" uid="uid://bqrfbg57op0jf" path="res://spr/russia.png" id="12"]
 
 [node name="Main" type="Node2D"]
@@ -206,8 +206,8 @@ offset_bottom = 736.0
 color = Color(0, 0, 0, 1)
 
 [node name="Border" type="Sprite2D" parent="Grid/UI"]
-position = Vector2(130.914, 61.4567)
-scale = Vector2(4.26807, 4.10658)
+position = Vector2(127, 61.4567)
+scale = Vector2(4.3125, 4.12978)
 texture = ExtResource("9")
 centered = false
 
@@ -215,8 +215,16 @@ centered = false
 wait_time = 0.5
 one_shot = true
 
-[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("11")
-autoplay = true
+[node name="BattleGround" type="Node2D" parent="."]
+
+[node name="player" type="Sprite2D" parent="BattleGround"]
+position = Vector2(751, 230)
+scale = Vector2(6, 6)
+texture = ExtResource("11_a2rgw")
+
+[node name="enemy" type="Sprite2D" parent="BattleGround"]
+position = Vector2(1026, 234)
+scale = Vector2(6, 6)
+texture = ExtResource("11_a2rgw")
 
 [connection signal="timeout" from="Grid/LockTimer" to="Grid" method="_on_LockTimer_timeout"]

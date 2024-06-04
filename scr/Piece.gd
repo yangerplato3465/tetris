@@ -42,3 +42,14 @@ func getShapeWithoutBorders():
 
 func getTextureForPiece():
 	return PokeballTextures.getTextureForColorIndex(getColorIndex())
+
+func getShapeName():
+	match (getColorIndex()):
+		1: return "I"
+		2: return "J"
+		3: return "L"
+		4: return "O"
+		5: return "T"
+		6: return "Z"
+		7: return "S"
+

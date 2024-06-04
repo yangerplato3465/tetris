@@ -120,12 +120,12 @@ func _physics_process(delta):
 		deltaSum = 0
 	dasCounter+=1
 	if Input.is_action_pressed("ui_down"):
-			if canPieceMoveDown():
-				movePieceInGrid(0,1)
-				score += 1
-				$UI/Score/ScoreNumber.text = str(score)
-				sthHappened = true
-			actions = 0
+		if canPieceMoveDown():
+			movePieceInGrid(0,1)
+			score += 1
+			$UI/Score/ScoreNumber.text = str(score)
+			sthHappened = true
+		actions = 0
 	if Input.is_action_just_pressed("hard_drop"):	
 		hardDropPiece()
 		afterDrop()
@@ -333,6 +333,7 @@ func spawnPiece():
 	currentPiece.positionInGrid = Vector2((gridWidth - currentPiece.shape[0].size())/2, spawnIn)
 	currentPiece.rotationState = 0
 	addPiece()
+	print("Check shape" + str(currentPiece.getShapeName()))
 
 func canPieceMoveDown():
 	for i in range(0,currentPiece.shape.size()):
