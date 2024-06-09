@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="Tetris"
-run/main_scene="res://scn/Main.tscn"
+run/main_scene="res://Scene/Main.tscn"
 config/features=PackedStringArray("4.2")
-config/icon="res://spr/icon.png"
+config/icon="res://Sprite/icon.png"
 
 [autoload]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dsdhsn18wdlr6"
-path="res://.godot/imported/grid.png-e341eea8f3ef8139bbf8bb7d14c8bc94.ctex"
+uid="uid://c28wciyag1k4p"
+path="res://.godot/imported/button.png-4fb64756828c9f9c474fb85aeacfddeb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://spr/grid.png"
-dest_files=["res://.godot/imported/grid.png-e341eea8f3ef8139bbf8bb7d14c8bc94.ctex"]
+source_file="res://Sprite/button.png"
+dest_files=["res://.godot/imported/button.png-4fb64756828c9f9c474fb85aeacfddeb.ctex"]
 
 [params]
 
