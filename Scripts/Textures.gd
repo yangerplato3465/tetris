@@ -1,13 +1,13 @@
 extends Node
 
-const texture0 = preload("res://spr/ghost.png")
-const texture1 = preload("res://spr/block.png") #I
-const texture2 = preload("res://spr/block.png") #J
-const texture3 = preload("res://spr/block.png") #L
-const texture4 = preload("res://spr/block.png") #O
-const texture5 = preload("res://spr/block.png") #T
-const texture6 = preload("res://spr/block.png") #Z
-const texture7 = preload("res://spr/block.png") #S
+const texture0 = preload("res://Sprite/ghost.png")
+const texture1 = preload("res://Sprite/block.png") #I
+const texture2 = preload("res://Sprite/block.png") #J
+const texture3 = preload("res://Sprite/block.png") #L
+const texture4 = preload("res://Sprite/block.png") #O
+const texture5 = preload("res://Sprite/block.png") #T
+const texture6 = preload("res://Sprite/block.png") #Z
+const texture7 = preload("res://Sprite/block.png") #S
 
 func getTextureForColorIndex(index):
 	match (index):

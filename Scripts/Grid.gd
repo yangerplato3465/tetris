@@ -11,14 +11,14 @@ var gridOffsetY
 const dasDelay = 8
 const infinityValue = 15
 
-const Piece = preload("res://scr/Piece.gd")
+const Piece = preload("res://Scripts/Piece.gd")
 var currentPiece: Piece
 var lastPiece: Piece
 
 const darkMaterial = preload("res://extras/DarkMaterial.tres")
 
-const DropParticle = preload("res://scn/DropParticle.tscn")
-const ClearParticle = preload("res://scn/ClearParticle.tscn")
+const DropParticle = preload("res://Scene/DropParticle.tscn")
+const ClearParticle = preload("res://Scene/ClearParticle.tscn")
 
 var timer = 0
 var deltaSum = 0
