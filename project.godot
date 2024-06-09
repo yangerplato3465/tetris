@@ -17,10 +17,10 @@ config/icon="res://spr/icon.png"
 
 [autoload]
 
-PokeballTextures="*res://scr/PokeballTextures.gd"
 Utilities="*res://scr/Utilities.gd"
 Constants="*res://scr/Constants.gd"
 MatrixOperations="*res://scr/MatrixOperations.gd"
+Textures="*res://scr/Textures.gd"
 
 [display]
 

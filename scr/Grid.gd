@@ -19,7 +19,6 @@ const darkMaterial = preload("res://extras/DarkMaterial.tres")
 
 const DropParticle = preload("res://scn/DropParticle.tscn")
 const ClearParticle = preload("res://scn/ClearParticle.tscn")
-const HoldParticle = preload("res://scn/HoldParticle.tscn")
 
 var timer = 0
 var deltaSum = 0
@@ -75,7 +74,7 @@ func drawGrid():
 				circle.position = Vector2(x*spriteSize + gridOffsetX,y*spriteSize + gridOffsetY + 16)
 			else:
 				circle.position = Vector2(x*spriteSize + gridOffsetX,y*spriteSize + gridOffsetY)
-			circle.texture = PokeballTextures.getTextureForColorIndex(grid[x][y])
+			circle.texture = Textures.getTextureForColorIndex(grid[x][y])
 			circle.scale = Vector2(2,2)
 			circle.centered = false
 			add_child(circle)
@@ -150,11 +149,11 @@ func _physics_process(delta):
 			deletePieceFromGrid()
 			
 			#Particle
-			var particle = HoldParticle.instantiate()
-			particle.setDestination($UI/Hold.position + $UI/Hold.size/2)
-			particle.texture = currentPiece.getTextureForPiece()
-			add_child(particle)
-			particle.emit(Vector2(spriteSize*(currentPiece.positionInGrid.x + currentPiece.getShapeWithoutBorders().size()/2.0) + gridOffsetX ,spriteSize*(currentPiece.positionInGrid.y++ currentPiece.getShapeWithoutBorders()[0].size()/2.0) + gridOffsetY ))
+			# var particle = HoldParticle.instantiate()
+			# particle.setDestination($UI/Hold.position + $UI/Hold.size/2)
+			# particle.texture = currentPiece.getTextureForPiece()
+			# add_child(particle)
+			# particle.emit(Vector2(spriteSize*(currentPiece.positionInGrid.x + currentPiece.getShapeWithoutBorders().size()/2.0) + gridOffsetX ,spriteSize*(currentPiece.positionInGrid.y++ currentPiece.getShapeWithoutBorders()[0].size()/2.0) + gridOffsetY ))
 			
 			var heldPiece = $UI/Hold.swapPiece(currentPiece)
 			if heldPiece:

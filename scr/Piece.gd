@@ -41,7 +41,7 @@ func getShapeWithoutBorders():
 	return newShape
 
 func getTextureForPiece():
-	return PokeballTextures.getTextureForColorIndex(getColorIndex())
+	return Textures.getTextureForColorIndex(getColorIndex())
 
 func getShapeName():
 	match (getColorIndex()):
