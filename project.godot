@@ -17,10 +17,10 @@ config/icon="res://spr/icon.png"
 
 [autoload]
 
-Utilities="*res://scr/Utilities.gd"
-Constants="*res://scr/Constants.gd"
-MatrixOperations="*res://scr/MatrixOperations.gd"
-Textures="*res://scr/Textures.gd"
+Utilities="*res://Scripts/Utils/Utilities.gd"
+Constants="*res://Scripts/Constants.gd"
+MatrixOperations="*res://Scripts/Utils/MatrixOperations.gd"
+Textures="*res://Scripts/Textures.gd"
 
 [display]
 

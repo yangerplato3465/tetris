@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bb8wh8ii57hfk"]
 
-[ext_resource type="Script" path="res://scr/ClearParticle.gd" id="1"]
+[ext_resource type="Script" path="res://Scripts/ClearParticle.gd" id="1"]
 
 [sub_resource type="ParticleProcessMaterial" id="1"]
 emission_shape = 3
