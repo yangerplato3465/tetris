@@ -13,6 +13,7 @@ const infinityValue = 15
 
 const Piece = preload("res://scr/Piece.gd")
 var currentPiece: Piece
+var lastPiece: Piece
 
 const darkMaterial = preload("res://extras/DarkMaterial.tres")
 
@@ -191,6 +192,7 @@ func _on_LockTimer_timeout():
 		prevActions = actions
 
 func afterDrop():
+	lastPiece = currentPiece;
 	currentPiece = Piece.new()
 	checkAndClearFullLines()
 	if (checkGameOver()):
@@ -294,6 +296,8 @@ func checkAndClearFullLines():
 			2: newScore=300*level
 			3: newScore=500*level
 			4: newScore=800*level
+		if lastPiece.getShapeName() == "T" && lastPiece.rotationState != 0: #Detect T spin (Can be optimized)
+			print("T SPIN!!!" + str(lastPiece.rotationState))
 		score += newScore
 		lines += cleared
 		$UI/Score/ScoreNumber.text = str(score)
