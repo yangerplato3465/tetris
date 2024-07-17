@@ -336,7 +336,7 @@ func spawnPiece():
 	currentPiece.positionInGrid = Vector2((gridWidth - currentPiece.shape[0].size())/2, spawnIn)
 	currentPiece.rotationState = 0
 	addPiece()
-	print("Check shape" + str(currentPiece.getShapeName()))
+	# print("Check shape" + str(currentPiece.getShapeName()))
 
 func canPieceMoveDown():
 	for i in range(0,currentPiece.shape.size()):

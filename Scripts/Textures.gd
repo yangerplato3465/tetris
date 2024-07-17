@@ -11,7 +11,7 @@ const texture7 = preload("res://Sprite/block_S.png") #S
 
 func getTextureForColorIndex(index):
 	match (index):
-		(0): return texture0
+		# (0): return texture0
 		(1): return texture1
 		(2): return texture2
 		(3): return texture3
