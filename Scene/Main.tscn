@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://d3korpfrgseif"]
+[gd_scene load_steps=11 format=3 uid="uid://d3korpfrgseif"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_grhrx"]
 [ext_resource type="Script" path="res://Scripts/Grid.gd" id="2_jk1g6"]
@@ -10,7 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://c28wciyag1k4p" path="res://Sprite/button.png" id="8_oe607"]
 [ext_resource type="Texture2D" uid="uid://bqrfbg57op0jf" path="res://Sprite/russia.png" id="9_tfv7g"]
 [ext_resource type="Texture2D" uid="uid://dsdhsn18wdlr6" path="res://Sprite/grid.png" id="10_qcj1q"]
-[ext_resource type="Texture2D" uid="uid://6k85snnlv5j4" path="res://Sprite/tile_0087.png" id="11_dmfy0"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_grhrx")
@@ -214,17 +213,5 @@ centered = false
 [node name="LockTimer" type="Timer" parent="Grid"]
 wait_time = 0.5
 one_shot = true
-
-[node name="BattleGround" type="Node2D" parent="."]
-
-[node name="player" type="Sprite2D" parent="BattleGround"]
-position = Vector2(751, 230)
-scale = Vector2(6, 6)
-texture = ExtResource("11_dmfy0")
-
-[node name="enemy" type="Sprite2D" parent="BattleGround"]
-position = Vector2(1026, 234)
-scale = Vector2(6, 6)
-texture = ExtResource("11_dmfy0")
 
 [connection signal="timeout" from="Grid/LockTimer" to="Grid" method="_on_LockTimer_timeout"]
