@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqrfbg57op0jf"
-path="res://.godot/imported/russia.png-651dd372888c4021f16371182452f693.ctex"
+uid="uid://rxye0hgteuye"
+path="res://.godot/imported/enemy_bandit.png-fd7fda79a5714d9bce57447fd35fdd0a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/russia.png"
-dest_files=["res://.godot/imported/russia.png-651dd372888c4021f16371182452f693.ctex"]
+source_file="res://Sprite/Character/enemy_bandit.png"
+dest_files=["res://.godot/imported/enemy_bandit.png-fd7fda79a5714d9bce57447fd35fdd0a.ctex"]
 
 [params]
 

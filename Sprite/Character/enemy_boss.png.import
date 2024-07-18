@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://6k85snnlv5j4"
-path="res://.godot/imported/tile_0087.png-f5cdde5fbc53db0e32b3c7bda78f832d.ctex"
+uid="uid://j81yq8tf5hp0"
+path="res://.godot/imported/enemy_boss.png-ff8806478731d5cff35bd01055293102.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/tile_0087.png"
-dest_files=["res://.godot/imported/tile_0087.png-f5cdde5fbc53db0e32b3c7bda78f832d.ctex"]
+source_file="res://Sprite/Character/enemy_boss.png"
+dest_files=["res://.godot/imported/enemy_boss.png-ff8806478731d5cff35bd01055293102.ctex"]
 
 [params]
 

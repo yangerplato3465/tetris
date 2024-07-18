@@ -21,6 +21,8 @@ Utilities="*res://Scripts/Utils/Utilities.gd"
 Constants="*res://Scripts/Constants.gd"
 MatrixOperations="*res://Scripts/Utils/MatrixOperations.gd"
 Textures="*res://Scripts/Textures.gd"
+PlayerManager="*res://Scripts/Managers/PlayerManager.gd"
+SignalManager="*res://Scripts/Managers/SignalManager.gd"
 
 [display]
 
