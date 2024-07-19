@@ -1,1 +1,1 @@
-signal ROTATE
+extends Node

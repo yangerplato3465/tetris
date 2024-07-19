@@ -1,0 +1,125 @@
+[gd_scene load_steps=11 format=3 uid="uid://boi74rmhircqc"]
+
+[ext_resource type="Script" path="res://Scripts/Menu.gd" id="1_ay6wy"]
+[ext_resource type="Shader" path="res://Shader/TransitionIn.gdshader" id="2_bti5n"]
+[ext_resource type="Shader" path="res://Shader/TransitionOut.gdshader" id="2_cmgbi"]
+[ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="3_wde31"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8gk4w"]
+shader = ExtResource("2_bti5n")
+shader_parameter/progress = 0.0
+shader_parameter/diamondPixelSize = 50.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_c1pnh"]
+shader = ExtResource("2_cmgbi")
+shader_parameter/progress = 0.0
+shader_parameter/diamondPixelSize = 50.0
+
+[sub_resource type="Animation" id="Animation_og2y8"]
+resource_name = "FadeIn"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TransitionIn:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_50ha7"]
+resource_name = "FadeOut"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TransitionOut:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_acykq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TransitionIn:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TransitionOut:material:shader_parameter/progress")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ggal3"]
+_data = {
+"FadeIn": SubResource("Animation_og2y8"),
+"FadeOut": SubResource("Animation_50ha7"),
+"RESET": SubResource("Animation_acykq")
+}
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ay6wy")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 573.0
+offset_top = 497.0
+offset_right = 619.0
+offset_bottom = 528.0
+tooltip_text = "wdcsdc"
+text = "Start"
+
+[node name="TransitionIn" type="Sprite2D" parent="."]
+modulate = Color(0.133333, 0.133333, 0.133333, 1)
+self_modulate = Color(0, 0, 0, 1)
+show_behind_parent = true
+z_index = 1
+z_as_relative = false
+material = SubResource("ShaderMaterial_8gk4w")
+position = Vector2(595, 401)
+scale = Vector2(20, 14)
+texture = ExtResource("3_wde31")
+
+[node name="TransitionOut" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 1)
+material = SubResource("ShaderMaterial_c1pnh")
+position = Vector2(598, 396)
+scale = Vector2(20, 14)
+texture = ExtResource("3_wde31")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_ggal3")
+}
+autoplay = "FadeIn"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
