@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ox17kqbyw6yc"
-path="res://.godot/imported/enemy_ghost.png-fd7c39becedee577b16f3fdf3caa07e0.ctex"
+uid="uid://c3jgqpsvcvdeb"
+path="res://.godot/imported/upgrade_bg.png-9e70c78ae2c871ab5c62bd986eaf02ad.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/Character/enemy_ghost.png"
-dest_files=["res://.godot/imported/enemy_ghost.png-fd7c39becedee577b16f3fdf3caa07e0.ctex"]
+source_file="res://Sprite/Cards/upgrade_bg.png"
+dest_files=["res://.godot/imported/upgrade_bg.png-9e70c78ae2c871ab5c62bd986eaf02ad.ctex"]
 
 [params]
 

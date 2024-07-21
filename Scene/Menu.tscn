@@ -1,9 +1,41 @@
-[gd_scene load_steps=11 format=3 uid="uid://boi74rmhircqc"]
+[gd_scene load_steps=15 format=3 uid="uid://boi74rmhircqc"]
 
 [ext_resource type="Script" path="res://Scripts/Menu.gd" id="1_ay6wy"]
+[ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_7qibs"]
 [ext_resource type="Shader" path="res://Shader/TransitionIn.gdshader" id="2_bti5n"]
 [ext_resource type="Shader" path="res://Shader/TransitionOut.gdshader" id="2_cmgbi"]
 [ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="3_wde31"]
+[ext_resource type="Texture2D" uid="uid://c8axk1wq1awhf" path="res://Sprite/pallette.png" id="3_y3v8b"]
+[ext_resource type="Texture2D" uid="uid://decvwuodicu0" path="res://Sprite/bg/025.png" id="4_5a6tp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v1mak"]
+shader = ExtResource("2_7qibs")
+shader_parameter/snes_transparency = true
+shader_parameter/gba_transparency = false
+shader_parameter/horizontal_scan_line = false
+shader_parameter/vertical_scan_line = false
+shader_parameter/enable_palette_cycling = false
+shader_parameter/sprite_scroll_direction = Vector2(0.02, 0.05)
+shader_parameter/sprite_scroll_speed = 0.001
+shader_parameter/gba_transparency_scroll_direction = Vector2(1, 1)
+shader_parameter/gba_transparency_scroll_speed = 0.01
+shader_parameter/gba_transparency_value = 0.0
+shader_parameter/horizontal_wave_amplitude = 0.075
+shader_parameter/horizontal_wave_frequency = 5.0
+shader_parameter/horizontal_wave_speed = 1.0
+shader_parameter/vertical_wave_amplitude = 0.01
+shader_parameter/vertical_wave_frequency = 1.0
+shader_parameter/vertical_wave_speed = 1.0
+shader_parameter/horizontal_deform_amplitude = 0.01
+shader_parameter/horizontal_deform_frequency = 0.05
+shader_parameter/horizontal_deform_speed = 0.5
+shader_parameter/vertical_deform_amplitude = 0.05
+shader_parameter/vertical_deform_frequency = 0.05
+shader_parameter/vertical_deform_speed = 0.5
+shader_parameter/width = 200.0
+shader_parameter/height = 200.0
+shader_parameter/palette_cycling_speed = 0.5
+shader_parameter/palette = ExtResource("3_y3v8b")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8gk4w"]
 shader = ExtResource("2_bti5n")
@@ -88,6 +120,16 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ay6wy")
 
+[node name="TextureRect" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_v1mak")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_5a6tp")
+
 [node name="Button" type="Button" parent="."]
 layout_mode = 0
 offset_left = 573.0
@@ -120,6 +162,11 @@ libraries = {
 "": SubResource("AnimationLibrary_ggal3")
 }
 autoplay = "FadeIn"
+
+[node name="TextureButton" type="TextureButton" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

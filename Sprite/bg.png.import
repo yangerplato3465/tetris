@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d0aj2k4x0djco"
-path="res://.godot/imported/enemy_giant.png-4a71e46ba79bd2a4be2e39399785d96e.ctex"
+uid="uid://6xdo00gl3xjh"
+path="res://.godot/imported/bg.png-066188305dd5ac4282f900b4afbcd594.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/Character/enemy_giant.png"
-dest_files=["res://.godot/imported/enemy_giant.png-4a71e46ba79bd2a4be2e39399785d96e.ctex"]
+source_file="res://Sprite/bg.png"
+dest_files=["res://.godot/imported/bg.png-066188305dd5ac4282f900b4afbcd594.ctex"]
 
 [params]
 

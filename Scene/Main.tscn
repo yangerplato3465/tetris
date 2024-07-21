@@ -1,16 +1,19 @@
-[gd_scene load_steps=19 format=3 uid="uid://d3korpfrgseif"]
+[gd_scene load_steps=22 format=3 uid="uid://d3korpfrgseif"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_grhrx"]
 [ext_resource type="Script" path="res://Scripts/Grid.gd" id="2_jk1g6"]
 [ext_resource type="Script" path="res://Scripts/Hold.gd" id="3_4xxhf"]
 [ext_resource type="FontFile" path="res://fonts/UniFont.tres" id="4_q1r3v"]
-[ext_resource type="Texture2D" uid="uid://bmkr2i2afgq4f" path="res://Sprite/holdPiece.png" id="5_tyqav"]
+[ext_resource type="Texture2D" uid="uid://bnt4hwunm1wcg" path="res://Sprite/panel-transparent-center-004.png" id="5_7frpj"]
 [ext_resource type="Script" path="res://Scripts/NextPieces.gd" id="6_5uiqx"]
-[ext_resource type="Texture2D" uid="uid://0sifyyptxqvw" path="res://Sprite/nextPiece.png" id="7_ih2c8"]
+[ext_resource type="Texture2D" uid="uid://bts34kgu2mf2x" path="res://Sprite/nextPieces.png" id="7_mes35"]
 [ext_resource type="Texture2D" uid="uid://c28wciyag1k4p" path="res://Sprite/button.png" id="8_oe607"]
 [ext_resource type="Shader" path="res://Shader/TransitionIn.gdshader" id="10_83d7f"]
 [ext_resource type="Texture2D" uid="uid://dsdhsn18wdlr6" path="res://Sprite/grid.png" id="10_qcj1q"]
+[ext_resource type="Texture2D" uid="uid://dxnfbt3cw5jmg" path="res://Sprite/Character/rogues.png" id="10_qvtii"]
 [ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="11_gpdoy"]
+[ext_resource type="Script" path="res://Scripts/Player.gd" id="11_v2383"]
+[ext_resource type="Texture2D" uid="uid://3cuaurygw1ii" path="res://Sprite/Character/monsters.png" id="12_abno3"]
 [ext_resource type="Shader" path="res://Shader/TransitionOut.gdshader" id="12_m7afq"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h8ttf"]
@@ -98,8 +101,6 @@ script = ExtResource("2_jk1g6")
 show_behind_parent = true
 layout_mode = 3
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
 
 [node name="Hold" type="Control" parent="Grid/UI"]
 anchors_preset = 0
@@ -124,10 +125,8 @@ layout_mode = 0
 offset_top = 4.0
 offset_right = 26.0
 offset_bottom = 30.0
-grow_horizontal = 0
-grow_vertical = 0
 scale = Vector2(4, 4)
-texture = ExtResource("5_tyqav")
+texture = ExtResource("5_7frpj")
 
 [node name="NextPieces" type="Control" parent="Grid/UI"]
 anchors_preset = 0
@@ -152,9 +151,10 @@ layout_mode = 0
 offset_right = 26.0
 offset_bottom = 130.0
 scale = Vector2(4, 4)
-texture = ExtResource("7_ih2c8")
+texture = ExtResource("7_mes35")
 
 [node name="Score" type="Control" parent="Grid/UI"]
+visible = false
 anchors_preset = 0
 offset_right = 202.0
 offset_bottom = 40.0
@@ -189,6 +189,7 @@ texture = ExtResource("8_oe607")
 expand_mode = 1
 
 [node name="Level" type="Control" parent="Grid/UI"]
+visible = false
 anchors_preset = 0
 offset_left = 498.0
 offset_right = 601.0
@@ -225,6 +226,7 @@ texture = ExtResource("8_oe607")
 expand_mode = 1
 
 [node name="Lines" type="Control" parent="Grid/UI"]
+visible = false
 anchors_preset = 0
 offset_left = 478.0
 offset_top = 760.0
@@ -253,14 +255,6 @@ text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Background" type="ColorRect" parent="Grid/UI"]
-show_behind_parent = true
-layout_mode = 0
-offset_right = 600.0
-offset_bottom = 821.0
-color = Color(0.0431373, 0.0392157, 0.0901961, 1)
-metadata/_edit_lock_ = true
-
 [node name="GridBackground" type="ColorRect" parent="Grid/UI"]
 light_mask = 0
 layout_mode = 0
@@ -282,7 +276,23 @@ one_shot = true
 
 [node name="Battle" type="Node2D" parent="."]
 
+[node name="Player" type="Sprite2D" parent="Battle"]
+position = Vector2(759, 187)
+scale = Vector2(-5, 5)
+texture = ExtResource("10_qvtii")
+hframes = 5
+vframes = 5
+script = ExtResource("11_v2383")
+
+[node name="Enemy" type="Sprite2D" parent="Battle"]
+position = Vector2(1019, 191)
+scale = Vector2(5, 5)
+texture = ExtResource("12_abno3")
+hframes = 7
+vframes = 8
+
 [node name="TransitionIn" type="Sprite2D" parent="."]
+visible = false
 modulate = Color(0.133333, 0.133333, 0.133333, 1)
 self_modulate = Color(0, 0, 0, 1)
 show_behind_parent = true
@@ -294,6 +304,7 @@ scale = Vector2(20, 14)
 texture = ExtResource("11_gpdoy")
 
 [node name="TransitionOut" type="Sprite2D" parent="."]
+visible = false
 modulate = Color(0, 0, 0, 1)
 z_index = 2
 material = SubResource("ShaderMaterial_uidep")

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c0ynthm3baejf"
-path="res://.godot/imported/enemy_bat.png-04c6351353ddcab375f13bfa9eaea7fa.ctex"
+uid="uid://dxnfbt3cw5jmg"
+path="res://.godot/imported/rogues.png-75a62ca58a84c4c573e13eee29920467.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/Character/enemy_bat.png"
-dest_files=["res://.godot/imported/enemy_bat.png-04c6351353ddcab375f13bfa9eaea7fa.ctex"]
+source_file="res://Sprite/Character/rogues.png"
+dest_files=["res://.godot/imported/rogues.png-75a62ca58a84c4c573e13eee29920467.ctex"]
 
 [params]
 

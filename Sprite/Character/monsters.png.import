@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://j81yq8tf5hp0"
-path="res://.godot/imported/enemy_boss.png-ff8806478731d5cff35bd01055293102.ctex"
+uid="uid://3cuaurygw1ii"
+path="res://.godot/imported/monsters.png-4cd85c942a09556cb2fbe41567652b61.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/Character/enemy_boss.png"
-dest_files=["res://.godot/imported/enemy_boss.png-ff8806478731d5cff35bd01055293102.ctex"]
+source_file="res://Sprite/Character/monsters.png"
+dest_files=["res://.godot/imported/monsters.png-4cd85c942a09556cb2fbe41567652b61.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cd01ggdibli7k"
-path="res://.godot/imported/enemy_cactus.png-f9e402f369a34729fe49538fffe117b5.ctex"
+uid="uid://decvwuodicu0"
+path="res://.godot/imported/025.png-e174e9250aa8d44b2dea1d6017c8bfd4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/Character/enemy_cactus.png"
-dest_files=["res://.godot/imported/enemy_cactus.png-f9e402f369a34729fe49538fffe117b5.ctex"]
+source_file="res://Sprite/bg/025.png"
+dest_files=["res://.godot/imported/025.png-e174e9250aa8d44b2dea1d6017c8bfd4.ctex"]
 
 [params]
 

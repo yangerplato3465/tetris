@@ -126,7 +126,7 @@ func _physics_process(delta):
 			$UI/Score/ScoreNumber.text = str(score)
 			sthHappened = true
 		actions = 0
-	if Input.is_action_just_pressed("hard_drop"):	
+	if Input.is_action_just_pressed("hard_drop"):
 		hardDropPiece()
 		afterDrop()
 		sthHappened = true

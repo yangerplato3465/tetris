@@ -1,5 +1,7 @@
 extends Node
 
+var health = 30
+var maxHealth = 30
 var visibleNextPiece = 1
 var singleDamage = 10
 var doubleDamage = 30
@@ -12,6 +14,8 @@ func _ready():
 	pass
 
 func reset(): 
+	health = 30
+	maxHealth = 30
 	visibleNextPiece = 1
 	singleDamage = 10
 	doubleDamage = 30

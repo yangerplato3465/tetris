@@ -5,7 +5,7 @@ shader_type canvas_item;
 
 
 
-uniform float _c_Settings;
+group_uniforms Settings;
 uniform bool snes_transparency = false;
 uniform bool gba_transparency = false;
 uniform bool horizontal_scan_line = false;
@@ -13,46 +13,46 @@ uniform bool vertical_scan_line = false;
 uniform bool enable_palette_cycling = false;
 
 
-uniform float _c_Sprite_Scroll;
+group_uniforms Sprite_Scroll;
 uniform vec2 sprite_scroll_direction = vec2(0.0, 0.0);
 uniform float sprite_scroll_speed = 0.01;
 
 
-uniform float _c_GBA_Transparency;
+group_uniforms GBA_Transparency;
 uniform vec2 gba_transparency_scroll_direction = vec2(0.0, 0.0);
 uniform float gba_transparency_scroll_speed = 0.01;
 uniform float gba_transparency_value : hint_range(0.0, 1.0) = 0.5;
 
 
-uniform float _c_Horizontal_Wave;
+group_uniforms Horizontal_Wave;
 uniform float horizontal_wave_amplitude = 0.0;
 uniform float horizontal_wave_frequency = 0.0;
 uniform float horizontal_wave_speed = 1.0;
 
-uniform float _c_Vertical_Wave;
+group_uniforms Vertical_Wave;
 uniform float vertical_wave_amplitude = 0.0;
 uniform float vertical_wave_frequency = 0.0;
 uniform float vertical_wave_speed = 1.0;
 
 
-uniform float _c_Horizontal_Deform;
+group_uniforms Horizontal_Deform;
 uniform float horizontal_deform_amplitude = 0.0;
 uniform float horizontal_deform_frequency = 0.0;
 uniform float horizontal_deform_speed = 1.0;
 
 
-uniform float _c_Vertical_Deform;
+group_uniforms Vertical_Deform;
 uniform float vertical_deform_amplitude = 0.0;
 uniform float vertical_deform_frequency = 0.0;
 uniform float vertical_deform_speed = 1.0;
 
 
-uniform float _c_Size;
+group_uniforms Size;
 uniform float width = 0.0;
 uniform float height = 0.0;
 
 
-uniform float _c_Palette_Cycling;
+group_uniforms Palette_Cycling;
 uniform float palette_cycling_speed = 0.1;
 uniform sampler2D palette;
 
