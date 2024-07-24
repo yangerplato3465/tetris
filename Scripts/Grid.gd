@@ -88,16 +88,16 @@ func addPiece():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
 	var sthHappened = false
-	if Input.is_action_just_pressed("ui_exit"):
-		get_tree().quit()
-	if Input.is_action_just_pressed("ui_right"):
+	#if Input.is_action_just_pressed("ui_exit"):
+		#get_tree().quit()
+	if Input.is_action_just_pressed("right"):
 		if canPieceMoveRight():
 			movePieceInGrid(1,0)
 			sthHappened = true
 			actions += 1
 		deltaSum = 0
 		dasCounter = 0
-	if Input.is_action_just_pressed("ui_left"):
+	if Input.is_action_just_pressed("left"):
 		if canPieceMoveLeft():
 			movePieceInGrid(-1,0)
 			sthHappened = true
@@ -107,19 +107,19 @@ func _physics_process(delta):
 
 	deltaSum += delta
 	if (deltaSum > 2*delta) && (dasCounter>dasDelay):
-		if Input.is_action_pressed("ui_right"):
+		if Input.is_action_pressed("right"):
 			if canPieceMoveRight():
 				movePieceInGrid(1,0)
 				sthHappened = true
 				actions += 1
-		if Input.is_action_pressed("ui_left"):
+		if Input.is_action_pressed("left"):
 			if canPieceMoveLeft():
 				movePieceInGrid(-1,0)
 				sthHappened = true
 				actions += 1
 		deltaSum = 0
 	dasCounter+=1
-	if Input.is_action_pressed("ui_down"):
+	if Input.is_action_pressed("soft_drop"):
 		if canPieceMoveDown():
 			movePieceInGrid(0,1)
 			score += 1
@@ -132,19 +132,19 @@ func _physics_process(delta):
 		sthHappened = true
 		timer=0
 		actions = 0
-	if Input.is_action_just_pressed("ui_up"):
+	if Input.is_action_just_pressed("rotate_right"):
 		var kickValues = getPosibleRotation(Direction.CLOCKWISE)
 		if kickValues != null:
 			rotatePiece(Direction.CLOCKWISE, kickValues)
 			sthHappened = true
 			actions += 1
-	if Input.is_action_just_pressed("rotate_anticlockwise"):
+	if Input.is_action_just_pressed("rotate_left"):
 		var kickValues = getPosibleRotation(Direction.ANTICLOCKWISE)
 		if kickValues != null:
 			rotatePiece(Direction.ANTICLOCKWISE, kickValues)
 			sthHappened = true
 			actions += 1
-	if Input.is_action_just_pressed("swap_piece"):
+	if Input.is_action_just_pressed("hold_piece"):
 		if (!hasSwapped):
 			deletePieceFromGrid()
 			
