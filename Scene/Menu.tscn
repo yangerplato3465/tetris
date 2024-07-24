@@ -15,8 +15,8 @@ shader_parameter/gba_transparency = false
 shader_parameter/horizontal_scan_line = false
 shader_parameter/vertical_scan_line = false
 shader_parameter/enable_palette_cycling = false
-shader_parameter/sprite_scroll_direction = Vector2(0.02, 0.05)
-shader_parameter/sprite_scroll_speed = 0.001
+shader_parameter/sprite_scroll_direction = Vector2(1, 1)
+shader_parameter/sprite_scroll_speed = 0.05
 shader_parameter/gba_transparency_scroll_direction = Vector2(1, 1)
 shader_parameter/gba_transparency_scroll_speed = 0.01
 shader_parameter/gba_transparency_value = 0.0
@@ -121,6 +121,7 @@ grow_vertical = 2
 script = ExtResource("1_ay6wy")
 
 [node name="TextureRect" type="TextureRect" parent="."]
+texture_repeat = 2
 material = SubResource("ShaderMaterial_v1mak")
 layout_mode = 1
 anchors_preset = 15

@@ -8,6 +8,7 @@ func _ready():
 func _process(delta):
 	if Input.is_action_just_pressed("hard_drop"):
 		attackAnim()
+		PopupNumbers.displayNumber(500, self.position, false)
 
 func attackAnim():
 	var tween = create_tween()

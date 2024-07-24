@@ -1,0 +1,376 @@
+[gd_scene load_steps=24 format=3 uid="uid://beaknpi8orob3"]
+
+[ext_resource type="Script" path="res://Scripts/GameplayScene/GameplayScene.gd" id="1_xfrsu"]
+[ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_ga022"]
+[ext_resource type="Texture2D" uid="uid://ckpystk8dsjaw" path="res://Sprite/bg/016.png" id="3_mv8fe"]
+[ext_resource type="PackedScene" uid="uid://c207dqp8bvfn6" path="res://Scene/UpgradePanell.tscn" id="4_7kfqw"]
+[ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="4_ey0gg"]
+[ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="6_nyed1"]
+[ext_resource type="Texture2D" uid="uid://cefkvdnrh7jae" path="res://Sprite/Cards/enemy_panel_bg.png" id="7_p2hnr"]
+[ext_resource type="Texture2D" uid="uid://3cuaurygw1ii" path="res://Sprite/Character/monsters.png" id="8_yy6d3"]
+[ext_resource type="Shader" path="res://Shader/TransitionIn.gdshader" id="9_7tgni"]
+[ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="10_ojaq8"]
+[ext_resource type="Shader" path="res://Shader/TransitionOut.gdshader" id="11_nob76"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5yxvj"]
+shader = ExtResource("2_ga022")
+shader_parameter/snes_transparency = true
+shader_parameter/gba_transparency = false
+shader_parameter/horizontal_scan_line = false
+shader_parameter/vertical_scan_line = false
+shader_parameter/enable_palette_cycling = false
+shader_parameter/sprite_scroll_direction = Vector2(1, 1)
+shader_parameter/sprite_scroll_speed = 0.05
+shader_parameter/gba_transparency_scroll_direction = Vector2(1, 1)
+shader_parameter/gba_transparency_scroll_speed = 0.01
+shader_parameter/gba_transparency_value = 0.5
+shader_parameter/horizontal_wave_amplitude = 0.075
+shader_parameter/horizontal_wave_frequency = 5.0
+shader_parameter/horizontal_wave_speed = 1.0
+shader_parameter/vertical_wave_amplitude = 0.01
+shader_parameter/vertical_wave_frequency = 1.0
+shader_parameter/vertical_wave_speed = 1.0
+shader_parameter/horizontal_deform_amplitude = 0.01
+shader_parameter/horizontal_deform_frequency = 0.05
+shader_parameter/horizontal_deform_speed = 0.5
+shader_parameter/vertical_deform_amplitude = 0.05
+shader_parameter/vertical_deform_frequency = 0.05
+shader_parameter/vertical_deform_speed = 0.5
+shader_parameter/width = 200.0
+shader_parameter/height = 200.0
+shader_parameter/palette_cycling_speed = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ubuj6"]
+shader = ExtResource("4_ey0gg")
+shader_parameter/height = 3.0
+shader_parameter/frequency = 20.0
+shader_parameter/speed = 3.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_ixkuv"]
+line_spacing = 0.0
+font = ExtResource("6_nyed1")
+font_size = 100
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_tj1ht"]
+line_spacing = 0.0
+font = ExtResource("6_nyed1")
+font_size = 60
+font_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_03ueg"]
+line_spacing = 0.0
+font = ExtResource("6_nyed1")
+font_size = 32
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_gn7mw"]
+line_spacing = 0.0
+font = ExtResource("6_nyed1")
+font_size = 24
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_14ju1"]
+shader = ExtResource("9_7tgni")
+shader_parameter/progress = 0.0
+shader_parameter/diamondPixelSize = 50.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fh8vg"]
+shader = ExtResource("11_nob76")
+shader_parameter/progress = null
+shader_parameter/diamondPixelSize = 50.0
+
+[sub_resource type="Animation" id="Animation_i5jjq"]
+resource_name = "FadeIn"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TransitionIn:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_tcxt3"]
+resource_name = "FadeOut"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TransitionOut:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [null, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_qanxg"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TransitionIn:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TransitionOut:material:shader_parameter/progress")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [null]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_kdwy1"]
+_data = {
+"FadeIn": SubResource("Animation_i5jjq"),
+"FadeOut": SubResource("Animation_tcxt3"),
+"RESET": SubResource("Animation_qanxg")
+}
+
+[node name="GameplayScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xfrsu")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_5yxvj")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_mv8fe")
+
+[node name="PrepareScene" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="PrepareScene"]
+material = SubResource("ShaderMaterial_ubuj6")
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -425.0
+offset_top = 59.0
+offset_right = 425.0
+offset_bottom = 151.0
+grow_horizontal = 2
+text = "Choose enemy"
+label_settings = SubResource("LabelSettings_ixkuv")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LevelNumber" type="Label" parent="PrepareScene"]
+material = SubResource("ShaderMaterial_ubuj6")
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -156.0
+offset_right = 156.0
+offset_bottom = 92.0
+grow_horizontal = 2
+text = "Level 1"
+label_settings = SubResource("LabelSettings_tj1ht")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PrepareScene"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -233.0
+offset_right = 500.0
+offset_bottom = 367.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Option1" type="TextureRect" parent="PrepareScene/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("7_p2hnr")
+stretch_mode = 2
+
+[node name="Name" type="Label" parent="PrepareScene/HBoxContainer/Option1"]
+layout_mode = 0
+offset_left = 123.0
+offset_top = 209.0
+offset_right = 243.0
+offset_bottom = 239.0
+text = "The name"
+label_settings = SubResource("LabelSettings_03ueg")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="PrepareScene/HBoxContainer/Option1"]
+position = Vector2(184, 131)
+scale = Vector2(4, 4)
+texture = ExtResource("8_yy6d3")
+hframes = 7
+vframes = 8
+
+[node name="Description" type="Label" parent="PrepareScene/HBoxContainer/Option1"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 248.0
+offset_right = 312.0
+offset_bottom = 271.0
+text = "xcvxcvxcvxcvxcvxcvxcvxcv"
+label_settings = SubResource("LabelSettings_gn7mw")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="TextureButton" type="TextureButton" parent="PrepareScene/HBoxContainer/Option1"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 522.0
+offset_right = 200.0
+offset_bottom = 562.0
+
+[node name="Option2" type="TextureRect" parent="PrepareScene/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("7_p2hnr")
+stretch_mode = 2
+
+[node name="Name" type="Label" parent="PrepareScene/HBoxContainer/Option2"]
+layout_mode = 0
+offset_left = 123.0
+offset_top = 209.0
+offset_right = 243.0
+offset_bottom = 239.0
+text = "The name"
+label_settings = SubResource("LabelSettings_03ueg")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="PrepareScene/HBoxContainer/Option2"]
+position = Vector2(184, 131)
+scale = Vector2(4, 4)
+texture = ExtResource("8_yy6d3")
+hframes = 7
+vframes = 8
+
+[node name="Description" type="Label" parent="PrepareScene/HBoxContainer/Option2"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 248.0
+offset_right = 312.0
+offset_bottom = 271.0
+text = "xcvxcvxcvxcvxcvxcvxcvxcv"
+label_settings = SubResource("LabelSettings_gn7mw")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="TextureButton" type="TextureButton" parent="PrepareScene/HBoxContainer/Option2"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 522.0
+offset_right = 200.0
+offset_bottom = 562.0
+
+[node name="Option3" type="TextureRect" parent="PrepareScene/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("7_p2hnr")
+stretch_mode = 2
+
+[node name="Name" type="Label" parent="PrepareScene/HBoxContainer/Option3"]
+layout_mode = 0
+offset_left = 123.0
+offset_top = 209.0
+offset_right = 243.0
+offset_bottom = 239.0
+text = "The name"
+label_settings = SubResource("LabelSettings_03ueg")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="PrepareScene/HBoxContainer/Option3"]
+position = Vector2(184, 131)
+scale = Vector2(4, 4)
+texture = ExtResource("8_yy6d3")
+hframes = 7
+vframes = 8
+
+[node name="Description" type="Label" parent="PrepareScene/HBoxContainer/Option3"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 248.0
+offset_right = 312.0
+offset_bottom = 271.0
+text = "xcvxcvxcvxcvxcvxcvxcvxcv"
+label_settings = SubResource("LabelSettings_gn7mw")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="TextureButton" type="TextureButton" parent="PrepareScene/HBoxContainer/Option3"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 522.0
+offset_right = 200.0
+offset_bottom = 562.0
+
+[node name="UpgradePanel" parent="." instance=ExtResource("4_7kfqw")]
+visible = false
+layout_mode = 1
+
+[node name="TransitionIn" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0.133333, 0.133333, 0.133333, 1)
+self_modulate = Color(0, 0, 0, 1)
+show_behind_parent = true
+z_index = 2
+z_as_relative = false
+material = SubResource("ShaderMaterial_14ju1")
+position = Vector2(595, 401)
+scale = Vector2(20, 14)
+texture = ExtResource("10_ojaq8")
+
+[node name="TransitionOut" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 1)
+z_index = 2
+material = SubResource("ShaderMaterial_fh8vg")
+position = Vector2(598, 417)
+scale = Vector2(20, 14)
+texture = ExtResource("10_ojaq8")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_kdwy1")
+}
+autoplay = "FadeIn"

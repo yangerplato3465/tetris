@@ -23,6 +23,9 @@ MatrixOperations="*res://Scripts/Utils/MatrixOperations.gd"
 Textures="*res://Scripts/Textures.gd"
 PlayerManager="*res://Scripts/Managers/PlayerManager.gd"
 SignalManager="*res://Scripts/Managers/SignalManager.gd"
+PopupNumbers="*res://Scripts/Managers/PopupNumbers.gd"
+SceneManager="*res://Scripts/Managers/SceneManager.gd"
+Consts="*res://Scripts/Utils/Consts.gd"
 
 [display]
 

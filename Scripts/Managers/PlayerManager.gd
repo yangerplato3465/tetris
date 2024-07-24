@@ -1,5 +1,9 @@
 extends Node
 
+# Level vars============
+var curretnLevel = 1
+
+# Player stat vars============
 var health = 30
 var maxHealth = 30
 var visibleNextPiece = 1
@@ -8,7 +12,7 @@ var doubleDamage = 30
 var tripleDamage = 50
 var tetrisDamage = 80
 var damageMult = 1
-var comboMult = 1.2
+var comboMult = 1.1
 
 func _ready():
 	pass
@@ -22,5 +26,5 @@ func reset():
 	tripleDamage = 50
 	tetrisDamage = 80
 	damageMult = 1
-	comboMult = 1.2
+	comboMult = 1.1
 

@@ -6,7 +6,7 @@ shader_type canvas_item;
 
 
 group_uniforms Settings;
-uniform bool snes_transparency = false;
+uniform bool snes_transparency = true;
 uniform bool gba_transparency = false;
 uniform bool horizontal_scan_line = false;
 uniform bool vertical_scan_line = false;
@@ -14,46 +14,46 @@ uniform bool enable_palette_cycling = false;
 
 
 group_uniforms Sprite_Scroll;
-uniform vec2 sprite_scroll_direction = vec2(0.0, 0.0);
-uniform float sprite_scroll_speed = 0.01;
+uniform vec2 sprite_scroll_direction = vec2(0.02, 0.05);
+uniform float sprite_scroll_speed = 0.001;
 
 
 group_uniforms GBA_Transparency;
-uniform vec2 gba_transparency_scroll_direction = vec2(0.0, 0.0);
+uniform vec2 gba_transparency_scroll_direction = vec2(1.0, 1.0);
 uniform float gba_transparency_scroll_speed = 0.01;
 uniform float gba_transparency_value : hint_range(0.0, 1.0) = 0.5;
 
 
 group_uniforms Horizontal_Wave;
-uniform float horizontal_wave_amplitude = 0.0;
-uniform float horizontal_wave_frequency = 0.0;
+uniform float horizontal_wave_amplitude = 0.075;
+uniform float horizontal_wave_frequency = 5;
 uniform float horizontal_wave_speed = 1.0;
 
 group_uniforms Vertical_Wave;
-uniform float vertical_wave_amplitude = 0.0;
-uniform float vertical_wave_frequency = 0.0;
+uniform float vertical_wave_amplitude = 0.01;
+uniform float vertical_wave_frequency = 1.0;
 uniform float vertical_wave_speed = 1.0;
 
 
 group_uniforms Horizontal_Deform;
-uniform float horizontal_deform_amplitude = 0.0;
-uniform float horizontal_deform_frequency = 0.0;
-uniform float horizontal_deform_speed = 1.0;
+uniform float horizontal_deform_amplitude = 0.01;
+uniform float horizontal_deform_frequency = 0.05;
+uniform float horizontal_deform_speed = 0.5;
 
 
 group_uniforms Vertical_Deform;
-uniform float vertical_deform_amplitude = 0.0;
-uniform float vertical_deform_frequency = 0.0;
-uniform float vertical_deform_speed = 1.0;
+uniform float vertical_deform_amplitude = 0.05;
+uniform float vertical_deform_frequency = 0.05;
+uniform float vertical_deform_speed = 0.5;
 
 
 group_uniforms Size;
-uniform float width = 0.0;
-uniform float height = 0.0;
+uniform float width = 200.0;
+uniform float height = 200.0;
 
 
 group_uniforms Palette_Cycling;
-uniform float palette_cycling_speed = 0.1;
+uniform float palette_cycling_speed = 0.5;
 uniform sampler2D palette;
 
 

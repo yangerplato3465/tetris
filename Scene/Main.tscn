@@ -1,8 +1,10 @@
-[gd_scene load_steps=22 format=3 uid="uid://d3korpfrgseif"]
+[gd_scene load_steps=25 format=3 uid="uid://d3korpfrgseif"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_grhrx"]
+[ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_48tma"]
 [ext_resource type="Script" path="res://Scripts/Grid.gd" id="2_jk1g6"]
 [ext_resource type="Script" path="res://Scripts/Hold.gd" id="3_4xxhf"]
+[ext_resource type="Texture2D" uid="uid://decvwuodicu0" path="res://Sprite/bg/025.png" id="3_6xk6h"]
 [ext_resource type="FontFile" path="res://fonts/UniFont.tres" id="4_q1r3v"]
 [ext_resource type="Texture2D" uid="uid://bnt4hwunm1wcg" path="res://Sprite/panel-transparent-center-004.png" id="5_7frpj"]
 [ext_resource type="Script" path="res://Scripts/NextPieces.gd" id="6_5uiqx"]
@@ -15,6 +17,34 @@
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="11_v2383"]
 [ext_resource type="Texture2D" uid="uid://3cuaurygw1ii" path="res://Sprite/Character/monsters.png" id="12_abno3"]
 [ext_resource type="Shader" path="res://Shader/TransitionOut.gdshader" id="12_m7afq"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8wuwa"]
+shader = ExtResource("2_48tma")
+shader_parameter/snes_transparency = true
+shader_parameter/gba_transparency = false
+shader_parameter/horizontal_scan_line = false
+shader_parameter/vertical_scan_line = false
+shader_parameter/enable_palette_cycling = false
+shader_parameter/sprite_scroll_direction = Vector2(0.02, 0.05)
+shader_parameter/sprite_scroll_speed = 0.001
+shader_parameter/gba_transparency_scroll_direction = Vector2(1, 1)
+shader_parameter/gba_transparency_scroll_speed = 0.01
+shader_parameter/gba_transparency_value = 0.5
+shader_parameter/horizontal_wave_amplitude = 0.075
+shader_parameter/horizontal_wave_frequency = 5.0
+shader_parameter/horizontal_wave_speed = 1.0
+shader_parameter/vertical_wave_amplitude = 0.01
+shader_parameter/vertical_wave_frequency = 1.0
+shader_parameter/vertical_wave_speed = 1.0
+shader_parameter/horizontal_deform_amplitude = 0.01
+shader_parameter/horizontal_deform_frequency = 0.05
+shader_parameter/horizontal_deform_speed = 0.5
+shader_parameter/vertical_deform_amplitude = 0.05
+shader_parameter/vertical_deform_frequency = 0.05
+shader_parameter/vertical_deform_speed = 0.5
+shader_parameter/width = 200.0
+shader_parameter/height = 200.0
+shader_parameter/palette_cycling_speed = 0.5
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h8ttf"]
 shader = ExtResource("10_83d7f")
@@ -90,8 +120,25 @@ _data = {
 "RESET": SubResource("Animation_qanxg")
 }
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_grhrx")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8wuwa")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_6xk6h")
 
 [node name="Grid" type="Node2D" parent="."]
 z_index = 1
