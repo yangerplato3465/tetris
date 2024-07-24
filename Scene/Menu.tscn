@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://boi74rmhircqc"]
+[gd_scene load_steps=21 format=3 uid="uid://boi74rmhircqc"]
 
 [ext_resource type="Script" path="res://Scripts/Menu.gd" id="1_ay6wy"]
 [ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_7qibs"]
@@ -7,6 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="3_wde31"]
 [ext_resource type="Texture2D" uid="uid://c8axk1wq1awhf" path="res://Sprite/pallette.png" id="3_y3v8b"]
 [ext_resource type="Texture2D" uid="uid://decvwuodicu0" path="res://Sprite/bg/025.png" id="4_5a6tp"]
+[ext_resource type="Texture2D" uid="uid://cjrdc1on2b0uf" path="res://Sprite/Cards/UI_button.png" id="8_sj8w7"]
+[ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="9_3jm4x"]
+[ext_resource type="Texture2D" uid="uid://dyq1y8vkxfbfj" path="res://Sprite/Cards/big_panel.png" id="10_thk3g"]
+[ext_resource type="Texture2D" uid="uid://bhwmx8lr2ruro" path="res://Sprite/Cards/exit.png" id="11_k6ab6"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_v1mak"]
 shader = ExtResource("2_7qibs")
@@ -36,6 +40,11 @@ shader_parameter/width = 200.0
 shader_parameter/height = 200.0
 shader_parameter/palette_cycling_speed = 0.5
 shader_parameter/palette = ExtResource("3_y3v8b")
+
+[sub_resource type="LabelSettings" id="LabelSettings_3q1kd"]
+line_spacing = 0.0
+font = ExtResource("9_3jm4x")
+font_size = 30
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8gk4w"]
 shader = ExtResource("2_bti5n")
@@ -111,6 +120,12 @@ _data = {
 "RESET": SubResource("Animation_acykq")
 }
 
+[sub_resource type="LabelSettings" id="LabelSettings_byx5h"]
+line_spacing = 0.0
+font = ExtResource("9_3jm4x")
+font_size = 34
+font_color = Color(0, 0, 0, 1)
+
 [node name="Menu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -131,16 +146,82 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("4_5a6tp")
 
-[node name="Button" type="Button" parent="."]
-layout_mode = 0
-offset_left = 573.0
-offset_top = 497.0
-offset_right = 619.0
-offset_bottom = 528.0
-tooltip_text = "wdcsdc"
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -112.0
+offset_top = -424.0
+offset_right = 112.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Start" type="TextureButton" parent="VBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("8_sj8w7")
+
+[node name="Label" type="Label" parent="VBoxContainer/Start"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
 text = "Start"
+label_settings = SubResource("LabelSettings_3q1kd")
+
+[node name="Rules" type="TextureButton" parent="VBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("8_sj8w7")
+
+[node name="Label" type="Label" parent="VBoxContainer/Rules"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "How to play"
+label_settings = SubResource("LabelSettings_3q1kd")
+
+[node name="Settings" type="TextureButton" parent="VBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("8_sj8w7")
+
+[node name="Label" type="Label" parent="VBoxContainer/Settings"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Settings"
+label_settings = SubResource("LabelSettings_3q1kd")
 
 [node name="TransitionIn" type="Sprite2D" parent="."]
+visible = false
 modulate = Color(0.133333, 0.133333, 0.133333, 1)
 self_modulate = Color(0, 0, 0, 1)
 show_behind_parent = true
@@ -152,6 +233,7 @@ scale = Vector2(20, 14)
 texture = ExtResource("3_wde31")
 
 [node name="TransitionOut" type="Sprite2D" parent="."]
+visible = false
 modulate = Color(0, 0, 0, 1)
 material = SubResource("ShaderMaterial_c1pnh")
 position = Vector2(598, 396)
@@ -164,10 +246,70 @@ libraries = {
 }
 autoplay = "FadeIn"
 
-[node name="TextureButton" type="TextureButton" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="RulesPanel" type="NinePatchRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -494.0
+offset_top = -327.0
+offset_right = 494.0
+offset_bottom = 327.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(494, 327)
+texture = ExtResource("10_thk3g")
+patch_margin_left = 32
+patch_margin_top = 32
+patch_margin_right = 32
+patch_margin_bottom = 32
 
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[node name="Content" type="Label" parent="RulesPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -416.5
+offset_top = -160.0
+offset_right = 416.5
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "-Deal damage by clearing lines on a tetris board
+-The more lines cleared the more damage dealt
+-consecutively clearing lines deals more damage
+-you lose a run when the timer runs out or the tetrimino
+reaches the top
+-item shop shows up when you defeat an enemy, gather 
+coins to spend at the shop
+-you can rebind control in the settings menu
+-different potions and materials mix into stronger 
+combinations"
+label_settings = SubResource("LabelSettings_byx5h")
+
+[node name="Close" type="TextureButton" parent="RulesPanel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -98.0
+offset_right = 40.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 0
+pivot_offset = Vector2(40, 40)
+texture_normal = ExtResource("11_k6ab6")
+
+[connection signal="pressed" from="VBoxContainer/Start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="VBoxContainer/Rules" to="." method="_on_rules_pressed"]
+[connection signal="pressed" from="VBoxContainer/Settings" to="." method="_on_settings_pressed"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
+[connection signal="pressed" from="RulesPanel/Close" to="." method="_on_close_pressed"]

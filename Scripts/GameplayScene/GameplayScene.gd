@@ -1,6 +1,6 @@
 extends Control
 
-@onready var enemyOptionPrefab = $PrepareScene/EnemyOptionContainer/Option
+@onready var enemyOptionPrefab = $PrepareScene/Option
 @onready var enemyOptionContainer = $PrepareScene/EnemyOptionContainer
 
 func _ready():
@@ -14,12 +14,13 @@ func generateRandomEnemies():
 		3:
 			pass
 		4, 5:
-			chooseRandom(Consts.tier2Enemy);
+			for enemy in chooseRandom(Consts.tier1Enemy):
+				setOptions(enemy)
 		6:
 			pass
 		7, 8:
-			chooseRandom(Consts.tier3Enemy);
-
+			for enemy in chooseRandom(Consts.tier1Enemy):
+				setOptions(enemy)
 		9:
 			pass
 
@@ -41,8 +42,14 @@ func setOptions(enemy):
 	newOption.visible = true
 
 	newOption.pivot_offset = Vector2(184, 300)
-	newOption.connect("mouse_entered", Utilities.scaleUp.bind(newOption))
-	newOption.connect("mouse_exited", Utilities.scaleDown.bind(newOption))
+	newOption.mouse_entered.connect(Utilities.scaleUp.bind(newOption))
+	newOption.mouse_exited.connect(Utilities.scaleDown.bind(newOption))
+	newOption.gui_input.connect(onPressed.bind(enemy.id, newOption))
 
 	enemyOptionContainer.add_child(newOption)
+
+func onPressed(event: InputEvent, enemyId, node):
+	if(event.is_pressed()):
+		Utilities.onPressed(node)
+	
 
