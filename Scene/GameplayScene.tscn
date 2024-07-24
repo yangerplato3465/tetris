@@ -204,7 +204,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PrepareScene"]
+[node name="EnemyOptionContainer" type="HBoxContainer" parent="PrepareScene"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -217,13 +217,15 @@ offset_right = 500.0
 offset_bottom = 367.0
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 1
 
-[node name="Option1" type="TextureRect" parent="PrepareScene/HBoxContainer"]
+[node name="Option" type="TextureRect" parent="PrepareScene/EnemyOptionContainer"]
+visible = false
 layout_mode = 2
 texture = ExtResource("7_p2hnr")
 stretch_mode = 2
 
-[node name="Name" type="Label" parent="PrepareScene/HBoxContainer/Option1"]
+[node name="Name" type="Label" parent="PrepareScene/EnemyOptionContainer/Option"]
 layout_mode = 0
 offset_left = 123.0
 offset_top = 209.0
@@ -234,14 +236,14 @@ label_settings = SubResource("LabelSettings_03ueg")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Icon" type="Sprite2D" parent="PrepareScene/HBoxContainer/Option1"]
+[node name="Icon" type="Sprite2D" parent="PrepareScene/EnemyOptionContainer/Option"]
 position = Vector2(184, 131)
 scale = Vector2(4, 4)
 texture = ExtResource("8_yy6d3")
 hframes = 7
 vframes = 8
 
-[node name="Description" type="Label" parent="PrepareScene/HBoxContainer/Option1"]
+[node name="Description" type="Label" parent="PrepareScene/EnemyOptionContainer/Option"]
 layout_mode = 0
 offset_left = 60.0
 offset_top = 248.0
@@ -252,97 +254,6 @@ label_settings = SubResource("LabelSettings_gn7mw")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 1
-
-[node name="TextureButton" type="TextureButton" parent="PrepareScene/HBoxContainer/Option1"]
-layout_mode = 0
-offset_left = 160.0
-offset_top = 522.0
-offset_right = 200.0
-offset_bottom = 562.0
-
-[node name="Option2" type="TextureRect" parent="PrepareScene/HBoxContainer"]
-layout_mode = 2
-texture = ExtResource("7_p2hnr")
-stretch_mode = 2
-
-[node name="Name" type="Label" parent="PrepareScene/HBoxContainer/Option2"]
-layout_mode = 0
-offset_left = 123.0
-offset_top = 209.0
-offset_right = 243.0
-offset_bottom = 239.0
-text = "The name"
-label_settings = SubResource("LabelSettings_03ueg")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Icon" type="Sprite2D" parent="PrepareScene/HBoxContainer/Option2"]
-position = Vector2(184, 131)
-scale = Vector2(4, 4)
-texture = ExtResource("8_yy6d3")
-hframes = 7
-vframes = 8
-
-[node name="Description" type="Label" parent="PrepareScene/HBoxContainer/Option2"]
-layout_mode = 0
-offset_left = 60.0
-offset_top = 248.0
-offset_right = 312.0
-offset_bottom = 271.0
-text = "xcvxcvxcvxcvxcvxcvxcvxcv"
-label_settings = SubResource("LabelSettings_gn7mw")
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 1
-
-[node name="TextureButton" type="TextureButton" parent="PrepareScene/HBoxContainer/Option2"]
-layout_mode = 0
-offset_left = 160.0
-offset_top = 522.0
-offset_right = 200.0
-offset_bottom = 562.0
-
-[node name="Option3" type="TextureRect" parent="PrepareScene/HBoxContainer"]
-layout_mode = 2
-texture = ExtResource("7_p2hnr")
-stretch_mode = 2
-
-[node name="Name" type="Label" parent="PrepareScene/HBoxContainer/Option3"]
-layout_mode = 0
-offset_left = 123.0
-offset_top = 209.0
-offset_right = 243.0
-offset_bottom = 239.0
-text = "The name"
-label_settings = SubResource("LabelSettings_03ueg")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Icon" type="Sprite2D" parent="PrepareScene/HBoxContainer/Option3"]
-position = Vector2(184, 131)
-scale = Vector2(4, 4)
-texture = ExtResource("8_yy6d3")
-hframes = 7
-vframes = 8
-
-[node name="Description" type="Label" parent="PrepareScene/HBoxContainer/Option3"]
-layout_mode = 0
-offset_left = 60.0
-offset_top = 248.0
-offset_right = 312.0
-offset_bottom = 271.0
-text = "xcvxcvxcvxcvxcvxcvxcvxcv"
-label_settings = SubResource("LabelSettings_gn7mw")
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 1
-
-[node name="TextureButton" type="TextureButton" parent="PrepareScene/HBoxContainer/Option3"]
-layout_mode = 0
-offset_left = 160.0
-offset_top = 522.0
-offset_right = 200.0
-offset_bottom = 562.0
 
 [node name="UpgradePanel" parent="." instance=ExtResource("4_7kfqw")]
 visible = false
