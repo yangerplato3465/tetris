@@ -40,3 +40,23 @@ func hidePanel(node):
 	tween.finished.connect(func():
 		node.visible = false
 	)
+
+func slideOut(outNode):
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_BACK) 
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(outNode, "position:y", outNode.position.y + 500, 0.5)
+	tween.finished.connect(func():
+		outNode.visible = false
+	)
+
+func slideIn(node):
+	node.visible = true
+	node.position.y = 900
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_QUINT) 
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(node, "position:y", 0, 1).set_delay(1)
+	tween.finished.connect(func():
+		SignalManager.stageReady.emit()
+	)

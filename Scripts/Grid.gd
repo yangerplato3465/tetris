@@ -145,7 +145,7 @@ func _physics_process(delta):
 			sthHappened = true
 			actions += 1
 	if Input.is_action_just_pressed("hold_piece"):
-		if (!hasSwapped):
+		if (!hasSwapped && PlayerManager.canHoldPiece):
 			deletePieceFromGrid()
 			
 			#Particle

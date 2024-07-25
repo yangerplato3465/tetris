@@ -230,7 +230,6 @@ text = "Settings"
 label_settings = SubResource("LabelSettings_3q1kd")
 
 [node name="TransitionIn" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.133333, 0.133333, 0.133333, 1)
 self_modulate = Color(0, 0, 0, 1)
 show_behind_parent = true
@@ -242,7 +241,6 @@ scale = Vector2(20, 14)
 texture = ExtResource("3_wde31")
 
 [node name="TransitionOut" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0, 0, 0, 1)
 material = SubResource("ShaderMaterial_c1pnh")
 position = Vector2(598, 396)

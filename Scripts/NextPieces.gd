@@ -1,6 +1,6 @@
 extends PiecePanel
 
-const separation = 105
+const separation = 107
 
 func drawPieces(currentBag, nextBag):
 	Utilities.delete_children(self)

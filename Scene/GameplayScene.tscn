@@ -165,6 +165,14 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("3_mv8fe")
 
+[node name="UpgradePanel" parent="." instance=ExtResource("4_7kfqw")]
+visible = false
+layout_mode = 1
+
+[node name="Main" parent="." instance=ExtResource("9_f7h70")]
+visible = false
+layout_mode = 1
+
 [node name="PrepareScene" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -180,9 +188,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -425.0
-offset_top = 59.0
+offset_top = 96.0
 offset_right = 425.0
-offset_bottom = 151.0
+offset_bottom = 188.0
 grow_horizontal = 2
 text = "Choose enemy"
 label_settings = SubResource("LabelSettings_ixkuv")
@@ -196,8 +204,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -156.0
+offset_top = 18.0
 offset_right = 156.0
-offset_bottom = 92.0
+offset_bottom = 110.0
 grow_horizontal = 2
 text = "Level 1"
 label_settings = SubResource("LabelSettings_tj1ht")
@@ -213,9 +222,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -500.0
-offset_top = -233.0
+offset_top = -172.0
 offset_right = 500.0
-offset_bottom = 257.0
+offset_bottom = 318.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
@@ -260,16 +269,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 1
 
-[node name="UpgradePanel" parent="." instance=ExtResource("4_7kfqw")]
-visible = false
-layout_mode = 1
-
-[node name="Main" parent="." instance=ExtResource("9_f7h70")]
-visible = false
-layout_mode = 1
-
 [node name="TransitionIn" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.133333, 0.133333, 0.133333, 1)
 self_modulate = Color(0, 0, 0, 1)
 show_behind_parent = true
@@ -281,7 +281,6 @@ scale = Vector2(20, 14)
 texture = ExtResource("10_ojaq8")
 
 [node name="TransitionOut" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0, 0, 0, 1)
 z_index = 2
 material = SubResource("ShaderMaterial_fh8vg")

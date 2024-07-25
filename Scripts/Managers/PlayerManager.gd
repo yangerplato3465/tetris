@@ -1,10 +1,11 @@
 extends Node
 
 # Level vars============
-var curretnLevel = 1
+var currentLevel = 1
 
 # Player stat vars============
 var visibleNextPiece = 1
+var canHoldPiece = false
 var singleDamage = 10
 var doubleDamage = 30
 var tripleDamage = 50
@@ -17,6 +18,7 @@ func _ready():
 
 func reset(): 
 	visibleNextPiece = 1
+	canHoldPiece = false
 	singleDamage = 10
 	doubleDamage = 30
 	tripleDamage = 50
