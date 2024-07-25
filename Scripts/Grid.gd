@@ -48,7 +48,9 @@ func _ready():
 	nextBag = newBag()
 	spawnFromBag()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
-	
+	SignalManager.stageReady.connect(stageReady)
+
+func stageReady():
 	drawGrid()
 	drawDroppingPoint()
 
@@ -195,9 +197,13 @@ func afterDrop():
 	currentPiece = Piece.new()
 	checkAndClearFullLines()
 	if (checkGameOver()):
-		get_tree().quit()
+		SignalManager.gameoverFromTimer.emit()
+		gameover()
 	spawnFromBag()
 	hasSwapped = false
+
+func gameover():
+	set_physics_process(false)
 
 func drawDroppingPoint():
 	deletePieceFromGrid()

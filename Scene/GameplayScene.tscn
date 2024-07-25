@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://beaknpi8orob3"]
+[gd_scene load_steps=26 format=3 uid="uid://beaknpi8orob3"]
 
 [ext_resource type="Script" path="res://Scripts/GameplayScene/GameplayScene.gd" id="1_xfrsu"]
 [ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_ga022"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://d3korpfrgseif" path="res://Scene/Main.tscn" id="9_f7h70"]
 [ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="10_ojaq8"]
 [ext_resource type="Shader" path="res://Shader/TransitionOut.gdshader" id="11_nob76"]
+[ext_resource type="PackedScene" uid="uid://3v75hcg5eaxn" path="res://Scene/Component/GameoverPanel.tscn" id="13_3fdth"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5yxvj"]
 shader = ExtResource("2_ga022")
@@ -73,12 +74,12 @@ font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_14ju1"]
 shader = ExtResource("9_7tgni")
-shader_parameter/progress = 0.0
+shader_parameter/progress = 1.0
 shader_parameter/diamondPixelSize = 50.0
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_fh8vg"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_olmte"]
 shader = ExtResource("11_nob76")
-shader_parameter/progress = null
+shader_parameter/progress = 0.0
 shader_parameter/diamondPixelSize = 50.0
 
 [sub_resource type="Animation" id="Animation_i5jjq"]
@@ -108,7 +109,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [null, 1.0]
+"values": [0.0, 1.0]
 }
 
 [sub_resource type="Animation" id="Animation_qanxg"]
@@ -116,7 +117,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("TransitionIn:material:shader_parameter/progress")
+tracks/0/path = NodePath("TransitionOut:material:shader_parameter/progress")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -124,18 +125,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [0.0]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("TransitionOut:material:shader_parameter/progress")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [null]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_kdwy1"]
@@ -273,7 +262,7 @@ autowrap_mode = 1
 modulate = Color(0.133333, 0.133333, 0.133333, 1)
 self_modulate = Color(0, 0, 0, 1)
 show_behind_parent = true
-z_index = 2
+z_index = 10
 z_as_relative = false
 material = SubResource("ShaderMaterial_14ju1")
 position = Vector2(595, 401)
@@ -281,10 +270,13 @@ scale = Vector2(20, 14)
 texture = ExtResource("10_ojaq8")
 
 [node name="TransitionOut" type="Sprite2D" parent="."]
-modulate = Color(0, 0, 0, 1)
-z_index = 2
-material = SubResource("ShaderMaterial_fh8vg")
-position = Vector2(598, 417)
+modulate = Color(0.133333, 0.133333, 0.133333, 1)
+self_modulate = Color(0, 0, 0, 1)
+show_behind_parent = true
+z_index = 10
+z_as_relative = false
+material = SubResource("ShaderMaterial_olmte")
+position = Vector2(595, 401)
 scale = Vector2(20, 14)
 texture = ExtResource("10_ojaq8")
 
@@ -293,3 +285,13 @@ libraries = {
 "": SubResource("AnimationLibrary_kdwy1")
 }
 autoplay = "FadeIn"
+
+[node name="GameoverPanel" parent="." instance=ExtResource("13_3fdth")]
+visible = false
+z_index = 5
+layout_mode = 1
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
+[connection signal="pressed" from="GameoverPanel/NinePatchRect/Close" to="." method="_on_close_pressed"]
+
+[editable path="GameoverPanel"]

@@ -1,0 +1,82 @@
+[gd_scene load_steps=7 format=3 uid="uid://3v75hcg5eaxn"]
+
+[ext_resource type="Script" path="res://Scripts/View/GameoverPanel.gd" id="1_gc30t"]
+[ext_resource type="Texture2D" uid="uid://dag1kuse68ky4" path="res://Sprite/Cards/UI_panel.png" id="2_c0uw1"]
+[ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="3_svbsl"]
+[ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="4_o4g1i"]
+[ext_resource type="Texture2D" uid="uid://bhwmx8lr2ruro" path="res://Sprite/Cards/exit.png" id="5_iqbds"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h84mk"]
+shader = ExtResource("3_svbsl")
+shader_parameter/height = 3.0
+shader_parameter/frequency = 15.0
+shader_parameter/speed = 5.0
+
+[node name="GameoverPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gc30t")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.466667)
+
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -266.5
+offset_right = 360.0
+offset_bottom = 266.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_c0uw1")
+patch_margin_left = 32
+patch_margin_top = 32
+patch_margin_right = 32
+patch_margin_bottom = 32
+
+[node name="Label" type="Label" parent="NinePatchRect"]
+material = SubResource("ShaderMaterial_h84mk")
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -259.0
+offset_top = 35.5
+offset_right = 259.0
+offset_bottom = 145.5
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_o4g1i")
+theme_override_font_sizes/font_size = 120
+text = "game over"
+
+[node name="Close" type="TextureButton" parent="NinePatchRect"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -94.5
+offset_right = 40.0
+offset_bottom = -14.5
+grow_horizontal = 2
+grow_vertical = 0
+pivot_offset = Vector2(40, 40)
+texture_normal = ExtResource("5_iqbds")

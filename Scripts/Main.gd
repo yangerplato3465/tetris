@@ -20,12 +20,20 @@ func _ready():
 	randomize()
 	SignalManager.setStage.connect(setStage)
 	SignalManager.stageReady.connect(stageReady)
+	SignalManager.gameoverFromTimer.connect(gameover)
+	timer.timeout.connect(func():
+		SignalManager.gameoverFromTimer.emit()
+		gameover()
+	)
 
 func setStage(enemyInfo):
 	timer.wait_time = enemyInfo.time
 	print("%02d:%02d" % timerLeft(true, enemyInfo.time))
 	timeLabel.text = "%02d:%02d" % timerLeft(true, enemyInfo.time)
 	enemy.frame = enemyInfo.frame
+
+func gameover():
+	set_process(false)
 
 func stageReady():
 	timer.start()

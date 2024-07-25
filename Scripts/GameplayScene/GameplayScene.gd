@@ -2,14 +2,21 @@ extends Control
 
 @onready var PrepareScene = $PrepareScene
 @onready var MainScene = $Main
+@onready var GameoverPanel = $GameoverPanel
 
 @onready var enemyOptionPrefab = $PrepareScene/Option
 @onready var enemyOptionContainer = $PrepareScene/EnemyOptionContainer
 @onready var levelText = $Main/Grid/UI/Level/LevelNumber
 
+@onready var gameoverClose = $GameoverPanel/NinePatchRect/Close
+
 func _ready():
 	generateRandomEnemies()
 	levelText.text = "level " + str(PlayerManager.currentLevel)
+	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
+	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
+	SignalManager.gameoverFromGrid.connect(showGameoverPanel)
+	SignalManager.gameoverFromTimer.connect(showGameoverPanel)
 
 func generateRandomEnemies():
 	match PlayerManager.currentLevel:
@@ -64,5 +71,18 @@ func onPressed(event: InputEvent, enemy, node: Control):
 func disableOthers():
 	for child in enemyOptionContainer.get_children():
 		child.gui_input.disconnect(onPressed)
-	
 
+func _on_close_pressed():
+	$AnimationPlayer.play("FadeOut")
+	gameoverClose.disabled = true
+	Utilities.onPressed(gameoverClose)
+
+func showGameoverPanel():
+	Utilities.slideIn(GameoverPanel)
+
+func _on_animation_player_animation_finished(anim_name):
+	if(anim_name == "FadeOut"):
+		backToMenu()
+
+func backToMenu():
+	get_tree().change_scene_to_file("res://Scene/Menu.tscn")
