@@ -17,7 +17,7 @@ shader_parameter/speed = 3.0
 font = ExtResource("5_3ist3")
 font_size = 72
 
-[node name="UpgradePanel" type="Control"]
+[node name="ShopPanel" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

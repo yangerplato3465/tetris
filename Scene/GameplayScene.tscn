@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/GameplayScene/GameplayScene.gd" id="1_xfrsu"]
 [ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_ga022"]
 [ext_resource type="Texture2D" uid="uid://ckpystk8dsjaw" path="res://Sprite/bg/016.png" id="3_mv8fe"]
-[ext_resource type="PackedScene" uid="uid://c207dqp8bvfn6" path="res://Scene/UpgradePanell.tscn" id="4_7kfqw"]
+[ext_resource type="PackedScene" uid="uid://c207dqp8bvfn6" path="res://Scene/ShopPanell.tscn" id="4_7kfqw"]
 [ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="4_ey0gg"]
 [ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="6_nyed1"]
 [ext_resource type="Texture2D" uid="uid://cefkvdnrh7jae" path="res://Sprite/Cards/enemy_panel_bg.png" id="7_p2hnr"]
@@ -165,7 +165,7 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("3_mv8fe")
 
-[node name="UpgradePanel" parent="." instance=ExtResource("4_7kfqw")]
+[node name="ShopPanel" parent="." instance=ExtResource("4_7kfqw")]
 visible = false
 layout_mode = 1
 
