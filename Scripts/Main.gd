@@ -9,18 +9,27 @@ extends Control
 
 @onready var timeLabel = $Timer/TimeLabel
 @onready var timer = $Timer/Timer
+@onready var enemyHealth = $EnemyHealth
 var timerStarted = false
 
 # Battle
 @onready var player = $Battle/Player
 @onready var enemy = $Battle/Enemy
+@onready var animationPlayer = $AnimationPlayer
+var currentEnemyHealth = 0
+var currentEnemyMaxHealth = 0
+const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 
 func _ready():
 	updateUI()
 	randomize()
+	connectSignals()
+
+func connectSignals():
 	SignalManager.setStage.connect(setStage)
 	SignalManager.stageReady.connect(stageReady)
 	SignalManager.gameoverFromTimer.connect(gameover)
+	SignalManager.clearLines.connect(attack)
 	timer.timeout.connect(func():
 		SignalManager.gameoverFromTimer.emit()
 		gameover()
@@ -28,9 +37,11 @@ func _ready():
 
 func setStage(enemyInfo):
 	timer.wait_time = enemyInfo.time
-	print("%02d:%02d" % timerLeft(true, enemyInfo.time))
 	timeLabel.text = "%02d:%02d" % timerLeft(true, enemyInfo.time)
 	enemy.frame = enemyInfo.frame
+	currentEnemyHealth = enemyInfo.health
+	currentEnemyMaxHealth = enemyInfo.health
+	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
 
 func gameover():
 	set_process(false)
@@ -59,3 +70,37 @@ func timerLeft(isInit = false, initTime = 30):
 	var minute = floor(timeLeft / 60)
 	var second = int(timeLeft) % 60
 	return [minute, second]
+
+func attack(clearedLines):
+	var damageDealt = 0
+	attackAnim()
+	match clearedLines:
+		1:
+			damageDealt = PlayerManager.singleDamage
+		2:
+			damageDealt = PlayerManager.doubleDamage
+		3:
+			damageDealt = PlayerManager.tripleDamage
+		4:
+			damageDealt = PlayerManager.tetrisDamage
+	PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
+	updateEnemyHealth(damageDealt)
+
+func updateEnemyHealth(damageDealt):
+	currentEnemyHealth -= damageDealt
+	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
+	if currentEnemyHealth <= 0:
+		victory()
+
+func victory():
+	print('victory')
+	animationPlayer.play("EnemyDeath")
+
+func attackAnim():
+	var tween = create_tween()
+	tween.finished.connect(func():
+		player.position = PLAYER_ORIGINAL_POS
+	)
+	tween.set_trans(Tween.TRANS_BACK) 
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(player, "position:x", player.position.x + 100, 0.1)

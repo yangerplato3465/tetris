@@ -305,14 +305,15 @@ func checkAndClearFullLines():
 			#print("T SPIN!!!" + str(lastPiece.rotationState))
 		score += newScore
 		lines += cleared
-		$UI/Score/ScoreNumber.text = str(score)
-		$UI/Lines/LinesNumber.text = str(lines)
+		# $UI/Score/ScoreNumber.text = str(score)
+		# $UI/Lines/LinesNumber.text = str(lines)
 		clearedLines += cleared
-		if (clearedLines >= 10):
-			clearedLines = clearedLines-10
-			level+=1
-			speed = pow(0.8-(level-1)*0.007,level-1)
-			$UI/Level/LevelNumber.text = str(level)
+		# if (clearedLines >= 10):
+		# 	clearedLines = clearedLines-10
+			# level+=1
+			# speed = pow(0.8-(level-1)*0.007,level-1)
+			# $UI/Level/LevelNumber.text = str(level)
+		SignalManager.clearLines.emit(cleared)
 
 func movePieceInGrid(xMovement, yMovement):
 	deletePieceFromGrid()

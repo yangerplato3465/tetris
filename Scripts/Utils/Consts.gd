@@ -5,7 +5,7 @@ var tier1Enemy = [
 		"id": 1,
 		"name": "Orc",
 		"time": 60,
-		"health": 60,
+		"health": 10,
 		"reward": 30,
 		"frame": 0
 	},
@@ -13,7 +13,7 @@ var tier1Enemy = [
 		"id": 2,
 		"name": "Goblin",
 		"time": 60,
-		"health": 60,
+		"health": 10,
 		"reward": 30,
 		"frame": 2
 	},
@@ -21,7 +21,7 @@ var tier1Enemy = [
 		"id": 3,
 		"name": "Slime",
 		"time": 60,
-		"health": 60,
+		"health": 10,
 		"reward": 30,
 		"frame": 14
 	},
@@ -29,7 +29,7 @@ var tier1Enemy = [
 		"id": 4,
 		"name": "Centipede",
 		"time": 60,
-		"health": 60,
+		"health": 10,
 		"reward": 30,
 		"frame": 42
 	},
@@ -37,7 +37,7 @@ var tier1Enemy = [
 		"id": 5,
 		"name": "Bat",
 		"time": 60,
-		"health": 60,
+		"health": 10,
 		"reward": 30,
 		"frame": 48
 	},

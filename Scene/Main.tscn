@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://d3korpfrgseif"]
+[gd_scene load_steps=20 format=3 uid="uid://d3korpfrgseif"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_grhrx"]
 [ext_resource type="Script" path="res://Scripts/Grid.gd" id="2_jk1g6"]
@@ -12,14 +12,58 @@
 [ext_resource type="Texture2D" uid="uid://c28wciyag1k4p" path="res://Sprite/button.png" id="8_oe607"]
 [ext_resource type="Texture2D" uid="uid://dsdhsn18wdlr6" path="res://Sprite/grid.png" id="10_qcj1q"]
 [ext_resource type="Texture2D" uid="uid://dxnfbt3cw5jmg" path="res://Sprite/Character/rogues.png" id="10_qvtii"]
-[ext_resource type="Script" path="res://Scripts/Player.gd" id="11_v2383"]
 [ext_resource type="Texture2D" uid="uid://3cuaurygw1ii" path="res://Sprite/Character/monsters.png" id="12_abno3"]
+[ext_resource type="Shader" path="res://Shader/dissolve.gdshader" id="14_31f0p"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_8i7nl"]
 line_spacing = 0.0
 font = ExtResource("3_vuny0")
 font_size = 32
 font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n22xw"]
+shader = ExtResource("14_31f0p")
+shader_parameter/progress = 0.0
+shader_parameter/noise_desnity = 200.0
+shader_parameter/beam_size = 0.07
+shader_parameter/color = Color(0.890196, 0, 0.427451, 1)
+
+[sub_resource type="Animation" id="Animation_w4lnr"]
+resource_name = "EnemyDeath"
+length = 5.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Battle/Enemy:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_t652n"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Battle/Enemy:material:shader_parameter/progress")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_axdvt"]
+_data = {
+"EnemyDeath": SubResource("Animation_w4lnr"),
+"RESET": SubResource("Animation_t652n")
+}
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -444,22 +488,39 @@ centered = false
 wait_time = 0.5
 one_shot = true
 
+[node name="EnemyHealth" type="Label" parent="."]
+offset_left = 926.0
+offset_top = 85.0
+offset_right = 1099.0
+offset_bottom = 140.0
+theme_override_colors/font_color = Color(1, 0.12549, 0.0862745, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("3_vuny0")
+theme_override_font_sizes/font_size = 60
+text = "60 / 60"
+
 [node name="Battle" type="Node2D" parent="."]
 
 [node name="Player" type="Sprite2D" parent="Battle"]
-position = Vector2(759, 187)
+position = Vector2(729, 230)
 scale = Vector2(-5, 5)
 texture = ExtResource("10_qvtii")
 hframes = 5
 vframes = 5
 frame = 20
-script = ExtResource("11_v2383")
 
 [node name="Enemy" type="Sprite2D" parent="Battle"]
-position = Vector2(1019, 191)
+material = SubResource("ShaderMaterial_n22xw")
+position = Vector2(1019, 236)
 scale = Vector2(5, 5)
 texture = ExtResource("12_abno3")
 hframes = 7
 vframes = 8
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_axdvt")
+}
 
 [connection signal="timeout" from="Grid/LockTimer" to="Grid" method="_on_LockTimer_timeout"]

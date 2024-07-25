@@ -8,7 +8,7 @@ func displayNumber(value: int, position: Vector2, isCritical: bool = false):
 	number.z_index = 5
 	number.label_settings = LabelSettings.new()
 	
-	var color = Color.CORNFLOWER_BLUE
+	var color = Color.YELLOW
 	if isCritical:
 		color = Color.RED
 	if value == 0:
