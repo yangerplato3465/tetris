@@ -7,5 +7,5 @@ signal gameoverFromTimer
 
 # Gameplay ================
 signal clearLines
-signal combo
 signal hardDrop
+signal victory

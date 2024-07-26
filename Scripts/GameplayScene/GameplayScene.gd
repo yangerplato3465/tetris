@@ -47,6 +47,8 @@ func chooseRandom(array: Array):
 	return [array[indices[0]], array[indices[1]], array[indices[2]]]
 
 func setOptions(enemy):
+	for option in enemyOptionContainer.get_children():
+		option.queue_free()
 	var newOption = enemyOptionPrefab.duplicate()
 	newOption.get_node("Name").text = enemy.name
 	newOption.get_node("Icon").frame = enemy.frame

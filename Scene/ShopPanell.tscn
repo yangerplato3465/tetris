@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://c207dqp8bvfn6"]
 
 [ext_resource type="Texture2D" uid="uid://c3jgqpsvcvdeb" path="res://Sprite/Cards/upgrade_bg.png" id="1_qxw41"]
-[ext_resource type="Script" path="res://Scripts/UpgradePanel/UpgradePanell.gd" id="1_r22dp"]
+[ext_resource type="Script" path="res://Scripts/UpgradePanel/ShopPanell.gd" id="1_r22dp"]
 [ext_resource type="Texture2D" uid="uid://bjst3wn35n1t4" path="res://Sprite/Cards/Icons.png" id="2_fl5if"]
 [ext_resource type="LabelSettings" uid="uid://dhanq3p82xsba" path="res://Font/new_label_settings.tres" id="3_7i0p8"]
 [ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="4_01mgo"]

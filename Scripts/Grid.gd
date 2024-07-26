@@ -317,7 +317,10 @@ func checkAndClearFullLines():
 			# level+=1
 			# speed = pow(0.8-(level-1)*0.007,level-1)
 			# $UI/Level/LevelNumber.text = str(level)
-		SignalManager.clearLines.emit(cleared)
+		SignalManager.clearLines.emit(cleared, combo)
+	else:
+		hasCleared = false
+		combo = 0
 
 func movePieceInGrid(xMovement, yMovement):
 	deletePieceFromGrid()

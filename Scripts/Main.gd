@@ -71,7 +71,7 @@ func timerLeft(isInit = false, initTime = 30):
 	var second = int(timeLeft) % 60
 	return [minute, second]
 
-func attack(clearedLines):
+func attack(clearedLines, combo):
 	var damageDealt = 0
 	attackAnim()
 	match clearedLines:
@@ -83,6 +83,7 @@ func attack(clearedLines):
 			damageDealt = PlayerManager.tripleDamage
 		4:
 			damageDealt = PlayerManager.tetrisDamage
+	damageDealt = damageDealt * pow(PlayerManager.comboMult, combo)
 	PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
 
@@ -93,8 +94,9 @@ func updateEnemyHealth(damageDealt):
 		victory()
 
 func victory():
-	print('victory')
 	animationPlayer.play("EnemyDeath")
+	PlayerManager.currentLevel += 1
+	SignalManager.victory.emit()
 
 func attackAnim():
 	var tween = create_tween()
