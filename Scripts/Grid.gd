@@ -31,6 +31,8 @@ var actions = 0
 var prevActions = 0
 var speed = 1
 var hasSwapped = false
+var hasCleared = false
+var combo = 0
 
 var currentBag
 var nextBag
@@ -295,6 +297,8 @@ func checkAndClearFullLines():
 			particle.emit()
 	#Scoring
 	if cleared != 0:
+		hasCleared = true
+		combo += 1
 		var newScore
 		match (cleared):
 			1: newScore=100*level
