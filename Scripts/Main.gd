@@ -36,8 +36,8 @@ func connectSignals():
 	)
 
 func setStage(enemyInfo):
-	timer.wait_time = enemyInfo.time
-	timeLabel.text = "%02d:%02d" % timerLeft(true, enemyInfo.time)
+	timer.wait_time = PlayerManager.timer
+	timeLabel.text = "%02d:%02d" % timerLeft(true, PlayerManager.timer)
 	enemy.frame = enemyInfo.frame
 	currentEnemyHealth = enemyInfo.health
 	currentEnemyMaxHealth = enemyInfo.health
