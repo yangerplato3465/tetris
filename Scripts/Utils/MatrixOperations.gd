@@ -1,14 +1,24 @@
 extends Node
 
-func create2DMatrix(width, height, value):
-	var a = []
+func create2DMatrix(width, height, value, initBoard = []):
+	var matrixRes = []
 	for x in range(width):
-		a.append([])
-		a[x].resize(height)
+		matrixRes.append([])
+		matrixRes[x].resize(height)
 
 		for y in range(height):
-			a[x][y] = value
-	return a
+			matrixRes[x][y] = value
+
+	# if need start block
+	if initBoard.size() == 0:
+		return matrixRes
+
+	for x in initBoard.size():
+		for y in initBoard[x].size():
+			print("ddw check",x, "|",y)
+			matrixRes[x][y] = initBoard[x][y]
+
+	return matrixRes
 
 func invert2DMatrix(matrix):
 	var newMatrix = MatrixOperations.create2DMatrix(matrix[0].size(), matrix.size(), 0)

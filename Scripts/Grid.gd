@@ -44,7 +44,7 @@ enum Direction {CLOCKWISE, ANTICLOCKWISE}
 func _ready():
 	gridOffsetX = $UI/Border.position.x + BORDER_OFFSET
 	gridOffsetY = $UI/Border.position.y - (vanishZone-1)*spriteSize
-	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0)
+	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, PlayerManager.startGrid)
 	
 	currentBag = newBag()
 	nextBag = newBag()
