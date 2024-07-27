@@ -80,3 +80,5 @@ grow_horizontal = 2
 grow_vertical = 0
 pivot_offset = Vector2(40, 40)
 texture_normal = ExtResource("5_iqbds")
+
+[connection signal="pressed" from="NinePatchRect/Close" to="." method="_on_close_pressed"]

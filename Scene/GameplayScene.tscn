@@ -154,10 +154,6 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("3_1qbt2")
 
-[node name="ShopPanel" parent="." instance=ExtResource("4_7kfqw")]
-visible = false
-layout_mode = 1
-
 [node name="Main" parent="." instance=ExtResource("9_f7h70")]
 visible = false
 layout_mode = 1
@@ -257,6 +253,10 @@ label_settings = SubResource("LabelSettings_gn7mw")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 1
+
+[node name="ShopPanel" parent="." instance=ExtResource("4_7kfqw")]
+visible = false
+layout_mode = 1
 
 [node name="TransitionIn" type="Sprite2D" parent="."]
 visible = false

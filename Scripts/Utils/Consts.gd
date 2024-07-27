@@ -155,3 +155,163 @@ var BossEnemy = [
 		"frame": 30
 	},
 ]
+
+var alchemyItems = [
+	{
+		"id": 0,
+		"name": "Red Potion",
+		"description": "Increase single damage by 10 (Current %1)",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 1,
+		"name": "Blue Potion",
+		"description": "Increase double damage by 20 (Current %1)",
+		"price": 10,
+		"frame": 145
+	},
+	{
+		"id": 2,
+		"name": "Green Potion",
+		"description": "Increase triple damage by 30 (Current %1)",
+		"price": 10,
+		"frame": 146
+	},
+	{
+		"id": 3,
+		"name": "Yellow Potion",
+		"description": "Increase tetris damage by 50 (Current %1)",
+		"price": 10,
+		"frame":326
+	},
+	{
+		"id": 4,
+		"name": "Blue Powder",
+		"description": "Increase combo multiplier by 0.1 (Current %1)",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 5,
+		"name": "Hourglass",
+		"description": "Increase timer by 5 seconds (Current %1)",
+		"price": 10,
+		"frame": 175
+	},
+	{
+		"id": 6,
+		"name": "",
+		"description": "",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 7,
+		"name": "",
+		"description": "",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 8,
+		"name": "",
+		"description": "",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 9,
+		"name": "",
+		"description": "",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 10,
+		"name": "",
+		"description": "",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 11,
+		"name": "",
+		"description": "",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 12,
+		"name": "",
+		"description": "",
+		"price": 10,
+		"frame": 144
+	},
+	{
+		"id": 13,
+		"name": "",
+		"description": "",
+		"price": 10,
+		"frame": 144
+	},
+]
+
+var equipmentItems = [
+	{
+		"id": 0,
+		"name": "Old Key",
+		"description": "Unlock the ability to hold pieces",
+		"price": 10,
+		"frame": 185
+	},
+	{
+		"id": 1,
+		"name": "Magnifying Glass",
+		"description": "See one more up coming piece",
+		"price": 10,
+		"frame": 169
+	},
+	{
+		"id": 1,
+		"name": "Magnifying Glass",
+		"description": "See one more up coming piece",
+		"price": 10,
+		"frame": 169
+	},
+	{
+		"id": 1,
+		"name": "Magnifying Glass",
+		"description": "See one more up coming piece",
+		"price": 10,
+		"frame": 169
+	},
+	{
+		"id": 1,
+		"name": "Magnifying Glass",
+		"description": "See one more up coming piece",
+		"price": 10,
+		"frame": 169
+	},
+	{
+		"id": 2,
+		"name": "Double Edge Sword",
+		"description": "Every time you hard drop, deal your single damage (%1) to the enemy",
+		"price": 10,
+		"frame": 82
+	},
+	{
+		"id": 3,
+		"name": "Treasure Box",
+		"description": "Every time you score a tetris, gain 5 coins",
+		"price": 10,
+		"frame": 187
+	},
+	{
+		"id": 3,
+		"name": "Ocarina of Time",
+		"description": "Every time you score a triple, gain 5 second on the timer",
+		"price": 10,
+		"frame": 181
+	},
+]
