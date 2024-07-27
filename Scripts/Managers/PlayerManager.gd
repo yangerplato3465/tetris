@@ -26,7 +26,7 @@ var startGrid = [
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,1,1],
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,1,1],
 ]
-
+var coin = 10
 
 func _ready():
 	pass
@@ -42,3 +42,4 @@ func reset():
 	comboMult = 1.1
 	numberStoreItem = 6
 	timer = 60
+	coin = 10

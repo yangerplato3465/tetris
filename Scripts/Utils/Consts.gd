@@ -4,7 +4,6 @@ var tier1Enemy = [
 	{
 		"id": 1,
 		"name": "Orc",
-		"time": 60,
 		"health": 10,
 		"reward": 30,
 		"frame": 0
@@ -12,7 +11,6 @@ var tier1Enemy = [
 	{
 		"id": 2,
 		"name": "Goblin",
-		"time": 60,
 		"health": 10,
 		"reward": 30,
 		"frame": 2
@@ -20,7 +18,6 @@ var tier1Enemy = [
 	{
 		"id": 3,
 		"name": "Slime",
-		"time": 60,
 		"health": 10,
 		"reward": 30,
 		"frame": 14
@@ -28,7 +25,6 @@ var tier1Enemy = [
 	{
 		"id": 4,
 		"name": "Centipede",
-		"time": 60,
 		"health": 10,
 		"reward": 30,
 		"frame": 42
@@ -36,7 +32,6 @@ var tier1Enemy = [
 	{
 		"id": 5,
 		"name": "Bat",
-		"time": 60,
 		"health": 10,
 		"reward": 30,
 		"frame": 48
@@ -47,7 +42,6 @@ var tier2Enemy = [
 	{
 		"id": 6,
 		"name": "Orc Wizard",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 1
@@ -55,7 +49,6 @@ var tier2Enemy = [
 	{
 		"id": 7,
 		"name": "Skeleton",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 28
@@ -63,7 +56,6 @@ var tier2Enemy = [
 	{
 		"id": 8,
 		"name": "Zombie",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 32
@@ -71,7 +63,6 @@ var tier2Enemy = [
 	{
 		"id": 9,
 		"name": "Banshee",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 35
@@ -79,7 +70,6 @@ var tier2Enemy = [
 	{
 		"id": 10,
 		"name": "Reaper",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 36
@@ -90,7 +80,6 @@ var tier3Enemy = [
 	{
 		"id": 11,
 		"name": "Ettin",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 7
@@ -98,7 +87,6 @@ var tier3Enemy = [
 	{
 		"id": 12,
 		"name": "worm",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 44
@@ -106,7 +94,6 @@ var tier3Enemy = [
 	{
 		"id": 13,
 		"name": "Death",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 37
@@ -114,7 +101,6 @@ var tier3Enemy = [
 	{
 		"id": 14,
 		"name": "rock golem",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 51
@@ -122,7 +108,6 @@ var tier3Enemy = [
 	{
 		"id": 15,
 		"name": "lich",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 33
@@ -133,7 +118,6 @@ var BossEnemy = [
 	{
 		"id": 16,
 		"name": "wendigo",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 50
@@ -141,7 +125,6 @@ var BossEnemy = [
 	{
 		"id": 17,
 		"name": "centaur",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 52
@@ -149,12 +132,18 @@ var BossEnemy = [
 	{
 		"id": 18,
 		"name": "Shadow Lord",
-		"time": 30,
 		"health": 60,
 		"reward": 30,
 		"frame": 30
 	},
 ]
+
+enum {
+	COMMON,
+	RARE,
+	EPIC,
+	LEGENDARY
+}
 
 var alchemyItems = [
 	{
@@ -162,156 +151,202 @@ var alchemyItems = [
 		"name": "Red Potion",
 		"description": "Increase single damage by 10 (Current %1)",
 		"price": 10,
-		"frame": 144
+		"frame": 144,
+		"tier": COMMON
 	},
 	{
 		"id": 1,
 		"name": "Blue Potion",
 		"description": "Increase double damage by 20 (Current %1)",
 		"price": 10,
-		"frame": 145
+		"frame": 145,
+		"tier": COMMON
 	},
 	{
 		"id": 2,
 		"name": "Green Potion",
 		"description": "Increase triple damage by 30 (Current %1)",
 		"price": 10,
-		"frame": 146
+		"frame": 146,
+		"tier": COMMON
 	},
 	{
 		"id": 3,
 		"name": "Yellow Potion",
 		"description": "Increase tetris damage by 50 (Current %1)",
 		"price": 10,
-		"frame":326
+		"frame":147,
+		"tier": COMMON
 	},
 	{
 		"id": 4,
-		"name": "Blue Powder",
+		"name": "White Powder",
 		"description": "Increase combo multiplier by 0.1 (Current %1)",
 		"price": 10,
-		"frame": 144
+		"frame": 331,
+		"tier": COMMON
 	},
 	{
 		"id": 5,
 		"name": "Hourglass",
 		"description": "Increase timer by 5 seconds (Current %1)",
 		"price": 10,
-		"frame": 175
+		"frame": 175,
+		"tier": COMMON
+	},
+	{
+		"id": 0,
+		"name": "Red Potion+",
+		"description": "Increase single damage by 20 (Current %1)",
+		"price": 10,
+		"frame": 148,
+		"tier": RARE
+	},
+	{
+		"id": 1,
+		"name": "Blue Potion+",
+		"description": "Increase double damage by 40 (Current %1)",
+		"price": 10,
+		"frame": 149,
+		"tier": RARE
+	},
+	{
+		"id": 2,
+		"name": "Green Potion+",
+		"description": "Increase triple damage by 60 (Current %1)",
+		"price": 10,
+		"frame": 150,
+		"tier": RARE
+	},
+	{
+		"id": 3,
+		"name": "Yellow Potion+",
+		"description": "Increase tetris damage by 100 (Current %1)",
+		"price": 10,
+		"frame":151,
+		"tier": RARE
 	},
 	{
 		"id": 6,
-		"name": "",
-		"description": "",
+		"name": "Blue Powder",
+		"description": "'I' pieces appear 2X more often",
 		"price": 10,
-		"frame": 144
+		"frame": 326,
+		"tier": RARE
 	},
 	{
 		"id": 7,
-		"name": "",
-		"description": "",
+		"name": "Purple Powder",
+		"description": "Increase crit chance by 10%",
 		"price": 10,
-		"frame": 144
+		"frame": 329,
+		"tier": RARE
 	},
 	{
 		"id": 8,
-		"name": "",
-		"description": "",
+		"name": "Gray Powder",
+		"description": "Increase all type damage by 30 (Current %1)",
 		"price": 10,
-		"frame": 144
+		"frame": 332,
+		"tier": EPIC
 	},
 	{
-		"id": 9,
-		"name": "",
-		"description": "",
+		"id": 8,
+		"name": "Red Glob",
+		"description": "Double your current single damage (Current %1)",
 		"price": 10,
-		"frame": 144
+		"frame": 288,
+		"tier": LEGENDARY
 	},
 	{
-		"id": 10,
-		"name": "",
-		"description": "",
+		"id": 8,
+		"name": "Blue Glob",
+		"description": "Double your current double damage (Current %1)",
 		"price": 10,
-		"frame": 144
+		"frame": 288,
+		"tier": LEGENDARY
 	},
 	{
-		"id": 11,
-		"name": "",
-		"description": "",
+		"id": 8,
+		"name": "Green Glob",
+		"description": "Double your current triple damage (Current %1)",
 		"price": 10,
-		"frame": 144
+		"frame": 288,
+		"tier": LEGENDARY
 	},
 	{
-		"id": 12,
-		"name": "",
-		"description": "",
+		"id": 8,
+		"name": "Yellow Glob",
+		"description": "Double your current tetris damage (Current %1)",
 		"price": 10,
-		"frame": 144
-	},
-	{
-		"id": 13,
-		"name": "",
-		"description": "",
-		"price": 10,
-		"frame": 144
+		"frame": 288,
+		"tier": LEGENDARY
 	},
 ]
 
-var equipmentItems = [
+var equipmentNormalItems = [
 	{
 		"id": 0,
 		"name": "Old Key",
 		"description": "Unlock the ability to hold pieces",
 		"price": 10,
-		"frame": 185
+		"frame": 185,
+		"tier": COMMON
 	},
 	{
 		"id": 1,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
 		"price": 10,
-		"frame": 169
+		"frame": 169,
+		"tier": COMMON
 	},
 	{
 		"id": 1,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
 		"price": 10,
-		"frame": 169
+		"frame": 169,
+		"tier": COMMON
 	},
 	{
 		"id": 1,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
 		"price": 10,
-		"frame": 169
+		"frame": 169,
+		"tier": COMMON
 	},
 	{
 		"id": 1,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
 		"price": 10,
-		"frame": 169
+		"frame": 169,
+		"tier": COMMON
 	},
 	{
 		"id": 2,
 		"name": "Double Edge Sword",
 		"description": "Every time you hard drop, deal your single damage (%1) to the enemy",
 		"price": 10,
-		"frame": 82
+		"frame": 82,
+		"tier": EPIC
 	},
 	{
 		"id": 3,
 		"name": "Treasure Box",
-		"description": "Every time you score a tetris, gain 5 coins",
+		"description": "Every time you score a Tetris, gain 10 coins",
 		"price": 10,
-		"frame": 187
+		"frame": 187,
+		"tier": RARE
 	},
 	{
-		"id": 3,
+		"id": 4,
 		"name": "Ocarina of Time",
-		"description": "Every time you score a triple, gain 5 second on the timer",
+		"description": "Every time you score a double, gain 5 second on the timer",
 		"price": 10,
-		"frame": 181
+		"frame": 181,
+		"tier": RARE
 	},
 ]

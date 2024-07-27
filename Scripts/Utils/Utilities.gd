@@ -60,3 +60,13 @@ func slideIn(node):
 	tween.finished.connect(func():
 		SignalManager.stageReady.emit()
 	)
+
+func chooseRandom(arraySize: int, size: int):
+	var indices = []
+	
+	while indices.size() < size:
+		var index = randi() % arraySize
+		if index not in indices:
+			indices.append(index)
+	
+	return indices
