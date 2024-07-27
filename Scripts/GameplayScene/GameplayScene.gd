@@ -43,7 +43,6 @@ func setOptions(enemy):
 	var newOption = enemyOptionPrefab.duplicate()
 	newOption.get_node("Name").text = enemy.name
 	newOption.get_node("Icon").frame = enemy.frame
-	newOption.get_node("Description").text = str(enemy.time)
 	newOption.visible = true
 
 	newOption.pivot_offset = Vector2(184, 300)
