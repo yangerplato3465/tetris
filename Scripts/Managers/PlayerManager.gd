@@ -14,6 +14,7 @@ var damageMult = 1
 var comboMult = 1.1
 var numberStoreItem = 6
 var timer = 60
+var coin = 10
 
 func _ready():
 	pass
@@ -29,3 +30,4 @@ func reset():
 	comboMult = 1.1
 	numberStoreItem = 6
 	timer = 60
+	coin = 10
