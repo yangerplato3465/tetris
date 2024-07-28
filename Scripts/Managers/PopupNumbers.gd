@@ -31,4 +31,3 @@ func displayNumber(value: int, position: Vector2, isCritical: bool = false):
 	
 	await tween.finished
 	number.queue_free()
-	

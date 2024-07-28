@@ -41,6 +41,7 @@ func connectSignals():
 	)
 
 func setStage(enemyInfo):
+	updateUI()
 	timer.wait_time = PlayerManager.timer
 	timeLabel.text = "%d" % timerLeft(true, PlayerManager.timer)
 	rewardLabel.text = "+$%d" % enemyInfo.reward
@@ -100,6 +101,7 @@ func attack(clearedLines, combo):
 	updateEnemyHealth(damageDealt)
 
 func updateEnemyHealth(damageDealt):
+	Utilities.shakeNode(enemyHealth)
 	currentEnemyHealth -= damageDealt
 	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
 	if currentEnemyHealth <= 0:

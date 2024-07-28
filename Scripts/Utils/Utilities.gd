@@ -70,3 +70,13 @@ func chooseRandom(arraySize: int, size: int):
 			indices.append(index)
 	
 	return indices
+
+func shakeNode(node):
+	var tween = create_tween()
+	var shake = 10
+	var shake_duration = 0.05
+	var shake_count = 20
+	var originalPosition = node.position
+
+	for i in shake_count:
+		tween.tween_property(node, "position", Vector2(originalPosition.x + randf_range(-shake, shake), originalPosition.y + randf_range(-shake, shake)), shake_duration)

@@ -51,7 +51,15 @@ func setItem(itemData, isAlchemy):
 	item.tooltip_text = formatDescriptionText(itemData.description, itemData.id)
 	item.connect("mouse_entered", Utilities.scaleUp.bind(item))
 	item.connect("mouse_exited", Utilities.scaleDown.bind(item))
+	item.gui_input.connect(onPressed.bind(itemData, item))
 	container.add_child(item)
+
+func onPressed(event: InputEvent, itemData, node):
+	if(event.is_pressed()):
+		if PlayerManager.coin < itemData.price:
+			return
+		PlayerManager.applyUpgrades(itemData.id, itemData.price)
+		node.queue_free()
 
 func formatDescriptionText(text, id):
 	var finalText = text

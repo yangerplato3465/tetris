@@ -316,31 +316,31 @@ var equipmentNormalItems = [
 		"tier": COMMON
 	},
 	{
+		"id": 18,
+		"name": "Magnifying Glass",
+		"description": "See one more up coming piece",
+		"price": 10,
+		"frame": 169,
+		"tier": COMMON
+	},
+	{
+		"id": 18,
+		"name": "Magnifying Glass",
+		"description": "See one more up coming piece",
+		"price": 10,
+		"frame": 169,
+		"tier": COMMON
+	},
+	{
+		"id": 18,
+		"name": "Magnifying Glass",
+		"description": "See one more up coming piece",
+		"price": 10,
+		"frame": 169,
+		"tier": COMMON
+	},
+	{
 		"id": 19,
-		"name": "Magnifying Glass",
-		"description": "See one more up coming piece",
-		"price": 10,
-		"frame": 169,
-		"tier": COMMON
-	},
-	{
-		"id": 20,
-		"name": "Magnifying Glass",
-		"description": "See one more up coming piece",
-		"price": 10,
-		"frame": 169,
-		"tier": COMMON
-	},
-	{
-		"id": 21,
-		"name": "Magnifying Glass",
-		"description": "See one more up coming piece",
-		"price": 10,
-		"frame": 169,
-		"tier": COMMON
-	},
-	{
-		"id": 22,
 		"name": "Double Edge Sword",
 		"description": "Every time you hard drop, deal your single damage (%1) to the enemy",
 		"price": 10,
@@ -348,7 +348,7 @@ var equipmentNormalItems = [
 		"tier": EPIC
 	},
 	{
-		"id": 23,
+		"id": 20,
 		"name": "Treasure Box",
 		"description": "Every time you score a Tetris, gain 10 coins",
 		"price": 10,
@@ -356,7 +356,7 @@ var equipmentNormalItems = [
 		"tier": RARE
 	},
 	{
-		"id": 24,
+		"id": 21,
 		"name": "Ocarina of Time",
 		"description": "Every time you score a double, gain 5 second on the timer",
 		"price": 10,
