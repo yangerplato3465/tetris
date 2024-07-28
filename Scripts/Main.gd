@@ -10,6 +10,8 @@ extends Control
 @onready var timeLabel = $Timer/TimeLabel
 @onready var timer = $Timer/Timer
 @onready var enemyHealth = $EnemyHealth
+@onready var victoryLabel = $VictoryLabel
+@onready var rewardLabel = $RewardLabel
 var timerStarted = false
 
 # Battle
@@ -24,6 +26,8 @@ func _ready():
 	updateUI()
 	randomize()
 	connectSignals()
+	timeLabel.label_settings = LabelSettings.new()
+	timeLabel.label_settings.font_size = 80
 
 func connectSignals():
 	SignalManager.setStage.connect(setStage)
@@ -37,7 +41,9 @@ func connectSignals():
 
 func setStage(enemyInfo):
 	timer.wait_time = PlayerManager.timer
-	timeLabel.text = "%02d:%02d" % timerLeft(true, PlayerManager.timer)
+	timeLabel.text = "%d" % timerLeft(true, PlayerManager.timer)
+	rewardLabel.text = "+$%d" % enemyInfo.reward
+	animationPlayer.play("RESET")
 	enemy.frame = enemyInfo.frame
 	currentEnemyHealth = enemyInfo.health
 	currentEnemyMaxHealth = enemyInfo.health
@@ -47,12 +53,17 @@ func gameover():
 	set_process(false)
 
 func stageReady():
+	set_process(true)
 	timer.start()
 	timerStarted = true
 
 func _process(delta):
 	if timerStarted:
-		timeLabel.text = "%02d:%02d" % timerLeft()
+		if timerLeft() < 10:
+			timeLabel.label_settings.font_color = Color.DARK_RED
+		else:
+			timeLabel.label_settings.font_color = Color.FLORAL_WHITE
+		timeLabel.text = "%d" % timerLeft()
 
 func updateUI():
 	singleText.text = str(PlayerManager.singleDamage)
@@ -67,9 +78,8 @@ func timerLeft(isInit = false, initTime = 30):
 		timeLeft = initTime
 	else:
 		timeLeft = timer.time_left
-	var minute = floor(timeLeft / 60)
-	var second = int(timeLeft) % 60
-	return [minute, second]
+	
+	return timeLeft
 
 func attack(clearedLines, combo):
 	var damageDealt = 0
@@ -83,7 +93,7 @@ func attack(clearedLines, combo):
 			damageDealt = PlayerManager.tripleDamage
 		4:
 			damageDealt = PlayerManager.tetrisDamage
-	damageDealt = damageDealt * pow(PlayerManager.comboMult, combo)
+	damageDealt = damageDealt * pow(PlayerManager.comboMult, combo - 1)
 	PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
 
@@ -95,6 +105,8 @@ func updateEnemyHealth(damageDealt):
 
 func victory():
 	animationPlayer.play("EnemyDeath")
+	showVictoryAndReward()
+	set_process(false)
 
 func attackAnim():
 	var tween = create_tween()
@@ -108,6 +120,23 @@ func attackAnim():
 
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "EnemyDeath":
-		animationPlayer.play("RESET")
 		PlayerManager.currentLevel += 1
 		SignalManager.victory.emit()
+
+func showVictoryAndReward():
+	var hideVictory = func():
+		victoryLabel.visible = false
+		rewardLabel.visible = true
+	var hideReward = func():
+		rewardLabel.visible = false
+	victoryLabel.scale = Vector2(0.5, 0.5)
+	victoryLabel.visible = true
+	rewardLabel.scale = Vector2(0.5, 0.5)
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_ELASTIC) 
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(victoryLabel, "scale", Vector2(1, 1), 0.7).set_delay(0.5)
+	tween.finished.connect(hideVictory)
+	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 0.5).set_delay(1.2)
+
+

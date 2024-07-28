@@ -51,6 +51,18 @@ func _ready():
 	spawnFromBag()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
 	SignalManager.stageReady.connect(stageReady)
+	SignalManager.victory.connect(victory)
+	SignalManager.resetGrid.connect(resetGrid)
+
+func victory():
+	set_physics_process(false)
+
+func resetGrid():
+	set_physics_process(true)
+	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, PlayerManager.startGrid)
+	currentBag = newBag()
+	nextBag = newBag()
+	spawnFromBag()
 
 func stageReady():
 	drawGrid()

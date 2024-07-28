@@ -10,3 +10,4 @@ signal clearLines
 signal hardDrop
 signal victory
 signal shopFinished
+signal resetGrid

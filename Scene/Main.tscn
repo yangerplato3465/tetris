@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://d3korpfrgseif"]
+[gd_scene load_steps=20 format=3 uid="uid://d3korpfrgseif"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_grhrx"]
 [ext_resource type="Script" path="res://Scripts/Grid.gd" id="2_jk1g6"]
@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://dsdhsn18wdlr6" path="res://Sprite/grid.png" id="10_qcj1q"]
 [ext_resource type="Texture2D" uid="uid://dxnfbt3cw5jmg" path="res://Sprite/Character/rogues.png" id="10_qvtii"]
 [ext_resource type="PackedScene" uid="uid://q73nomp0kwbt" path="res://Scene/Component/Enemy.tscn" id="13_1gngx"]
+[ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="14_md5uo"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_8i7nl"]
 line_spacing = 0.0
@@ -57,6 +58,12 @@ _data = {
 "RESET": SubResource("Animation_t652n")
 }
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tb1un"]
+shader = ExtResource("14_md5uo")
+shader_parameter/height = 5.0
+shader_parameter/frequency = 30.0
+shader_parameter/speed = 3.0
+
 [node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -73,13 +80,15 @@ offset_bottom = 40.0
 
 [node name="TimeLabel" type="Label" parent="Timer"]
 layout_mode = 0
-offset_left = 318.0
-offset_top = 23.0
-offset_right = 455.0
-offset_bottom = 78.0
+offset_left = 319.0
+offset_top = 16.0
+offset_right = 456.0
+offset_bottom = 90.0
 theme_override_fonts/font = ExtResource("3_vuny0")
-theme_override_font_sizes/font_size = 60
-text = "00:00"
+theme_override_font_sizes/font_size = 80
+text = "120"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Timer" type="Timer" parent="Timer"]
 process_callback = 0
@@ -510,6 +519,37 @@ frame = 20
 libraries = {
 "": SubResource("AnimationLibrary_axdvt")
 }
+
+[node name="VictoryLabel" type="Label" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_tb1un")
+layout_mode = 0
+offset_left = 646.0
+offset_top = 176.0
+offset_right = 1134.0
+offset_bottom = 314.0
+pivot_offset = Vector2(244, 69)
+theme_override_colors/font_color = Color(0.898039, 0.529412, 0.854902, 1)
+theme_override_fonts/font = ExtResource("3_vuny0")
+theme_override_font_sizes/font_size = 150
+text = "Victory!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RewardLabel" type="Label" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 729.0
+offset_top = 192.0
+offset_right = 1021.0
+offset_bottom = 266.0
+pivot_offset = Vector2(146, 37)
+theme_override_colors/font_color = Color(0.658824, 0.737255, 0.121569, 1)
+theme_override_fonts/font = ExtResource("3_vuny0")
+theme_override_font_sizes/font_size = 80
+text = "+$80"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="timeout" from="Grid/LockTimer" to="Grid" method="_on_LockTimer_timeout"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
