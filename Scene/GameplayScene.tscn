@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/GameplayScene/GameplayScene.gd" id="1_xfrsu"]
 [ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_ga022"]
-[ext_resource type="Texture2D" uid="uid://decvwuodicu0" path="res://Sprite/bg/025.png" id="3_1qbt2"]
+[ext_resource type="Texture2D" uid="uid://dq2m11qkgo2s3" path="res://Sprite/bg/040.png" id="3_7th5x"]
 [ext_resource type="PackedScene" uid="uid://c207dqp8bvfn6" path="res://Scene/ShopPanell.tscn" id="4_7kfqw"]
 [ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="4_ey0gg"]
 [ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="6_nyed1"]
@@ -138,7 +138,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_1qbt2")
+texture = ExtResource("3_7th5x")
 
 [node name="Main" parent="." instance=ExtResource("9_f7h70")]
 visible = false
@@ -205,7 +205,6 @@ visible = false
 layout_mode = 1
 
 [node name="TransitionIn" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.133333, 0.133333, 0.133333, 1)
 self_modulate = Color(0, 0, 0, 1)
 show_behind_parent = true
@@ -217,7 +216,6 @@ scale = Vector2(20, 14)
 texture = ExtResource("10_ojaq8")
 
 [node name="TransitionOut" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.133333, 0.133333, 0.133333, 1)
 self_modulate = Color(0, 0, 0, 1)
 show_behind_parent = true

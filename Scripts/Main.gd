@@ -20,6 +20,7 @@ var timerStarted = false
 @onready var animationPlayer = $AnimationPlayer
 var currentEnemyHealth = 0
 var currentEnemyMaxHealth = 0
+var reward = 0
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 
 func _ready():
@@ -43,6 +44,7 @@ func setStage(enemyInfo):
 	timer.wait_time = PlayerManager.timer
 	timeLabel.text = "%d" % timerLeft(true, PlayerManager.timer)
 	rewardLabel.text = "+$%d" % enemyInfo.reward
+	reward = enemyInfo.reward
 	animationPlayer.play("RESET")
 	enemy.frame = enemyInfo.frame
 	currentEnemyHealth = enemyInfo.health
@@ -105,7 +107,8 @@ func updateEnemyHealth(damageDealt):
 
 func victory():
 	animationPlayer.play("EnemyDeath")
-	showVictoryAndReward()
+	showVictory()
+	timer.stop()
 	set_process(false)
 
 func attackAnim():
@@ -121,22 +124,33 @@ func attackAnim():
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "EnemyDeath":
 		PlayerManager.currentLevel += 1
-		SignalManager.victory.emit()
+		
 
-func showVictoryAndReward():
-	var hideVictory = func():
-		victoryLabel.visible = false
-		rewardLabel.visible = true
-	var hideReward = func():
-		rewardLabel.visible = false
+func showVictory():
+	await get_tree().create_timer(1).timeout
 	victoryLabel.scale = Vector2(0.5, 0.5)
 	victoryLabel.visible = true
-	rewardLabel.scale = Vector2(0.5, 0.5)
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_ELASTIC) 
 	tween.set_ease(Tween.EASE_OUT)
-	tween.tween_property(victoryLabel, "scale", Vector2(1, 1), 0.7).set_delay(0.5)
-	tween.finished.connect(hideVictory)
-	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 0.5).set_delay(1.2)
+	tween.tween_property(victoryLabel, "scale", Vector2(1, 1), 1.2)
+	tween.finished.connect(func():
+		victoryLabel.visible = false
+		showReward()
+	)
+
+func showReward():
+	await get_tree().create_timer(0.7).timeout
+	PlayerManager.coin += reward
+	var tween = create_tween()
+	rewardLabel.scale = Vector2(0.5, 0.5)
+	rewardLabel.visible = true
+	tween.set_trans(Tween.TRANS_ELASTIC) 
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 2)
+	tween.finished.connect(func():
+		rewardLabel.visible = false
+		SignalManager.victory.emit()
+	)
 
 

@@ -7,12 +7,12 @@ extends Control
 @onready var skipButton = $Skip
 
 func _ready():
-	generateItems()
-	coinLabel.text = str(PlayerManager.coin)
 	skipButton.connect("mouse_entered", Utilities.scaleUp.bind(skipButton))
 	skipButton.connect("mouse_exited", Utilities.scaleDown.bind(skipButton))
+	SignalManager.victory.connect(generateItems)
 
 func generateItems():
+	coinLabel.text = str(PlayerManager.coin) # Init coin count
 	for item in container.get_children():
 		item.queue_free()
 	
