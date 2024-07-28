@@ -95,8 +95,6 @@ func updateEnemyHealth(damageDealt):
 
 func victory():
 	animationPlayer.play("EnemyDeath")
-	PlayerManager.currentLevel += 1
-	SignalManager.victory.emit()
 
 func attackAnim():
 	var tween = create_tween()
@@ -106,3 +104,10 @@ func attackAnim():
 	tween.set_trans(Tween.TRANS_BACK) 
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(player, "position:x", player.position.x + 100, 0.1)
+
+
+func _on_animation_player_animation_finished(anim_name):
+	if anim_name == "EnemyDeath":
+		animationPlayer.play("RESET")
+		PlayerManager.currentLevel += 1
+		SignalManager.victory.emit()

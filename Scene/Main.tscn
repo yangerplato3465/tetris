@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://d3korpfrgseif"]
+[gd_scene load_steps=18 format=3 uid="uid://d3korpfrgseif"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_grhrx"]
 [ext_resource type="Script" path="res://Scripts/Grid.gd" id="2_jk1g6"]
@@ -12,21 +12,13 @@
 [ext_resource type="Texture2D" uid="uid://c28wciyag1k4p" path="res://Sprite/button.png" id="8_oe607"]
 [ext_resource type="Texture2D" uid="uid://dsdhsn18wdlr6" path="res://Sprite/grid.png" id="10_qcj1q"]
 [ext_resource type="Texture2D" uid="uid://dxnfbt3cw5jmg" path="res://Sprite/Character/rogues.png" id="10_qvtii"]
-[ext_resource type="Texture2D" uid="uid://3cuaurygw1ii" path="res://Sprite/Character/monsters.png" id="12_abno3"]
-[ext_resource type="Shader" path="res://Shader/dissolve.gdshader" id="14_31f0p"]
+[ext_resource type="PackedScene" uid="uid://q73nomp0kwbt" path="res://Scene/Component/Enemy.tscn" id="13_1gngx"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_8i7nl"]
 line_spacing = 0.0
 font = ExtResource("3_vuny0")
 font_size = 32
 font_color = Color(0, 0, 0, 1)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_n22xw"]
-shader = ExtResource("14_31f0p")
-shader_parameter/progress = 0.0
-shader_parameter/noise_desnity = 200.0
-shader_parameter/beam_size = 0.01
-shader_parameter/color = Color(0.890196, 0, 0.427451, 1)
 
 [sub_resource type="Animation" id="Animation_w4lnr"]
 resource_name = "EnemyDeath"
@@ -512,13 +504,7 @@ hframes = 5
 vframes = 5
 frame = 20
 
-[node name="Enemy" type="Sprite2D" parent="Battle"]
-material = SubResource("ShaderMaterial_n22xw")
-position = Vector2(1019, 236)
-scale = Vector2(5, 5)
-texture = ExtResource("12_abno3")
-hframes = 7
-vframes = 8
+[node name="Enemy" parent="Battle" instance=ExtResource("13_1gngx")]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -526,3 +512,4 @@ libraries = {
 }
 
 [connection signal="timeout" from="Grid/LockTimer" to="Grid" method="_on_LockTimer_timeout"]
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

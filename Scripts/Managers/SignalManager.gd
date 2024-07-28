@@ -9,3 +9,4 @@ signal gameoverFromTimer
 signal clearLines
 signal hardDrop
 signal victory
+signal shopFinished

@@ -20,7 +20,7 @@ var tier1Enemy = [
 		"name": "Slime",
 		"health": 10,
 		"reward": 30,
-		"frame": 14
+		"frame": 15
 	},
 	{
 		"id": 4,
@@ -86,7 +86,7 @@ var tier3Enemy = [
 	},
 	{
 		"id": 12,
-		"name": "worm",
+		"name": "huge worm",
 		"health": 60,
 		"reward": 30,
 		"frame": 44
@@ -100,21 +100,28 @@ var tier3Enemy = [
 	},
 	{
 		"id": 14,
+		"name": "slime body",
+		"health": 60,
+		"reward": 30,
+		"frame": 16
+	},
+	{
+		"id": 15,
+		"name": "skeleton archer",
+		"health": 60,
+		"reward": 30,
+		"frame": 29
+	},
+]
+
+var BossEnemy = [
+	{
+		"id": 16,
 		"name": "rock golem",
 		"health": 60,
 		"reward": 30,
 		"frame": 51
 	},
-	{
-		"id": 15,
-		"name": "lich",
-		"health": 60,
-		"reward": 30,
-		"frame": 33
-	},
-]
-
-var BossEnemy = [
 	{
 		"id": 16,
 		"name": "wendigo",
@@ -128,6 +135,13 @@ var BossEnemy = [
 		"health": 60,
 		"reward": 30,
 		"frame": 52
+	},
+	{
+		"id": 15,
+		"name": "death knight",
+		"health": 60,
+		"reward": 30,
+		"frame": 30
 	},
 	{
 		"id": 18,
@@ -195,7 +209,7 @@ var alchemyItems = [
 		"tier": COMMON
 	},
 	{
-		"id": 0,
+		"id": 6,
 		"name": "Red Potion+",
 		"description": "Increase single damage by 20 (Current %1)",
 		"price": 10,
@@ -203,7 +217,7 @@ var alchemyItems = [
 		"tier": RARE
 	},
 	{
-		"id": 1,
+		"id": 7,
 		"name": "Blue Potion+",
 		"description": "Increase double damage by 40 (Current %1)",
 		"price": 10,
@@ -211,7 +225,7 @@ var alchemyItems = [
 		"tier": RARE
 	},
 	{
-		"id": 2,
+		"id": 8,
 		"name": "Green Potion+",
 		"description": "Increase triple damage by 60 (Current %1)",
 		"price": 10,
@@ -219,7 +233,7 @@ var alchemyItems = [
 		"tier": RARE
 	},
 	{
-		"id": 3,
+		"id": 9,
 		"name": "Yellow Potion+",
 		"description": "Increase tetris damage by 100 (Current %1)",
 		"price": 10,
@@ -227,7 +241,7 @@ var alchemyItems = [
 		"tier": RARE
 	},
 	{
-		"id": 6,
+		"id": 10,
 		"name": "Blue Powder",
 		"description": "'I' pieces appear 2X more often",
 		"price": 10,
@@ -235,7 +249,7 @@ var alchemyItems = [
 		"tier": RARE
 	},
 	{
-		"id": 7,
+		"id": 11,
 		"name": "Purple Powder",
 		"description": "Increase crit chance by 10%",
 		"price": 10,
@@ -243,15 +257,15 @@ var alchemyItems = [
 		"tier": RARE
 	},
 	{
-		"id": 8,
+		"id": 12,
 		"name": "Gray Powder",
-		"description": "Increase all type damage by 30 (Current %1)",
+		"description": "Increase all type damage by 30",
 		"price": 10,
 		"frame": 332,
 		"tier": EPIC
 	},
 	{
-		"id": 8,
+		"id": 13,
 		"name": "Red Glob",
 		"description": "Double your current single damage (Current %1)",
 		"price": 10,
@@ -259,7 +273,7 @@ var alchemyItems = [
 		"tier": LEGENDARY
 	},
 	{
-		"id": 8,
+		"id": 14,
 		"name": "Blue Glob",
 		"description": "Double your current double damage (Current %1)",
 		"price": 10,
@@ -267,7 +281,7 @@ var alchemyItems = [
 		"tier": LEGENDARY
 	},
 	{
-		"id": 8,
+		"id": 15,
 		"name": "Green Glob",
 		"description": "Double your current triple damage (Current %1)",
 		"price": 10,
@@ -275,7 +289,7 @@ var alchemyItems = [
 		"tier": LEGENDARY
 	},
 	{
-		"id": 8,
+		"id": 16,
 		"name": "Yellow Glob",
 		"description": "Double your current tetris damage (Current %1)",
 		"price": 10,
@@ -286,7 +300,7 @@ var alchemyItems = [
 
 var equipmentNormalItems = [
 	{
-		"id": 0,
+		"id": 17,
 		"name": "Old Key",
 		"description": "Unlock the ability to hold pieces",
 		"price": 10,
@@ -294,7 +308,7 @@ var equipmentNormalItems = [
 		"tier": COMMON
 	},
 	{
-		"id": 1,
+		"id": 18,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
 		"price": 10,
@@ -302,7 +316,7 @@ var equipmentNormalItems = [
 		"tier": COMMON
 	},
 	{
-		"id": 1,
+		"id": 19,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
 		"price": 10,
@@ -310,7 +324,7 @@ var equipmentNormalItems = [
 		"tier": COMMON
 	},
 	{
-		"id": 1,
+		"id": 20,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
 		"price": 10,
@@ -318,7 +332,7 @@ var equipmentNormalItems = [
 		"tier": COMMON
 	},
 	{
-		"id": 1,
+		"id": 21,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
 		"price": 10,
@@ -326,7 +340,7 @@ var equipmentNormalItems = [
 		"tier": COMMON
 	},
 	{
-		"id": 2,
+		"id": 22,
 		"name": "Double Edge Sword",
 		"description": "Every time you hard drop, deal your single damage (%1) to the enemy",
 		"price": 10,
@@ -334,7 +348,7 @@ var equipmentNormalItems = [
 		"tier": EPIC
 	},
 	{
-		"id": 3,
+		"id": 23,
 		"name": "Treasure Box",
 		"description": "Every time you score a Tetris, gain 10 coins",
 		"price": 10,
@@ -342,7 +356,7 @@ var equipmentNormalItems = [
 		"tier": RARE
 	},
 	{
-		"id": 4,
+		"id": 24,
 		"name": "Ocarina of Time",
 		"description": "Every time you score a double, gain 5 second on the timer",
 		"price": 10,

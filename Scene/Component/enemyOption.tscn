@@ -1,0 +1,55 @@
+[gd_scene load_steps=6 format=3 uid="uid://pp0ktgnsm60o"]
+
+[ext_resource type="Texture2D" uid="uid://cefkvdnrh7jae" path="res://Sprite/Cards/enemy_panel_bg.png" id="1_58kvd"]
+[ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="2_x70uo"]
+[ext_resource type="Texture2D" uid="uid://3cuaurygw1ii" path="res://Sprite/Character/monsters.png" id="3_pjyiv"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_03ueg"]
+line_spacing = 0.0
+font = ExtResource("2_x70uo")
+font_size = 32
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_gn7mw"]
+line_spacing = 0.0
+font = ExtResource("2_x70uo")
+font_size = 24
+font_color = Color(0, 0, 0, 1)
+
+[node name="Option" type="TextureRect"]
+offset_left = 416.0
+offset_top = 167.0
+offset_right = 784.0
+offset_bottom = 657.0
+texture = ExtResource("1_58kvd")
+stretch_mode = 2
+
+[node name="Name" type="Label" parent="."]
+layout_mode = 0
+offset_left = 123.0
+offset_top = 209.0
+offset_right = 243.0
+offset_bottom = 239.0
+text = "The name"
+label_settings = SubResource("LabelSettings_03ueg")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="."]
+position = Vector2(184, 131)
+scale = Vector2(4, 4)
+texture = ExtResource("3_pjyiv")
+hframes = 7
+vframes = 8
+
+[node name="Description" type="Label" parent="."]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 248.0
+offset_right = 312.0
+offset_bottom = 271.0
+text = "xcvxcvxcvxcvxcvxcvxcvxcv"
+label_settings = SubResource("LabelSettings_gn7mw")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1

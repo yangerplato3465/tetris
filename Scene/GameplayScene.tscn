@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://beaknpi8orob3"]
+[gd_scene load_steps=22 format=3 uid="uid://beaknpi8orob3"]
 
 [ext_resource type="Script" path="res://Scripts/GameplayScene/GameplayScene.gd" id="1_xfrsu"]
 [ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_ga022"]
@@ -6,8 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://c207dqp8bvfn6" path="res://Scene/ShopPanell.tscn" id="4_7kfqw"]
 [ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="4_ey0gg"]
 [ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="6_nyed1"]
-[ext_resource type="Texture2D" uid="uid://cefkvdnrh7jae" path="res://Sprite/Cards/enemy_panel_bg.png" id="7_p2hnr"]
-[ext_resource type="Texture2D" uid="uid://3cuaurygw1ii" path="res://Sprite/Character/monsters.png" id="8_yy6d3"]
 [ext_resource type="Shader" path="res://Shader/TransitionIn.gdshader" id="9_7tgni"]
 [ext_resource type="PackedScene" uid="uid://d3korpfrgseif" path="res://Scene/Main.tscn" id="9_f7h70"]
 [ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="10_ojaq8"]
@@ -59,18 +57,6 @@ line_spacing = 0.0
 font = ExtResource("6_nyed1")
 font_size = 60
 font_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_03ueg"]
-line_spacing = 0.0
-font = ExtResource("6_nyed1")
-font_size = 32
-font_color = Color(0, 0, 0, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_gn7mw"]
-line_spacing = 0.0
-font = ExtResource("6_nyed1")
-font_size = 24
-font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_14ju1"]
 shader = ExtResource("9_7tgni")
@@ -213,46 +199,6 @@ offset_bottom = 318.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
-
-[node name="Option" type="TextureRect" parent="PrepareScene"]
-visible = false
-layout_mode = 2
-offset_left = 416.0
-offset_top = 167.0
-offset_right = 784.0
-offset_bottom = 657.0
-texture = ExtResource("7_p2hnr")
-stretch_mode = 2
-
-[node name="Name" type="Label" parent="PrepareScene/Option"]
-layout_mode = 0
-offset_left = 123.0
-offset_top = 209.0
-offset_right = 243.0
-offset_bottom = 239.0
-text = "The name"
-label_settings = SubResource("LabelSettings_03ueg")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Icon" type="Sprite2D" parent="PrepareScene/Option"]
-position = Vector2(184, 131)
-scale = Vector2(4, 4)
-texture = ExtResource("8_yy6d3")
-hframes = 7
-vframes = 8
-
-[node name="Description" type="Label" parent="PrepareScene/Option"]
-layout_mode = 0
-offset_left = 60.0
-offset_top = 248.0
-offset_right = 312.0
-offset_bottom = 271.0
-text = "xcvxcvxcvxcvxcvxcvxcvxcv"
-label_settings = SubResource("LabelSettings_gn7mw")
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 1
 
 [node name="ShopPanel" parent="." instance=ExtResource("4_7kfqw")]
 visible = false
