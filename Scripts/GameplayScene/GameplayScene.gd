@@ -7,13 +7,12 @@ extends Control
 
 @onready var enemyOptionPrefab = preload("res://Scene/Component/enemyOption.tscn")
 @onready var enemyOptionContainer = $PrepareScene/EnemyOptionContainer
-@onready var levelText = $Main/Grid/UI/Level/LevelNumber
+@onready var levelText = $PrepareScene/LevelNumber
 
 @onready var gameoverClose = $GameoverPanel/NinePatchRect/Close
 
 func _ready():
 	generateRandomEnemies()
-	levelText.text = "level " + str(PlayerManager.currentLevel)
 	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
 	SignalManager.gameoverFromGrid.connect(showGameoverPanel)
@@ -22,6 +21,8 @@ func _ready():
 	SignalManager.shopFinished.connect(shopFinished)
 
 func generateRandomEnemies():
+	print(PlayerManager.currentLevel)
+	levelText.text = "level %d" % PlayerManager.currentLevel
 	for option in enemyOptionContainer.get_children():
 		option.queue_free()
 	match PlayerManager.currentLevel:

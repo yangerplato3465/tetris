@@ -12,6 +12,12 @@ extends Control
 @onready var enemyHealth = $EnemyHealth
 @onready var victoryLabel = $VictoryLabel
 @onready var rewardLabel = $RewardLabel
+
+@onready var holdLock = $Grid/UI/Hold/TextureRect/Lock
+@onready var nextPieceLock2 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock2
+@onready var nextPieceLock3 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock3
+@onready var nextPieceLock4 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock4
+@onready var nextPieceLock5 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock5
 var timerStarted = false
 
 # Battle
@@ -35,11 +41,28 @@ func connectSignals():
 	SignalManager.stageReady.connect(stageReady)
 	SignalManager.gameoverFromTimer.connect(gameover)
 	SignalManager.clearLines.connect(attack)
+	SignalManager.unlockHold.connect(unlockHold)
+	SignalManager.unlockNextPiece.connect(unlockNextPiece)
 	timer.timeout.connect(func():
 		SignalManager.gameoverFromTimer.emit()
 		gameover()
 	)
 
+func unlockHold():
+	holdLock.visible = false
+
+func unlockNextPiece():
+	match PlayerManager.visibleNextPiece:
+		2:
+			nextPieceLock2.visible = false
+		3:
+			nextPieceLock3.visible = false
+		4:
+			nextPieceLock4.visible = false
+		5:
+			nextPieceLock5.visible = false
+
+			
 func setStage(enemyInfo):
 	updateUI()
 	timer.wait_time = PlayerManager.timer
@@ -108,6 +131,7 @@ func updateEnemyHealth(damageDealt):
 		victory()
 
 func victory():
+	PlayerManager.currentLevel += 1
 	animationPlayer.play("EnemyDeath")
 	showVictory()
 	timer.stop()
@@ -124,8 +148,9 @@ func attackAnim():
 
 
 func _on_animation_player_animation_finished(anim_name):
-	if anim_name == "EnemyDeath":
-		PlayerManager.currentLevel += 1
+	pass
+	# if anim_name == "EnemyDeath":
+		# PlayerManager.currentLevel += 1
 		
 
 func showVictory():

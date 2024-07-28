@@ -19,6 +19,10 @@ const darkMaterial = preload("res://extras/DarkMaterial.tres")
 
 const DropParticle = preload("res://Scene/DropParticle.tscn")
 const ClearParticle = preload("res://Scene/ClearParticle.tscn")
+@onready var gridBg = $UI/GridBackground
+@onready var border = $UI/Border
+const GRIDBG_POS = Vector2(230, 101)
+const BORDER_POS = Vector2(218, 88)
 
 var timer = 0
 var deltaSum = 0
@@ -143,6 +147,7 @@ func _physics_process(delta):
 			sthHappened = true
 		actions = 0
 	if Input.is_action_just_pressed("hard_drop"):
+		hardDropShake()
 		hardDropPiece()
 		afterDrop()
 		sthHappened = true
@@ -464,3 +469,11 @@ func deletePieceFromGrid():
 			if currentPiece.shape[x][y] != 0:
 				grid[x+currentPiece.positionInGrid.x][y+currentPiece.positionInGrid.y] = 0
 	
+func hardDropShake():
+	var tween = create_tween()
+	tween.finished.connect(func():
+		position = Vector2(0, 0)
+	)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.tween_property(self, "position:y", 2, 0.1)

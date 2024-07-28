@@ -330,7 +330,7 @@ layout_mode = 2
 texture = ExtResource("7_u34xh")
 expand_mode = 4
 
-[node name="Lock" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer/TextureRect2"]
+[node name="Lock2" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer/TextureRect2"]
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 102.0
@@ -341,7 +341,7 @@ layout_mode = 2
 texture = ExtResource("7_u34xh")
 expand_mode = 4
 
-[node name="Lock" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer/TextureRect3"]
+[node name="Lock3" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer/TextureRect3"]
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 102.0
@@ -352,7 +352,7 @@ layout_mode = 2
 texture = ExtResource("7_u34xh")
 expand_mode = 4
 
-[node name="Lock" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer/TextureRect4"]
+[node name="Lock4" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer/TextureRect4"]
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 102.0
@@ -363,7 +363,7 @@ layout_mode = 2
 texture = ExtResource("7_u34xh")
 expand_mode = 4
 
-[node name="Lock" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer/TextureRect5"]
+[node name="Lock5" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer/TextureRect5"]
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 102.0

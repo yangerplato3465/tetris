@@ -37,6 +37,7 @@ func _ready():
 	pass
 
 func reset(): 
+	currentLevel = 1
 	visibleNextPiece = 1
 	canHoldPiece = false
 	singleDamage = 10
@@ -94,8 +95,10 @@ func applyUpgrades(id, price):
 			tetrisDamage *= 2
 		17:
 			canHoldPiece = true
+			SignalManager.unlockHold.emit()
 		18:
 			visibleNextPiece += 1
+			SignalManager.unlockNextPiece.emit()
 		19:
 			hardDropDamage = true
 		20:

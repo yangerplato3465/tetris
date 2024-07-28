@@ -11,3 +11,7 @@ signal hardDrop
 signal victory
 signal shopFinished
 signal resetGrid
+
+# Upgrade ================
+signal unlockHold
+signal unlockNextPiece

@@ -15,7 +15,7 @@ func create2DMatrix(width, height, value, initBoard = []):
 
 	for x in initBoard.size():
 		for y in initBoard[x].size():
-			print("ddw check",x, "|",y)
+			# print("ddw check",x, "|",y)
 			matrixRes[x][y] = initBoard[x][y]
 
 	return matrixRes
