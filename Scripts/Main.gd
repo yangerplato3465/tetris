@@ -15,9 +15,9 @@ extends Control
 
 @onready var holdLock = $Grid/UI/Hold/TextureRect/Lock
 @onready var nextPieceLock2 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock2
-@onready var nextPieceLock3 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock3
-@onready var nextPieceLock4 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock4
-@onready var nextPieceLock5 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock5
+@onready var nextPieceLock3 = $Grid/UI/NextPieces/VBoxContainer/TextureRect3/Lock3
+@onready var nextPieceLock4 = $Grid/UI/NextPieces/VBoxContainer/TextureRect4/Lock4
+@onready var nextPieceLock5 = $Grid/UI/NextPieces/VBoxContainer/TextureRect5/Lock5
 var timerStarted = false
 
 # Battle

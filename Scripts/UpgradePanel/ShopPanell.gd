@@ -59,6 +59,7 @@ func onPressed(event: InputEvent, itemData, node):
 		if PlayerManager.coin < itemData.price:
 			return
 		PlayerManager.applyUpgrades(itemData.id, itemData.price)
+		coinLabel.text = str(PlayerManager.coin) # coin count
 		node.queue_free()
 
 func formatDescriptionText(text, id):
