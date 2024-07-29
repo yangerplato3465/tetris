@@ -30,7 +30,6 @@ var reward = 0
 var timerReduction = 0
 var damageReductionFlat = 0
 var damageReduction = 1
-var holdPieceDebuff = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 
 func _ready():
@@ -47,13 +46,14 @@ func connectSignals():
 	SignalManager.clearLines.connect(attack)
 	SignalManager.unlockHold.connect(unlockHold)
 	SignalManager.unlockNextPiece.connect(unlockNextPiece)
+	SignalManager.hardDrop.connect(hardDrop)
 	timer.timeout.connect(func():
 		SignalManager.gameoverFromTimer.emit()
 		gameover()
 	)
 
-func unlockHold():
-	holdLock.visible = false
+func unlockHold(unlock):
+	holdLock.visible = unlock
 
 func unlockNextPiece():
 	match PlayerManager.visibleNextPiece:
@@ -69,8 +69,6 @@ func unlockNextPiece():
 			
 func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	updateUI()
-	
-	rewardLabel.text = "+$%d" % enemyInfo.reward
 	reward = enemyInfo.reward
 	animationPlayer.play("RESET")
 	enemy.frame = enemyInfo.frame
@@ -94,7 +92,8 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 		13:
 			timerReduction = 15
 		14:
-			holdPieceDebuff = true
+			PlayerManager.holdPieceDebuff = true
+			unlockHold(true)
 		15:
 			damageReductionFlat = 20
 		16:
@@ -105,15 +104,19 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 			damageReductionFlat = 10
 			timerReduction = 20
 		19:
-			holdPieceDebuff = true
+			PlayerManager.holdPieceDebuff = true
 			damageReductionFlat = 10
+			unlockHold(true)
 		20:
 			damageReduction = 0.5
 		_:
 			timerReduction = 0
 			damageReductionFlat = 0
 			damageReduction = 1
-			holdPieceDebuff = false
+			PlayerManager.holdPieceDebuff = false
+			if(PlayerManager.canHoldPiece):
+				unlockHold(false)
+
 	timer.wait_time = PlayerManager.timer - timerReduction
 	timeLabel.text = "%d" % timerLeft(true, PlayerManager.timer - timerReduction)
 
@@ -161,13 +164,27 @@ func attack(clearedLines, combo):
 			damageDealt = PlayerManager.singleDamage
 		2:
 			damageDealt = PlayerManager.doubleDamage
+			if PlayerManager.ocarina:
+				var timeLeft = timer.time_left
+				timer.stop()
+				timer.wait_time = timeLeft + 5
+				timer.start()
 		3:
 			damageDealt = PlayerManager.tripleDamage
 		4:
 			damageDealt = PlayerManager.tetrisDamage
+			if PlayerManager.treasureBox:
+				showTreasureboxReward()
+
 	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction
 	PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
+
+func hardDrop():
+	if PlayerManager.hardDropDamage:
+		var damageDealt = (PlayerManager.singleDamage - damageReductionFlat) * damageReduction
+		PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
+		updateEnemyHealth(damageDealt)
 
 func updateEnemyHealth(damageDealt):
 	Utilities.shakeNode(enemyHealth)
@@ -192,14 +209,7 @@ func attackAnim():
 	tween.set_trans(Tween.TRANS_BACK) 
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(player, "position:x", player.position.x + 100, 0.1)
-
-
-func _on_animation_player_animation_finished(anim_name):
-	pass
-	# if anim_name == "EnemyDeath":
-		# PlayerManager.currentLevel += 1
 		
-
 func showVictory():
 	await get_tree().create_timer(1).timeout
 	victoryLabel.scale = Vector2(0.5, 0.5)
@@ -219,12 +229,26 @@ func showReward():
 	var tween = create_tween()
 	rewardLabel.scale = Vector2(0.5, 0.5)
 	rewardLabel.visible = true
+	rewardLabel.text = "+$%d" % reward
 	tween.set_trans(Tween.TRANS_ELASTIC) 
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 2)
 	tween.finished.connect(func():
 		rewardLabel.visible = false
 		SignalManager.victory.emit()
+	)
+
+func showTreasureboxReward():
+	PlayerManager.coin += 50
+	var tween = create_tween()
+	rewardLabel.scale = Vector2(0.5, 0.5)
+	rewardLabel.visible = true
+	rewardLabel.text = "+$%d" % 50
+	tween.set_trans(Tween.TRANS_ELASTIC) 
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 2)
+	tween.finished.connect(func():
+		rewardLabel.visible = false
 	)
 
 

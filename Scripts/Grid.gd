@@ -64,10 +64,17 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	match enemyInfo.id:
 		3, 16:
 			startingBoard = Utilities.generateSmallMessyBoard()
-		6, 8, 9, 10, 17, 18:
+		6, 8, 9, 10, 17, 18, 12, 13, 15:
 			startingBoard = Utilities.generateMediumMessyBoard()
-		11, 12, 13, 14, 15, 19, 20:
+		11, 20:
 			startingBoard = Utilities.generateLargeMessyBoard()
+		14:
+			startingBoard = Utilities.generateMediumMessyBoard()
+		19:
+			startingBoard = Utilities.generateLargeMessyBoard()
+		_:
+			startingBoard = PlayerManager.startGrid
+		
 
 func stopGrid():
 	set_physics_process(false)
@@ -177,7 +184,7 @@ func _physics_process(delta):
 			sthHappened = true
 			actions += 1
 	if Input.is_action_just_pressed("hold_piece"):
-		if (!hasSwapped && PlayerManager.canHoldPiece):
+		if (!hasSwapped && PlayerManager.canHoldPiece && !PlayerManager.holdPieceDebuff):
 			deletePieceFromGrid()
 			
 			#Particle
@@ -269,6 +276,7 @@ func drawDroppingPoint():
 					add_child(circle)
 	
 func hardDropPiece():
+	SignalManager.hardDrop.emit()
 	while (canPieceMoveDown()):
 		score += 2
 		$UI/Score/ScoreNumber.text = str(score)

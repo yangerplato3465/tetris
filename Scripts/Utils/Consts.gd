@@ -101,7 +101,7 @@ var tier3Enemy = [
 		"health": 1000,
 		"reward": 200,
 		"frame": 44,
-		"description": "Start with a very messy board, Extra high health"
+		"description": "Start with a messy board, Extra high health"
 	},
 	{
 		"id": 13,
@@ -109,7 +109,7 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 200,
 		"frame": 37,
-		"description": "Start with a very messy board, 15 less sec on the timer"
+		"description": "Start with a messy board, 15 less sec on the timer"
 	},
 	{
 		"id": 14,
@@ -117,7 +117,7 @@ var tier3Enemy = [
 		"health": 600,
 		"reward": 200,
 		"frame": 16,
-		"description": "Start with a very messy board, You cannot hold pieces"
+		"description": "Start with a messy board, You cannot hold pieces"
 	},
 	{
 		"id": 15,
@@ -125,7 +125,7 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 200,
 		"frame": 29,
-		"description": "Start with a very messy board, -20 on all damage"
+		"description": "Start with a messy board, -20 on all damage"
 	},
 ]
 
@@ -395,7 +395,7 @@ var equipmentRareItems = [
 	{
 		"id": 25,
 		"name": "Treasure Box",
-		"description": "Every time you score a Tetris, gain 10 coins",
+		"description": "Every time you score a Tetris, gain 50 coins",
 		"price": 100,
 		"frame": 187,
 		"tier": RARE

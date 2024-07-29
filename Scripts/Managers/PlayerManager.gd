@@ -14,23 +14,24 @@ var comboMult = 1.1
 var numberStoreItem = 6
 var timer = 40
 var hardDropDamage = false
-var treasureBox = false
+var treasureBox = true
 var ocarina = false
 var spawnBag = [0,1,2,3,4,5,6]
 var alchemyArray = []
 var equipmentArray = []
+var holdPieceDebuff = false
 
 var startGrid = [
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
-	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
+	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,1,  1,1,1],
 ]
 
 var coin = 10
@@ -51,11 +52,12 @@ func reset():
 	timer = 40
 	coin = 10
 	hardDropDamage = false
-	treasureBox = false
+	treasureBox = true
 	ocarina = false
 	spawnBag = [0,1,2,3,4,5,6]
 	alchemyArray = Consts.alchemyCommonItems
 	equipmentArray = Consts.equipmentCommonItems
+	holdPieceDebuff = false
 
 func applyUpgrades(id, price):
 	coin -= price
@@ -103,7 +105,7 @@ func applyUpgrades(id, price):
 			comboMult += 0.5
 		19: # Equipments
 			canHoldPiece = true
-			SignalManager.unlockHold.emit()
+			SignalManager.unlockHold.emit(false)
 			removeEquipment(19)
 		20:
 			visibleNextPiece += 1
