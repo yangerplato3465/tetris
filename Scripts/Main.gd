@@ -129,7 +129,7 @@ func attack(clearedLines, combo):
 func updateEnemyHealth(damageDealt):
 	Utilities.shakeNode(enemyHealth)
 	currentEnemyHealth -= damageDealt
-	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
+	enemyHealth.text = str(Utilities.floorNum(currentEnemyHealth)) + " / " + str(currentEnemyMaxHealth)
 	if currentEnemyHealth <= 0:
 		victory()
 

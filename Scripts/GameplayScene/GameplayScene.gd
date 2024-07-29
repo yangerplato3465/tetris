@@ -57,7 +57,7 @@ func setOptions(enemy):
 	var newOption = enemyOptionPrefab.instantiate()
 	newOption.find_child("Name").text = enemy.name
 	newOption.find_child("Icon").frame = enemy.frame
-	var descriptionText = "health: %s\nreward: %s" % [str(enemy.health), str(enemy.reward)]
+	var descriptionText = "health: %s\nreward: %s\n%s" % [str(enemy.health), str(enemy.reward), enemy.description]
 	newOption.find_child("Description").text = descriptionText
 
 	newOption.pivot_offset = Vector2(184, 300)

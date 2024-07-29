@@ -61,9 +61,9 @@ func onPressed(event: InputEvent, itemData, node):
 	if(event.is_pressed()):
 		if PlayerManager.coin < itemData.price:
 			return
+		node.tooltip_text = ""
 		shrinkAndHide(node)
 		node.gui_input.disconnect(onPressed)
-		node.tooltip_text = ""
 		PlayerManager.applyUpgrades(itemData.id, itemData.price)
 		coinLabel.text = str(PlayerManager.coin) # coin count
 		updateTooltipInfo()

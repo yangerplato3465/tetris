@@ -116,3 +116,6 @@ func generateLargeMessyBoard():
 func randomNum():
 	var num = randi_range(0, 1)
 	return num
+
+func floorNum(number):
+	return floor(number * 10) / 10.0
