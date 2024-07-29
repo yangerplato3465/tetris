@@ -12,7 +12,8 @@ var tripleDamage = 50
 var tetrisDamage = 80
 var comboMult = 1.1
 var numberStoreItem = 6
-var timer = 40
+var timer = 60
+var coin = 10
 var hardDropDamage = false
 var treasureBox = false
 var ocarina = false
@@ -34,7 +35,6 @@ var startGrid = [
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
 ]
 
-var coin = 10
 
 func _ready():
 	pass
@@ -49,8 +49,8 @@ func reset():
 	tetrisDamage = 80
 	comboMult = 1.1
 	numberStoreItem = 6
-	timer = 40
-	coin = 10
+	timer = 60
+	coin = 100
 	hardDropDamage = false
 	treasureBox = false
 	ocarina = false

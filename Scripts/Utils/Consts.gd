@@ -4,7 +4,7 @@ var tier1Enemy = [
 	{
 		"id": 1,
 		"name": "Orc",
-		"health": 200,
+		"health": 150,
 		"reward": 60,
 		"frame": 0,
 		"description": "Extra high health"
@@ -12,23 +12,23 @@ var tier1Enemy = [
 	{
 		"id": 2,
 		"name": "Goblin",
-		"health": 150,
-		"reward": 30,
+		"health": 100,
+		"reward": 40,
 		"frame": 2,
 		"description": ""
 	},
 	{
 		"id": 3,
 		"name": "Slime",
-		"health": 120,
-		"reward": 20,
+		"health": 100,
+		"reward": 40,
 		"frame": 15,
 		"description": "Start with small messy board"
 	},
 	{
 		"id": 4,
 		"name": "Centipede",
-		"health": 120,
+		"health": 100,
 		"reward": 40,
 		"frame": 42,
 		"description": "Start with 10 less sec on the timer"
@@ -37,7 +37,7 @@ var tier1Enemy = [
 		"id": 5,
 		"name": "Bat",
 		"health": 100,
-		"reward": 30,
+		"reward": 40,
 		"frame": 48,
 		"description": "-10 on all damage"
 	},
@@ -133,8 +133,8 @@ var BossEnemy = [
 	{
 		"id": 16,
 		"name": "rock golem",
-		"health": 500,
-		"reward": 200,
+		"health": 250,
+		"reward": 100,
 		"frame": 51,
 		"description": "Start with a small messy board, 15 less sec on the timer"
 	},
@@ -142,30 +142,30 @@ var BossEnemy = [
 		"id": 17,
 		"name": "wendigo",
 		"health": 400,
-		"reward": 300,
+		"reward": 150,
 		"frame": 50,
 		"description": "Start with a messy board, -10 on all damage"
 	},
 	{
 		"id": 18,
 		"name": "centaur",
-		"health": 60,
-		"reward": 400,
+		"health": 450,
+		"reward": 200,
 		"frame": 52,
 		"description": "Start with a messy board, -10 on all damage, 20 less sec on the timer"
 	},
 	{
 		"id": 19,
 		"name": "death knight",
-		"health": 60,
-		"reward": 500,
+		"health": 500,
+		"reward": 300,
 		"frame": 30,
 		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces"
 	},
 	{
 		"id": 20,
 		"name": "Shadow Lord",
-		"health": 60,
+		"health": 600,
 		"reward": 0,
 		"frame": 30,
 		"description": "Final boss, Start with a very messy board, all damage halfed"
@@ -425,8 +425,9 @@ var howToPlay = "-Deal damage by clearing lines on a tetris board
 -The more lines cleared the more damage dealt
 -consecutively clearing lines deals more damage
 -you lose a run when the timer runs out or the tetrimino
-reaches the top, base timer is 40 seconds
--item shop shows up when you defeat an enemy, gather 
-coins to spend at the shop
+reaches the top, base timer is 60 seconds
+-you start with 100 coins, item shop shows up when you 
+defeat an enemy,gather coins to spend at the shop
 -you can rebind control in the settings menu
--different enemies have certain debuff on you"
+-different enemies have certain debuff on you
+-There are a total of 15 levels, good luck!"
