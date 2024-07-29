@@ -91,7 +91,7 @@ func stageReady():
 	drawDroppingPoint()
 
 func newBag():
-	var bagIndexes = [0,1,2,3,4,5,6]
+	var bagIndexes = PlayerManager.spawnBag
 	var newBagIndexes = bagIndexes.duplicate()
 	newBagIndexes.shuffle()
 	var bag = []
