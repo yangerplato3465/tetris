@@ -27,6 +27,10 @@ var timerStarted = false
 var currentEnemyHealth = 0
 var currentEnemyMaxHealth = 0
 var reward = 0
+var timerReduction = 0
+var damageReductionFlat = 0
+var damageReduction = 1
+var holdPieceDebuff = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 
 func _ready():
@@ -63,10 +67,9 @@ func unlockNextPiece():
 			nextPieceLock5.visible = false
 
 			
-func setStage(enemyInfo):
+func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	updateUI()
-	timer.wait_time = PlayerManager.timer
-	timeLabel.text = "%d" % timerLeft(true, PlayerManager.timer)
+	
 	rewardLabel.text = "+$%d" % enemyInfo.reward
 	reward = enemyInfo.reward
 	animationPlayer.play("RESET")
@@ -74,6 +77,46 @@ func setStage(enemyInfo):
 	currentEnemyHealth = enemyInfo.health
 	currentEnemyMaxHealth = enemyInfo.health
 	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
+	match enemyInfo.id:
+		4:
+			timerReduction = 10
+		5:
+			damageReductionFlat = 10
+		7:
+			timerReduction = 15
+		8:
+			timerReduction = 10
+		9:
+			damageReductionFlat = 10
+		10:
+			damageReductionFlat = 5
+			timerReduction = 10
+		13:
+			timerReduction = 15
+		14:
+			holdPieceDebuff = true
+		15:
+			damageReductionFlat = 20
+		16:
+			timerReduction = 15
+		17:
+			damageReductionFlat = 10
+		18:
+			damageReductionFlat = 10
+			timerReduction = 20
+		19:
+			holdPieceDebuff = true
+			damageReductionFlat = 10
+		20:
+			damageReduction = 0.5
+		_:
+			timerReduction = 0
+			damageReductionFlat = 0
+			damageReduction = 1
+			holdPieceDebuff = false
+	timer.wait_time = PlayerManager.timer - timerReduction
+	timeLabel.text = "%d" % timerLeft(true, PlayerManager.timer - timerReduction)
+
 
 func gameover():
 	SignalManager.stopGrid.emit()
@@ -122,7 +165,7 @@ func attack(clearedLines, combo):
 			damageDealt = PlayerManager.tripleDamage
 		4:
 			damageDealt = PlayerManager.tetrisDamage
-	damageDealt = damageDealt * pow(PlayerManager.comboMult, combo - 1)
+	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction
 	PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
 

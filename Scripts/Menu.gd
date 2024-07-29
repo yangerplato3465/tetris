@@ -2,6 +2,7 @@ extends Control
 
 @onready var start = $VBoxContainer/Start
 @onready var rules = $VBoxContainer/Rules
+@onready var rulesContent = $RulesPanel/Content
 @onready var settings = $VBoxContainer/Settings
 @onready var rulesClose = $RulesPanel/Close
 @onready var settingsClose = $Settings/Close
@@ -24,6 +25,7 @@ var inputActions = {
 
 func _ready():
 	createActionList()
+	rulesContent.text = Consts.howToPlay
 	start.pivot_offset = Vector2(112, 56)
 	rules.pivot_offset = Vector2(112, 56)
 	settings.pivot_offset = Vector2(112, 56)

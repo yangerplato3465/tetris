@@ -37,6 +37,7 @@ var speed = 1
 var hasSwapped = false
 var hasCleared = false
 var combo = 0
+var startingBoard = []
 
 var currentBag
 var nextBag
@@ -57,13 +58,23 @@ func _ready():
 	SignalManager.stageReady.connect(stageReady)
 	SignalManager.stopGrid.connect(stopGrid)
 	SignalManager.resetGrid.connect(resetGrid)
+	SignalManager.setStage.connect(setStage)
+
+func setStage(enemyInfo): # Set stage base on enemy abilities and stats
+	match enemyInfo.id:
+		3, 16:
+			startingBoard = Utilities.generateSmallMessyBoard()
+		6, 8, 9, 10, 17, 18:
+			startingBoard = Utilities.generateMediumMessyBoard()
+		11, 12, 13, 14, 15, 19, 20:
+			startingBoard = Utilities.generateLargeMessyBoard()
 
 func stopGrid():
 	set_physics_process(false)
 
 func resetGrid():
 	set_physics_process(true)
-	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, Utilities.generateMediumMessyBoard())
+	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, startingBoard)
 	currentBag = newBag()
 	nextBag = newBag()
 	spawnFromBag()

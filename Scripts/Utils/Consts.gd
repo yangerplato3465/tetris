@@ -7,7 +7,7 @@ var tier1Enemy = [
 		"health": 200,
 		"reward": 60,
 		"frame": 0,
-		"description": ""
+		"description": "Extra high health"
 	},
 	{
 		"id": 2,
@@ -23,7 +23,7 @@ var tier1Enemy = [
 		"health": 120,
 		"reward": 20,
 		"frame": 15,
-		"description": ""
+		"description": "Start with small messy board"
 	},
 	{
 		"id": 4,
@@ -93,7 +93,7 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 150,
 		"frame": 7,
-		"description": "Start with a messy board"
+		"description": "Start with a very messy board"
 	},
 	{
 		"id": 12,
@@ -101,7 +101,7 @@ var tier3Enemy = [
 		"health": 1000,
 		"reward": 200,
 		"frame": 44,
-		"description": "Start with a messy board, Extra high health"
+		"description": "Start with a very messy board, Extra high health"
 	},
 	{
 		"id": 13,
@@ -109,7 +109,7 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 200,
 		"frame": 37,
-		"description": "Start with a messy board, 15 less sec on the timer"
+		"description": "Start with a very messy board, 15 less sec on the timer"
 	},
 	{
 		"id": 14,
@@ -117,7 +117,7 @@ var tier3Enemy = [
 		"health": 600,
 		"reward": 200,
 		"frame": 16,
-		"description": "Start with a messy board, You cannot hold pieces"
+		"description": "Start with a very messy board, You cannot hold pieces"
 	},
 	{
 		"id": 15,
@@ -125,7 +125,7 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 200,
 		"frame": 29,
-		"description": "Start with a messy board, -20 on all damage"
+		"description": "Start with a very messy board, -20 on all damage"
 	},
 ]
 
@@ -136,10 +136,10 @@ var BossEnemy = [
 		"health": 500,
 		"reward": 200,
 		"frame": 51,
-		"description": "Start with a messy board, 15 less sec on the timer"
+		"description": "Start with a small messy board, 15 less sec on the timer"
 	},
 	{
-		"id": 16,
+		"id": 17,
 		"name": "wendigo",
 		"health": 400,
 		"reward": 300,
@@ -147,7 +147,7 @@ var BossEnemy = [
 		"description": "Start with a messy board, -10 on all damage"
 	},
 	{
-		"id": 17,
+		"id": 18,
 		"name": "centaur",
 		"health": 60,
 		"reward": 400,
@@ -155,20 +155,20 @@ var BossEnemy = [
 		"description": "Start with a messy board, -10 on all damage, 20 less sec on the timer"
 	},
 	{
-		"id": 15,
+		"id": 19,
 		"name": "death knight",
 		"health": 60,
 		"reward": 500,
 		"frame": 30,
-		"description": "Start with a messy board, -10 on all damage, you cannot hold pieces"
+		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces"
 	},
 	{
-		"id": 18,
+		"id": 20,
 		"name": "Shadow Lord",
 		"health": 60,
 		"reward": 0,
 		"frame": 30,
-		"description": "Final boss, Start with a messy board, all damage halfed"
+		"description": "Final boss, Start with a very messy board, all damage halfed"
 	},
 ]
 
@@ -420,3 +420,13 @@ var equipmentLegendaryItems = [
 		"tier": LEGENDARY
 	},
 ]
+
+var howToPlay = "-Deal damage by clearing lines on a tetris board
+-The more lines cleared the more damage dealt
+-consecutively clearing lines deals more damage
+-you lose a run when the timer runs out or the tetrimino
+reaches the top, base timer is 40 seconds
+-item shop shows up when you defeat an enemy, gather 
+coins to spend at the shop
+-you can rebind control in the settings menu
+-different enemies have certain debuff on you"

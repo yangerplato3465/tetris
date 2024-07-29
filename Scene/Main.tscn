@@ -264,9 +264,9 @@ grow_vertical = 2
 [node name="Hold" type="Control" parent="Grid/UI"]
 anchors_preset = 0
 offset_left = 48.0
-offset_top = 75.0
+offset_top = 133.0
 offset_right = 154.0
-offset_bottom = 185.0
+offset_bottom = 243.0
 script = ExtResource("3_4xxhf")
 
 [node name="Label" type="Label" parent="Grid/UI/Hold"]
@@ -296,18 +296,18 @@ texture = ExtResource("7_ppmgw")
 
 [node name="NextPieces" type="Control" parent="Grid/UI"]
 anchors_preset = 0
-offset_left = 100.0
-offset_top = 285.0
-offset_right = 100.0
-offset_bottom = 285.0
+offset_left = 103.0
+offset_top = 365.0
+offset_right = 103.0
+offset_bottom = 365.0
 script = ExtResource("6_5uiqx")
 
 [node name="Label" type="Label" parent="Grid/UI/NextPieces"]
 layout_mode = 0
 offset_left = -50.0
-offset_top = -42.0
+offset_top = -92.0
 offset_right = 54.0
-offset_bottom = -12.0
+offset_bottom = -62.0
 theme_override_fonts/font = ExtResource("3_vuny0")
 theme_override_font_sizes/font_size = 32
 text = "Next"
@@ -316,9 +316,9 @@ horizontal_alignment = 1
 [node name="VBoxContainer" type="VBoxContainer" parent="Grid/UI/NextPieces"]
 layout_mode = 0
 offset_left = -51.0
-offset_top = 4.0
+offset_top = -51.0
 offset_right = 51.0
-offset_bottom = 530.0
+offset_bottom = 475.0
 
 [node name="TextureRect" type="TextureRect" parent="Grid/UI/NextPieces/VBoxContainer"]
 layout_mode = 2
