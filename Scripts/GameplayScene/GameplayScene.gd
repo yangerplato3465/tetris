@@ -12,6 +12,7 @@ extends Control
 @onready var gameoverClose = $GameoverPanel/NinePatchRect/Close
 
 func _ready():
+	PlayerManager.reset() # Reset all upgrades and stats
 	generateRandomEnemies()
 	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))

@@ -14,15 +14,14 @@ func _ready():
 
 func generateItems():
 	coinLabel.text = str(PlayerManager.coin) # Init coin count
-	currentItemData = []
 	for item in container.get_children():
 		item.queue_free()
 	
-	for index in Utilities.chooseRandom(Consts.alchemyCommonItems.size(), 5):
-		setItem(Consts.alchemyCommonItems[index], true)
-		currentItemData.append(Consts.alchemyCommonItems[index])
+	for index in Utilities.chooseRandom(PlayerManager.alchemyArray.size(), 5):
+		setItem(PlayerManager.alchemyArray[index], true)
+		currentItemData.append(PlayerManager.alchemyArray[index])
 	
-	var equipmentData = Consts.equipmentCommonItems[randi_range(0, Consts.equipmentCommonItems.size() - 1)]
+	var equipmentData = Consts.equipmentCommonItems[randi_range(0, PlayerManager.equipmentArray.size() - 1)]
 	currentItemData.append(equipmentData)
 	setItem(equipmentData, false)
 
