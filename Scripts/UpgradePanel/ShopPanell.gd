@@ -58,9 +58,21 @@ func onPressed(event: InputEvent, itemData, node):
 	if(event.is_pressed()):
 		if PlayerManager.coin < itemData.price:
 			return
+		shrinkAndHide(node)
+		node.gui_input.disconnect(onPressed)
 		PlayerManager.applyUpgrades(itemData.id, itemData.price)
 		coinLabel.text = str(PlayerManager.coin) # coin count
-		node.queue_free()
+
+func shrinkAndHide(node):
+	var tween = create_tween()
+	tween.finished.connect(func():
+		node.modulate.a = 0
+		node.scale = Vector2(0, 0)
+	)
+	tween.set_trans(Tween.TRANS_BACK) 
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(node, "scale", Vector2(0.3, 0.3), 0.2)
+
 
 func formatDescriptionText(text, id):
 	var finalText = text

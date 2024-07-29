@@ -133,6 +133,7 @@ func updateEnemyHealth(damageDealt):
 func victory():
 	PlayerManager.currentLevel += 1
 	animationPlayer.play("EnemyDeath")
+	SignalManager.stopGrid.emit()
 	showVictory()
 	timer.stop()
 	set_process(false)

@@ -55,10 +55,10 @@ func _ready():
 	spawnFromBag()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
 	SignalManager.stageReady.connect(stageReady)
-	SignalManager.victory.connect(victory)
+	SignalManager.stopGrid.connect(stopGrid)
 	SignalManager.resetGrid.connect(resetGrid)
 
-func victory():
+func stopGrid():
 	set_physics_process(false)
 
 func resetGrid():
