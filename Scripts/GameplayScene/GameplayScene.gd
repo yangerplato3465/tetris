@@ -73,7 +73,9 @@ func onPressed(event: InputEvent, enemy, node: Control):
 		Utilities.onPressed(node)
 		SignalManager.setStage.emit(enemy)
 		await Utilities.slideOut(PrepareScene)
-		Utilities.slideIn(MainScene)
+		Utilities.slideIn(MainScene, func(): 
+			SignalManager.stageReady.emit()	
+		)
 		SignalManager.resetGrid.emit()
 
 func disableOthers():

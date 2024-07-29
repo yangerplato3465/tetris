@@ -50,7 +50,7 @@ func slideOut(outNode):
 		outNode.visible = false
 	)
 
-func slideIn(node):
+func slideIn(node, callback: Callable = func():):
 	node.visible = true
 	node.position.y = 900
 	var tween = create_tween()
@@ -58,7 +58,7 @@ func slideIn(node):
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(node, "position:y", 0, 1).set_delay(1)
 	tween.finished.connect(func():
-		SignalManager.stageReady.emit()
+		callback.call()
 	)
 
 func chooseRandom(arraySize: int, size: int):

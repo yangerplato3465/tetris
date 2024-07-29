@@ -13,7 +13,7 @@ var tetrisDamage = 80
 var damageMult = 1
 var comboMult = 1.1
 var numberStoreItem = 6
-var timer = 60
+var timer = 10
 var hardDropDamage = false
 var treasureBox = false
 var ocarina = false
@@ -47,11 +47,12 @@ func reset():
 	damageMult = 1
 	comboMult = 1.1
 	numberStoreItem = 6
-	timer = 60
+	timer = 10
 	coin = 10
 	hardDropDamage = false
 	treasureBox = false
 	ocarina = false
+	spawnBag = [0,1,2,3,4,5,6]
 
 func applyUpgrades(id, price):
 	coin -= price

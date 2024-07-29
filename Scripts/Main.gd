@@ -39,7 +39,7 @@ func _ready():
 func connectSignals():
 	SignalManager.setStage.connect(setStage)
 	SignalManager.stageReady.connect(stageReady)
-	SignalManager.gameoverFromTimer.connect(gameover)
+	# SignalManager.gameoverFromTimer.connect(gameover)
 	SignalManager.clearLines.connect(attack)
 	SignalManager.unlockHold.connect(unlockHold)
 	SignalManager.unlockNextPiece.connect(unlockNextPiece)
@@ -76,6 +76,9 @@ func setStage(enemyInfo):
 	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
 
 func gameover():
+	SignalManager.stopGrid.emit()
+	timerStarted = false
+	timer.stop()
 	set_process(false)
 
 func stageReady():
