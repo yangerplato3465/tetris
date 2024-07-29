@@ -21,7 +21,6 @@ func _ready():
 	SignalManager.shopFinished.connect(shopFinished)
 
 func generateRandomEnemies():
-	print(PlayerManager.currentLevel)
 	levelText.text = "level %d" % PlayerManager.currentLevel
 	for option in enemyOptionContainer.get_children():
 		option.queue_free()

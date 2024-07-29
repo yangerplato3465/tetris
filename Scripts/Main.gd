@@ -89,7 +89,7 @@ func stageReady():
 func _process(delta):
 	if timerStarted:
 		if timerLeft() < 10:
-			timeLabel.label_settings.font_color = Color.DARK_RED
+			timeLabel.label_settings.font_color = Color.RED
 		else:
 			timeLabel.label_settings.font_color = Color.FLORAL_WHITE
 		timeLabel.text = "%d" % timerLeft()

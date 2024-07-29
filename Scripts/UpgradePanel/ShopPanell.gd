@@ -5,6 +5,7 @@ extends Control
 @onready var equipmentItem = preload("res://Scene/Component/Equipment.tscn")
 @onready var coinLabel = $CoinIcon/Label
 @onready var skipButton = $Skip
+var currentItemData = []
 
 func _ready():
 	skipButton.connect("mouse_entered", Utilities.scaleUp.bind(skipButton))
@@ -13,13 +14,16 @@ func _ready():
 
 func generateItems():
 	coinLabel.text = str(PlayerManager.coin) # Init coin count
+	currentItemData = []
 	for item in container.get_children():
 		item.queue_free()
 	
 	for index in Utilities.chooseRandom(Consts.alchemyItems.size(), 5):
 		setItem(Consts.alchemyItems[index], true)
+		currentItemData.append(Consts.alchemyItems[index])
 	
 	var equipmentData = Consts.equipmentNormalItems[randi_range(0, Consts.equipmentNormalItems.size() - 1)]
+	currentItemData.append(equipmentData)
 	setItem(equipmentData, false)
 
 func setItem(itemData, isAlchemy):
@@ -45,7 +49,7 @@ func setItem(itemData, isAlchemy):
 		Consts.EPIC:
 			color = Color.REBECCA_PURPLE
 		Consts.LEGENDARY:
-			color = Color.GOLD
+			color = Color.GOLDENROD
 			
 	itemName.label_settings.font_color = color
 	item.tooltip_text = formatDescriptionText(itemData.description, itemData.id)
@@ -60,8 +64,16 @@ func onPressed(event: InputEvent, itemData, node):
 			return
 		shrinkAndHide(node)
 		node.gui_input.disconnect(onPressed)
+		node.tooltip_text = ""
 		PlayerManager.applyUpgrades(itemData.id, itemData.price)
 		coinLabel.text = str(PlayerManager.coin) # coin count
+		updateTooltipInfo()
+
+func updateTooltipInfo():
+	var child = container.get_children()
+	for index in range(container.get_child_count()):
+		child[index].tooltip_text = formatDescriptionText(currentItemData[index].description, currentItemData[index].id)
+
 
 func shrinkAndHide(node):
 	var tween = create_tween()
@@ -77,7 +89,7 @@ func shrinkAndHide(node):
 func formatDescriptionText(text, id):
 	var finalText = text
 	match id:
-		0, 6, 13:
+		0, 6, 13, 19:
 			finalText = text.replace("%1", str(PlayerManager.singleDamage))
 		1, 7, 14:
 			finalText = text.replace("%1", str(PlayerManager.doubleDamage))
@@ -85,6 +97,10 @@ func formatDescriptionText(text, id):
 			finalText = text.replace("%1", str(PlayerManager.tripleDamage))
 		3, 9, 16:
 			finalText = text.replace("%1", str(PlayerManager.tetrisDamage))
+		4:
+			finalText = text.replace("%1", str(PlayerManager.comboMult))
+		5:
+			finalText = text.replace("%1", str(PlayerManager.timer))
 	return finalText
 			
 
