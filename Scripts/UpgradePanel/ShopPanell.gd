@@ -18,11 +18,11 @@ func generateItems():
 	for item in container.get_children():
 		item.queue_free()
 	
-	for index in Utilities.chooseRandom(Consts.alchemyItems.size(), 5):
-		setItem(Consts.alchemyItems[index], true)
-		currentItemData.append(Consts.alchemyItems[index])
+	for index in Utilities.chooseRandom(Consts.alchemyCommonItems.size(), 5):
+		setItem(Consts.alchemyCommonItems[index], true)
+		currentItemData.append(Consts.alchemyCommonItems[index])
 	
-	var equipmentData = Consts.equipmentNormalItems[randi_range(0, Consts.equipmentNormalItems.size() - 1)]
+	var equipmentData = Consts.equipmentCommonItems[randi_range(0, Consts.equipmentCommonItems.size() - 1)]
 	currentItemData.append(equipmentData)
 	setItem(equipmentData, false)
 

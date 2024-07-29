@@ -80,3 +80,39 @@ func shakeNode(node):
 
 	for i in shake_count:
 		tween.tween_property(node, "position", Vector2(originalPosition.x + randf_range(-shake, shake), originalPosition.y + randf_range(-shake, shake)), shake_duration)
+
+func generateMediumMessyBoard():
+	var messyGrid = [
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  randomNum(),randomNum(),randomNum()],
+	]
+
+	return messyGrid
+
+func generateLargeMessyBoard():
+	var messyGrid = [
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+		[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,randomNum(),randomNum(),randomNum(),  randomNum(),randomNum(),randomNum()],
+	]
+
+	return messyGrid
+
+func randomNum():
+	var num = randi_range(0, 1)
+	return num
