@@ -5,7 +5,7 @@ var tier1Enemy = [
 		"id": 1,
 		"name": "Orc",
 		"health": 150,
-		"reward": 60,
+		"reward": 80,
 		"frame": 0,
 		"description": "Extra high health"
 	},
@@ -13,7 +13,7 @@ var tier1Enemy = [
 		"id": 2,
 		"name": "Goblin",
 		"health": 100,
-		"reward": 40,
+		"reward": 60,
 		"frame": 2,
 		"description": ""
 	},
@@ -21,7 +21,7 @@ var tier1Enemy = [
 		"id": 3,
 		"name": "Slime",
 		"health": 100,
-		"reward": 40,
+		"reward": 60,
 		"frame": 15,
 		"description": "Start with small messy board"
 	},
@@ -29,7 +29,7 @@ var tier1Enemy = [
 		"id": 4,
 		"name": "Centipede",
 		"health": 100,
-		"reward": 40,
+		"reward": 60,
 		"frame": 42,
 		"description": "Start with 10 less sec on the timer"
 	},
@@ -37,9 +37,9 @@ var tier1Enemy = [
 		"id": 5,
 		"name": "Bat",
 		"health": 100,
-		"reward": 40,
+		"reward": 60,
 		"frame": 48,
-		"description": "-10 on all damage"
+		"description": "-5 on all damage"
 	},
 ]
 
@@ -66,7 +66,7 @@ var tier2Enemy = [
 		"health": 300,
 		"reward": 150,
 		"frame": 32,
-		"description": "Start with a messy board, -10 sec on the timer"
+		"description": "Start with a messy board, -20 sec on the timer"
 	},
 	{
 		"id": 9,
@@ -74,7 +74,7 @@ var tier2Enemy = [
 		"health": 200,
 		"reward": 150,
 		"frame": 35,
-		"description": "Start with a messy board, -10 on all damage"
+		"description": "Start with a messy board, -15 on all damage"
 	},
 	{
 		"id": 10,
@@ -82,7 +82,7 @@ var tier2Enemy = [
 		"health": 200,
 		"reward": 200,
 		"frame": 36,
-		"description": "Start with a messy board, -5 on all damage, -10 sec on the timer"
+		"description": "Start with a messy board, -10 on all damage, -10 sec on the timer"
 	},
 ]
 
@@ -98,7 +98,7 @@ var tier3Enemy = [
 	{
 		"id": 12,
 		"name": "huge worm",
-		"health": 1000,
+		"health": 800,
 		"reward": 200,
 		"frame": 44,
 		"description": "Start with a messy board, Extra high health"
@@ -144,7 +144,7 @@ var BossEnemy = [
 		"health": 400,
 		"reward": 150,
 		"frame": 50,
-		"description": "Start with a messy board, -10 on all damage"
+		"description": "Start with a messy board, -15 on all damage"
 	},
 	{
 		"id": 18,
@@ -152,12 +152,12 @@ var BossEnemy = [
 		"health": 450,
 		"reward": 200,
 		"frame": 52,
-		"description": "Start with a messy board, -10 on all damage, 20 less sec on the timer"
+		"description": "Start with a messy board, -15 on all damage, 20 less sec on the timer"
 	},
 	{
 		"id": 19,
 		"name": "death knight",
-		"health": 500,
+		"health": 1000,
 		"reward": 300,
 		"frame": 30,
 		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces"
@@ -207,7 +207,7 @@ var alchemyCommonItems = [
 	{
 		"id": 3,
 		"name": "Yellow Potion",
-		"description": "Increase tetris damage by 50 (Current %1)",
+		"description": "Increase tetris damage by 40 (Current %1)",
 		"price": 40,
 		"frame":147,
 		"tier": COMMON
@@ -234,7 +234,7 @@ var alchemyRareItems = [
 	{
 		"id": 6,
 		"name": "Red Potion+",
-		"description": "Increase single damage by 20 (Current %1)",
+		"description": "Increase single damage by 30 (Current %1)",
 		"price": 50,
 		"frame": 148,
 		"tier": RARE
@@ -250,7 +250,7 @@ var alchemyRareItems = [
 	{
 		"id": 8,
 		"name": "Green Potion+",
-		"description": "Increase triple damage by 60 (Current %1)",
+		"description": "Increase triple damage by 50 (Current %1)",
 		"price": 60,
 		"frame": 150,
 		"tier": RARE
@@ -258,7 +258,7 @@ var alchemyRareItems = [
 	{
 		"id": 9,
 		"name": "Yellow Potion+",
-		"description": "Increase tetris damage by 100 (Current %1)",
+		"description": "Increase tetris damage by 60 (Current %1)",
 		"price": 70,
 		"frame":151,
 		"tier": RARE
@@ -426,7 +426,7 @@ var howToPlay = "-Deal damage by clearing lines on a tetris board
 -consecutively clearing lines deals more damage
 -you lose a run when the timer runs out or the tetrimino
 reaches the top, base timer is 60 seconds
--you start with 100 coins, item shop shows up when you 
+-you start with 50 coins, item shop shows up when you 
 defeat an enemy,gather coins to spend at the shop
 -hover on shop items to see what it does
 -you can rebind control in the settings menu

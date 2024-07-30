@@ -57,7 +57,7 @@ func reset():
 	comboMult = 1.1
 	numberStoreItem = 6
 	timer = 60
-	coin = 80
+	coin = 50
 	hardDropDamage = false
 	treasureBox = false
 	ocarina = false
@@ -83,19 +83,19 @@ func applyUpgrades(id, price):
 		2:
 			tripleDamage += 30
 		3:
-			tetrisDamage += 50
+			tetrisDamage += 40
 		4:
 			comboMult += 0.1
 		5:
 			timer += 10
 		6:
-			singleDamage += 20
+			singleDamage += 30
 		7:
 			doubleDamage += 40
 		8:
-			tripleDamage += 60
+			tripleDamage += 50
 		9:
-			tetrisDamage += 100
+			tetrisDamage += 60
 		10:
 			timer += 15
 		11:

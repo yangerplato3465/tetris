@@ -79,15 +79,15 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 		4:
 			timerReduction = 10
 		5:
-			damageReductionFlat = 10
+			damageReductionFlat = 5
 		7:
 			timerReduction = 15
 		8:
-			timerReduction = 10
+			timerReduction = 20
 		9:
-			damageReductionFlat = 10
+			damageReductionFlat = 15
 		10:
-			damageReductionFlat = 5
+			damageReductionFlat = 10
 			timerReduction = 10
 		13:
 			timerReduction = 15
@@ -101,7 +101,7 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 		17:
 			damageReductionFlat = 10
 		18:
-			damageReductionFlat = 10
+			damageReductionFlat = 15
 			timerReduction = 20
 		19:
 			PlayerManager.holdPieceDebuff = true

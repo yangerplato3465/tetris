@@ -170,7 +170,6 @@ func _physics_process(delta):
 			sthHappened = true
 		actions = 0
 	if Input.is_action_just_pressed("hard_drop"):
-		hardDropShake()
 		hardDropPiece()
 		afterDrop()
 		sthHappened = true
@@ -239,6 +238,7 @@ func _on_LockTimer_timeout():
 
 func afterDrop():
 	AudioManager.drop.play()
+	hardDropShake()
 	lastPiece = currentPiece;
 	currentPiece = Piece.new()
 	checkAndClearFullLines()
