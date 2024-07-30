@@ -70,6 +70,7 @@ func setOptions(enemy):
 func onPressed(event: InputEvent, enemy, node: Control):
 	if(event.is_pressed()):
 		disableOthers()
+		PlayerManager.currentEnemy = enemy
 		Utilities.onPressed(node)
 		SignalManager.setStage.emit(enemy)
 		await Utilities.slideOut(PrepareScene)
@@ -88,6 +89,7 @@ func _on_close_pressed():
 	Utilities.onPressed(gameoverClose)
 
 func showGameoverPanel():
+	SignalManager.setStats.emit()
 	Utilities.slideIn(GameoverPanel)
 
 func _on_animation_player_animation_finished(anim_name):
@@ -98,8 +100,12 @@ func backToMenu():
 	get_tree().change_scene_to_file("res://Scene/Menu.tscn")
 
 func victory():
-	await Utilities.slideOut(MainScene)
-	Utilities.slideIn(ShopPanel)
+	if PlayerManager.currentLevel > 15:
+		SignalManager.setStats.emit(true)
+		Utilities.slideIn(GameoverPanel)
+	else:
+		await Utilities.slideOut(MainScene)
+		Utilities.slideIn(ShopPanel)
 
 func shopFinished():
 	await Utilities.slideOut(ShopPanel)

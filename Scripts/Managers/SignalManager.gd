@@ -4,6 +4,7 @@ signal setStage
 signal stageReady
 signal gameoverFromGrid
 signal gameoverFromTimer
+signal setStats
 
 # Gameplay ================
 signal clearLines

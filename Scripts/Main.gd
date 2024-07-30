@@ -178,6 +178,10 @@ func attack(clearedLines, combo):
 
 	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction
 	PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
+	PlayerManager.totalDamageDealt += damageDealt
+	PlayerManager.linesCleared += clearedLines
+	if (combo > PlayerManager.highestCombo):
+		PlayerManager.highestCombo = combo
 	updateEnemyHealth(damageDealt)
 
 func hardDrop():

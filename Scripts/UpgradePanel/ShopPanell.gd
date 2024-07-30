@@ -66,6 +66,8 @@ func onPressed(event: InputEvent, itemData, node):
 		node.gui_input.disconnect(onPressed)
 		PlayerManager.applyUpgrades(itemData.id, itemData.price)
 		coinLabel.text = str(PlayerManager.coin) # coin count
+		PlayerManager.coinsSpent += itemData.price # End stats
+		PlayerManager.itemsBought += 1 # End stats
 		updateTooltipInfo()
 
 func updateTooltipInfo():

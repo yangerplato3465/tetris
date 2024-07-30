@@ -35,6 +35,13 @@ var startGrid = [
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
 ]
 
+# End stats
+var currentEnemy = null;
+var coinsSpent = 0
+var itemsBought = 0
+var linesCleared = 0
+var highestCombo = 0
+var totalDamageDealt = 0
 
 func _ready():
 	pass
@@ -58,6 +65,13 @@ func reset():
 	alchemyArray = Consts.alchemyCommonItems
 	equipmentArray = Consts.equipmentCommonItems
 	holdPieceDebuff = false
+
+	currentEnemy = null;
+	coinsSpent = 0
+	itemsBought = 0
+	linesCleared = 0
+	highestCombo = 0
+	totalDamageDealt = 0
 
 func applyUpgrades(id, price):
 	coin -= price
