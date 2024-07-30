@@ -198,7 +198,7 @@ func attack(clearedLines, combo):
 
 func hardDrop():
 	if PlayerManager.hardDropDamage:
-		var damageDealt = (PlayerManager.singleDamage - damageReductionFlat) * damageReduction
+		var damageDealt = (50 - damageReductionFlat) * damageReduction
 		PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 		updateEnemyHealth(damageDealt)
 

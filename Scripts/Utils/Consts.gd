@@ -4,23 +4,23 @@ var tier1Enemy = [
 	{
 		"id": 1,
 		"name": "Orc",
-		"health": 150,
+		"health": 100,
 		"reward": 80,
 		"frame": 0,
-		"description": "Extra high health"
+		"description": ""
 	},
 	{
 		"id": 2,
 		"name": "Goblin",
-		"health": 100,
-		"reward": 60,
+		"health": 60,
+		"reward": 40,
 		"frame": 2,
 		"description": ""
 	},
 	{
 		"id": 3,
 		"name": "Slime",
-		"health": 100,
+		"health": 60,
 		"reward": 60,
 		"frame": 15,
 		"description": "Start with small messy board"
@@ -28,7 +28,7 @@ var tier1Enemy = [
 	{
 		"id": 4,
 		"name": "Centipede",
-		"health": 100,
+		"health": 60,
 		"reward": 60,
 		"frame": 42,
 		"description": "Start with 10 less sec on the timer"
@@ -36,7 +36,7 @@ var tier1Enemy = [
 	{
 		"id": 5,
 		"name": "Bat",
-		"health": 100,
+		"health": 60,
 		"reward": 60,
 		"frame": 48,
 		"description": "-5 on all damage"
@@ -63,7 +63,7 @@ var tier2Enemy = [
 	{
 		"id": 8,
 		"name": "Zombie",
-		"health": 300,
+		"health": 250,
 		"reward": 150,
 		"frame": 32,
 		"description": "Start with a messy board, -20 sec on the timer"
@@ -71,7 +71,7 @@ var tier2Enemy = [
 	{
 		"id": 9,
 		"name": "Banshee",
-		"health": 200,
+		"health": 250,
 		"reward": 150,
 		"frame": 35,
 		"description": "Start with a messy board, -15 on all damage"
@@ -79,7 +79,7 @@ var tier2Enemy = [
 	{
 		"id": 10,
 		"name": "Reaper",
-		"health": 200,
+		"health": 250,
 		"reward": 200,
 		"frame": 36,
 		"description": "Start with a messy board, -10 on all damage, -10 sec on the timer"
@@ -101,7 +101,7 @@ var tier3Enemy = [
 		"health": 800,
 		"reward": 200,
 		"frame": 44,
-		"description": "Start with a messy board, Extra high health"
+		"description": "Start with a messy board"
 	},
 	{
 		"id": 13,
@@ -133,8 +133,8 @@ var BossEnemy = [
 	{
 		"id": 16,
 		"name": "rock golem",
-		"health": 250,
-		"reward": 100,
+		"health": 200,
+		"reward": 120,
 		"frame": 51,
 		"description": "Start with a small messy board, 15 less sec on the timer"
 	},
@@ -183,7 +183,7 @@ var alchemyCommonItems = [
 	{
 		"id": 0,
 		"name": "Red Potion",
-		"description": "Increase single damage by 10 (Current %1)",
+		"description": "Increase single damage by 20 (Current %1)",
 		"price": 20,
 		"frame": 144,
 		"tier": COMMON
@@ -191,7 +191,7 @@ var alchemyCommonItems = [
 	{
 		"id": 1,
 		"name": "Blue Potion",
-		"description": "Increase double damage by 20 (Current %1)",
+		"description": "Increase double damage by 25 (Current %1)",
 		"price": 30,
 		"frame": 145,
 		"tier": COMMON
@@ -234,7 +234,7 @@ var alchemyRareItems = [
 	{
 		"id": 6,
 		"name": "Red Potion+",
-		"description": "Increase single damage by 30 (Current %1)",
+		"description": "Increase single damage by 40 (Current %1)",
 		"price": 50,
 		"frame": 148,
 		"tier": RARE
@@ -242,7 +242,7 @@ var alchemyRareItems = [
 	{
 		"id": 7,
 		"name": "Blue Potion+",
-		"description": "Increase double damage by 40 (Current %1)",
+		"description": "Increase double damage by 45 (Current %1)",
 		"price": 60,
 		"frame": 149,
 		"tier": RARE
@@ -353,7 +353,7 @@ var equipmentCommonItems = [
 		"id": 20,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
-		"price": 20,
+		"price": 30,
 		"frame": 169,
 		"tier": COMMON
 	},
@@ -361,7 +361,7 @@ var equipmentCommonItems = [
 		"id": 21,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
-		"price": 20,
+		"price": 30,
 		"frame": 169,
 		"tier": COMMON
 	},
@@ -369,7 +369,7 @@ var equipmentCommonItems = [
 		"id": 22,
 		"name": "Magnifying Glass",
 		"description": "See one more up coming piece",
-		"price": 20,
+		"price": 30,
 		"frame": 169,
 		"tier": COMMON
 	},
@@ -377,7 +377,7 @@ var equipmentCommonItems = [
 		"id": 23,
 		"name": "The lost chapter",
 		"description": "Rare and Epic items will appear in the shop",
-		"price": 20,
+		"price": 30,
 		"frame": 215,
 		"tier": COMMON
 	},
@@ -387,8 +387,8 @@ var equipmentRareItems = [
 	{
 		"id": 24,
 		"name": "Double Edge Sword",
-		"description": "Every time you hard drop, deal your single damage (%1) to the enemy",
-		"price": 80,
+		"description": "Every time you hard drop, deal 50 damage to the enemy",
+		"price": 150,
 		"frame": 82,
 		"tier": RARE
 	},

@@ -77,9 +77,9 @@ func applyUpgrades(id, price):
 	coin -= price
 	match id:
 		0: # Alchemy
-			singleDamage += 10
+			singleDamage += 20
 		1:
-			doubleDamage += 20
+			doubleDamage += 25
 		2:
 			tripleDamage += 30
 		3:
@@ -89,9 +89,9 @@ func applyUpgrades(id, price):
 		5:
 			timer += 10
 		6:
-			singleDamage += 30
+			singleDamage += 40
 		7:
-			doubleDamage += 40
+			doubleDamage += 45
 		8:
 			tripleDamage += 50
 		9:
