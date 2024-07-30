@@ -62,6 +62,7 @@ func createActionList():
 	
 func onInputButtonPressed(button, action):
 	if !isRemapping:
+		AudioManager.settings_press.play()
 		isRemapping = true
 		actionToRemap = action
 		remappingButton = button

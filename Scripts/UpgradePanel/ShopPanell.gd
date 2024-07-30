@@ -61,6 +61,7 @@ func onPressed(event: InputEvent, itemData, node):
 	if(event.is_pressed()):
 		if PlayerManager.coin < itemData.price:
 			return
+		AudioManager.money.play()
 		node.tooltip_text = ""
 		shrinkAndHide(node)
 		node.gui_input.disconnect(onPressed)
@@ -106,5 +107,6 @@ func formatDescriptionText(text, id):
 			
 
 func _on_skip_pressed():
+	AudioManager.kaching.play()
 	Utilities.onPressed(skipButton)
 	SignalManager.shopFinished.emit()

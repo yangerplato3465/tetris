@@ -7,6 +7,7 @@ func delete_children(node):
 			n.queue_free()
 
 func scaleUp(node):
+	AudioManager.hover.play()
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_ELASTIC) 
 	tween.set_ease(Tween.EASE_OUT)
@@ -19,6 +20,7 @@ func scaleDown(node):
 	tween.tween_property(node, "scale", Vector2(1, 1), 0.5)
 
 func onPressed(node):
+	AudioManager.button_press.play()
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_ELASTIC) 
 	tween.set_ease(Tween.EASE_OUT)

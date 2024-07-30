@@ -1,0 +1,80 @@
+[gd_scene load_steps=17 format=3 uid="uid://cekhmdav6p5i1"]
+
+[ext_resource type="Script" path="res://Scripts/Managers/AudioManager.gd" id="1_1b4k6"]
+[ext_resource type="AudioStream" uid="uid://bm45oajlbi27f" path="res://audio/music.mp3" id="2_qr32a"]
+[ext_resource type="AudioStream" uid="uid://diop3kbtb4fa7" path="res://audio/button_press.ogg" id="3_6v2a5"]
+[ext_resource type="AudioStream" uid="uid://soakt2a52c38" path="res://audio/button_hover.ogg" id="4_wyswp"]
+[ext_resource type="AudioStream" uid="uid://ix8q38o7yeat" path="res://audio/combo1.mp3" id="5_8rjl3"]
+[ext_resource type="AudioStream" uid="uid://c0iqi1lypvome" path="res://audio/combo2.mp3" id="6_0ijdn"]
+[ext_resource type="AudioStream" uid="uid://bcpj1siukpjtn" path="res://audio/combo3.mp3" id="7_kb4a5"]
+[ext_resource type="AudioStream" uid="uid://cf6jdysvbckm0" path="res://audio/combo4.mp3" id="8_kltma"]
+[ext_resource type="AudioStream" uid="uid://bw1gjx724kp5n" path="res://audio/combo5.mp3" id="9_ojye2"]
+[ext_resource type="AudioStream" uid="uid://fasboxo8dghw" path="res://audio/move.ogg" id="10_ravf5"]
+[ext_resource type="AudioStream" uid="uid://ndyhrhir6n6p" path="res://audio/rotate.ogg" id="11_n4tqr"]
+[ext_resource type="AudioStream" uid="uid://cjbsj5jsq6bpg" path="res://audio/drop.ogg" id="12_1mj2i"]
+[ext_resource type="AudioStream" uid="uid://c6ek4p1my1kp4" path="res://audio/money.mp3" id="13_bcj3m"]
+[ext_resource type="AudioStream" uid="uid://b1kmth50at811" path="res://audio/kaching.mp3" id="14_050l7"]
+[ext_resource type="AudioStream" uid="uid://d2beell75fejt" path="res://audio/settings_press.mp3" id="14_d8w1t"]
+[ext_resource type="AudioStream" uid="uid://ds3d16wrk40dv" path="res://audio/victory.mp3" id="16_8bo5k"]
+
+[node name="AudioManager" type="Node2D"]
+script = ExtResource("1_1b4k6")
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_qr32a")
+autoplay = true
+
+[node name="ButtonPress" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_6v2a5")
+volume_db = -20.0
+
+[node name="Hover" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_wyswp")
+volume_db = -20.0
+
+[node name="Combo1" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_8rjl3")
+volume_db = 10.0
+
+[node name="Combo2" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_0ijdn")
+volume_db = 10.0
+
+[node name="Combo3" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_kb4a5")
+volume_db = 10.0
+
+[node name="Combo4" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_kltma")
+volume_db = 10.0
+
+[node name="Combo5" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_ojye2")
+volume_db = 10.0
+
+[node name="Move" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10_ravf5")
+volume_db = -30.0
+
+[node name="Rotate" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11_n4tqr")
+volume_db = -25.0
+
+[node name="Drop" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_1mj2i")
+volume_db = -10.0
+
+[node name="Money" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("13_bcj3m")
+
+[node name="SettingsPress" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("14_d8w1t")
+volume_db = -20.0
+
+[node name="Kaching" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("14_050l7")
+volume_db = -10.0
+
+[node name="Victory" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("16_8bo5k")
+volume_db = -10.0

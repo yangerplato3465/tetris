@@ -175,6 +175,17 @@ func attack(clearedLines, combo):
 			damageDealt = PlayerManager.tetrisDamage
 			if PlayerManager.treasureBox:
 				showTreasureboxReward()
+	match combo:
+		1:
+			AudioManager.combo_1.play()
+		2:
+			AudioManager.combo_2.play()
+		3:
+			AudioManager.combo_3.play()
+		4:
+			AudioManager.combo_4.play()
+		_:
+			AudioManager.combo_5.play()
 
 	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction
 	PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
@@ -216,6 +227,7 @@ func attackAnim():
 		
 func showVictory():
 	await get_tree().create_timer(1).timeout
+	AudioManager.victory.play()
 	victoryLabel.scale = Vector2(0.5, 0.5)
 	victoryLabel.visible = true
 	var tween = create_tween()
@@ -229,6 +241,7 @@ func showVictory():
 
 func showReward():
 	await get_tree().create_timer(0.7).timeout
+	AudioManager.kaching.play()
 	PlayerManager.coin += reward
 	var tween = create_tween()
 	rewardLabel.scale = Vector2(0.5, 0.5)

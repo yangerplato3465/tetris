@@ -25,7 +25,7 @@ PlayerManager="*res://Scripts/Managers/PlayerManager.gd"
 SignalManager="*res://Scripts/Managers/SignalManager.gd"
 PopupNumbers="*res://Scripts/Managers/PopupNumbers.gd"
 Consts="*res://Scripts/Utils/Consts.gd"
-Audio="*res://Scene/Audio.tscn"
+AudioManager="*res://Scene/AudioManager.tscn"
 
 [display]
 
