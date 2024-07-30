@@ -422,7 +422,7 @@ var equipmentLegendaryItems = [
 ]
 
 var howToPlay = "-Deal damage by clearing lines on a tetris board
--The more lines cleared the more damage dealt
+-single = clear 1 line, double = clear 2 lines etc...
 -consecutively clearing lines deals more damage
 -you lose a run when the timer runs out or the tetrimino
 reaches the top, base timer is 60 seconds

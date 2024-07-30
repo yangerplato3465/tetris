@@ -13,6 +13,7 @@ func _ready():
 	SignalManager.victory.connect(generateItems)
 
 func generateItems():
+	currentItemData = []
 	coinLabel.text = str(PlayerManager.coin) # Init coin count
 	for item in container.get_children():
 		item.queue_free()
@@ -21,9 +22,10 @@ func generateItems():
 		setItem(PlayerManager.alchemyArray[index], true)
 		currentItemData.append(PlayerManager.alchemyArray[index])
 	
-	var equipmentData = Consts.equipmentCommonItems[randi_range(0, PlayerManager.equipmentArray.size() - 1)]
-	currentItemData.append(equipmentData)
-	setItem(equipmentData, false)
+	if PlayerManager.equipmentArray.size() > 0:
+		var equipmentData = Consts.equipmentCommonItems[randi_range(0, PlayerManager.equipmentArray.size() - 1)]
+		currentItemData.append(equipmentData)
+		setItem(equipmentData, false)
 
 func setItem(itemData, isAlchemy):
 	var item
