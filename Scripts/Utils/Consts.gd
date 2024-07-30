@@ -428,6 +428,7 @@ var howToPlay = "-Deal damage by clearing lines on a tetris board
 reaches the top, base timer is 60 seconds
 -you start with 100 coins, item shop shows up when you 
 defeat an enemy,gather coins to spend at the shop
+-hover on shop items to see what it does
 -you can rebind control in the settings menu
 -different enemies have certain debuff on you
 -There are a total of 15 levels, good luck!"
