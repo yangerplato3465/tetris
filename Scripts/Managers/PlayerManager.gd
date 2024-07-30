@@ -49,15 +49,15 @@ func _ready():
 func reset(): 
 	currentLevel = 1
 	visibleNextPiece = 1
-	canHoldPiece = true
+	canHoldPiece = false
 	singleDamage = 10
 	doubleDamage = 30
 	tripleDamage = 50
 	tetrisDamage = 80
 	comboMult = 1.1
 	numberStoreItem = 6
-	timer = 300
-	coin = 100
+	timer = 60
+	coin = 80
 	hardDropDamage = false
 	treasureBox = false
 	ocarina = false
