@@ -35,22 +35,28 @@ func setItem(itemData, isAlchemy):
 	var price = item.find_child("Price")
 	var itemName = item.find_child("Name")
 	itemName.label_settings = LabelSettings.new()
+	price.label_settings = LabelSettings.new()
 
 	icon.frame = itemData.frame
 	price.text = str(itemData.price)
 	itemName.text = itemData.name
-	var color
+	var tierColor
+	var priceColor = Color.BLACK
 	match itemData.tier:
 		Consts.COMMON:
-			color = Color.SEA_GREEN
+			tierColor = Color.SEA_GREEN
 		Consts.RARE:
-			color = Color.STEEL_BLUE
+			tierColor = Color.STEEL_BLUE
 		Consts.EPIC:
-			color = Color.REBECCA_PURPLE
+			tierColor = Color.REBECCA_PURPLE
 		Consts.LEGENDARY:
-			color = Color.GOLDENROD
+			tierColor = Color.GOLDENROD
+	
+	if itemData.price > PlayerManager.coin:
+		priceColor = Color.RED
 			
-	itemName.label_settings.font_color = color
+	itemName.label_settings.font_color = tierColor
+	price.label_settings.font_color = priceColor
 	item.tooltip_text = formatDescriptionText(itemData.description, itemData.id)
 	item.connect("mouse_entered", Utilities.scaleUp.bind(item))
 	item.connect("mouse_exited", Utilities.scaleDown.bind(item))
@@ -69,12 +75,15 @@ func onPressed(event: InputEvent, itemData, node):
 		coinLabel.text = str(PlayerManager.coin) # coin count
 		PlayerManager.coinsSpent += itemData.price # End stats
 		PlayerManager.itemsBought += 1 # End stats
-		updateTooltipInfo()
+		updateTooltipInfoAndPrice()
 
-func updateTooltipInfo():
+func updateTooltipInfoAndPrice():
 	var child = container.get_children()
 	for index in range(container.get_child_count()):
 		child[index].tooltip_text = formatDescriptionText(currentItemData[index].description, currentItemData[index].id)
+		if currentItemData[index].price > PlayerManager.coin:
+			var price = child[index].find_child("Price")
+			price.label_settings.font_color = Color.RED
 
 
 func shrinkAndHide(node):
