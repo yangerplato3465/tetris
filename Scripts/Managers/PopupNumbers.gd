@@ -4,11 +4,11 @@ extends Node
 func displayNumber(value: int, position: Vector2, isCritical: bool = false):
 	var number = Label.new()
 	number.global_position = position
-	number.text = str(value)
+	number.text = str(-value)
 	number.z_index = 5
 	number.label_settings = LabelSettings.new()
 	
-	var color = Color.YELLOW
+	var color = Color.RED
 	if isCritical:
 		color = Color.RED
 	if value == 0:

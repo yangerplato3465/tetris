@@ -31,6 +31,7 @@ var timerReduction = 0
 var damageReductionFlat = 0
 var damageReduction = 1
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
+const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 
 func _ready():
 	updateUI()
@@ -188,7 +189,7 @@ func attack(clearedLines, combo):
 			AudioManager.combo_5.play()
 
 	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction
-	PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
+	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	PlayerManager.totalDamageDealt += damageDealt
 	PlayerManager.linesCleared += clearedLines
 	if (combo > PlayerManager.highestCombo):
@@ -198,7 +199,7 @@ func attack(clearedLines, combo):
 func hardDrop():
 	if PlayerManager.hardDropDamage:
 		var damageDealt = (PlayerManager.singleDamage - damageReductionFlat) * damageReduction
-		PopupNumbers.displayNumber(damageDealt, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60))
+		PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 		updateEnemyHealth(damageDealt)
 
 func updateEnemyHealth(damageDealt):
