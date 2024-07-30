@@ -118,7 +118,7 @@ offset_left = 40.0
 offset_top = 24.0
 offset_right = 144.0
 offset_bottom = 54.0
-text = "single :"
+text = "single line:"
 label_settings = SubResource("LabelSettings_8i7nl")
 
 [node name="Number" type="Label" parent="Stats/Single"]
@@ -147,7 +147,7 @@ offset_left = 40.0
 offset_top = 24.0
 offset_right = 144.0
 offset_bottom = 54.0
-text = "double :"
+text = "double line:"
 label_settings = SubResource("LabelSettings_8i7nl")
 
 [node name="Number" type="Label" parent="Stats/Double"]
@@ -176,7 +176,7 @@ offset_left = 40.0
 offset_top = 24.0
 offset_right = 144.0
 offset_bottom = 54.0
-text = "triple :"
+text = "triple line:"
 label_settings = SubResource("LabelSettings_8i7nl")
 
 [node name="Number" type="Label" parent="Stats/Triple"]
