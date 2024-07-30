@@ -79,11 +79,11 @@ func applyUpgrades(id, price):
 		0: # Alchemy
 			singleDamage += 20
 		1:
-			doubleDamage += 25
+			doubleDamage += 20
 		2:
-			tripleDamage += 30
+			tripleDamage += 20
 		3:
-			tetrisDamage += 40
+			tetrisDamage += 20
 		4:
 			comboMult += 0.1
 		5:
@@ -91,15 +91,15 @@ func applyUpgrades(id, price):
 		6:
 			singleDamage += 40
 		7:
-			doubleDamage += 45
+			doubleDamage += 40
 		8:
-			tripleDamage += 50
+			tripleDamage += 40
 		9:
-			tetrisDamage += 60
+			tetrisDamage += 40
 		10:
 			timer += 15
 		11:
-			spawnBag.append_array([1, 1])
+			spawnBag.append_array([0, 0])
 		12:
 			comboMult += 0.1
 		13:

@@ -149,7 +149,7 @@ var BossEnemy = [
 	{
 		"id": 18,
 		"name": "centaur",
-		"health": 450,
+		"health": 800,
 		"reward": 200,
 		"frame": 52,
 		"description": "Start with a messy board, -15 on all damage, 20 less sec on the timer"
@@ -157,7 +157,7 @@ var BossEnemy = [
 	{
 		"id": 19,
 		"name": "death knight",
-		"health": 1000,
+		"health": 1200,
 		"reward": 300,
 		"frame": 30,
 		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces"
@@ -165,7 +165,7 @@ var BossEnemy = [
 	{
 		"id": 20,
 		"name": "Shadow Lord",
-		"health": 600,
+		"health": 1000,
 		"reward": 0,
 		"frame": 30,
 		"description": "Final boss, Start with a very messy board, all damage halfed"
@@ -191,7 +191,7 @@ var alchemyCommonItems = [
 	{
 		"id": 1,
 		"name": "Blue Potion",
-		"description": "Increase double damage by 25 (Current %1)",
+		"description": "Increase double damage by 20 (Current %1)",
 		"price": 30,
 		"frame": 145,
 		"tier": COMMON
@@ -199,7 +199,7 @@ var alchemyCommonItems = [
 	{
 		"id": 2,
 		"name": "Green Potion",
-		"description": "Increase triple damage by 30 (Current %1)",
+		"description": "Increase triple damage by 20 (Current %1)",
 		"price": 30,
 		"frame": 146,
 		"tier": COMMON
@@ -207,7 +207,7 @@ var alchemyCommonItems = [
 	{
 		"id": 3,
 		"name": "Yellow Potion",
-		"description": "Increase tetris damage by 40 (Current %1)",
+		"description": "Increase tetris damage by 20 (Current %1)",
 		"price": 40,
 		"frame":147,
 		"tier": COMMON
@@ -242,7 +242,7 @@ var alchemyRareItems = [
 	{
 		"id": 7,
 		"name": "Blue Potion+",
-		"description": "Increase double damage by 45 (Current %1)",
+		"description": "Increase double damage by 40 (Current %1)",
 		"price": 60,
 		"frame": 149,
 		"tier": RARE
@@ -250,7 +250,7 @@ var alchemyRareItems = [
 	{
 		"id": 8,
 		"name": "Green Potion+",
-		"description": "Increase triple damage by 50 (Current %1)",
+		"description": "Increase triple damage by 40 (Current %1)",
 		"price": 60,
 		"frame": 150,
 		"tier": RARE
@@ -258,7 +258,7 @@ var alchemyRareItems = [
 	{
 		"id": 9,
 		"name": "Yellow Potion+",
-		"description": "Increase tetris damage by 60 (Current %1)",
+		"description": "Increase tetris damage by 40 (Current %1)",
 		"price": 70,
 		"frame":151,
 		"tier": RARE
@@ -290,7 +290,7 @@ var alchemyRareItems = [
 	{
 		"id": 13,
 		"name": "Gray Powder",
-		"description": "Increase all type damage by 30",
+		"description": "Increase all type damage by 25",
 		"price": 80,
 		"frame": 332,
 		"tier": EPIC
