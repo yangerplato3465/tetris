@@ -387,7 +387,7 @@ var equipmentRareItems = [
 	{
 		"id": 24,
 		"name": "Double Edge Sword",
-		"description": "Every time you hard drop, deal 50 damage to the enemy",
+		"description": "Every time you hard drop, deal 20 damage to the enemy",
 		"price": 150,
 		"frame": 82,
 		"tier": RARE
