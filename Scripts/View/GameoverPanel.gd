@@ -30,7 +30,10 @@ func setStats(isWin = false):
 		var num = 0
 		match stat:
 			"Level":
-				num = PlayerManager.currentLevel
+				if PlayerManager.currentLevel > 15:
+					num = 15
+				else:
+					num = PlayerManager.currentLevel
 			"coins spent":
 				num = PlayerManager.coinsSpent
 			"items bought":
