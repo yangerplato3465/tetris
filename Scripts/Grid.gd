@@ -85,6 +85,7 @@ func resetGrid():
 	currentBag = newBag()
 	nextBag = newBag()
 	spawnFromBag()
+	$UI/Hold.reset()
 
 func stageReady():
 	drawGrid()

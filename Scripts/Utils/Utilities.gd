@@ -71,12 +71,15 @@ func chooseRandom(arraySize: int, size: int):
 	
 	return indices
 
-func shakeNode(node):
+func shakeNode(node, originalPos):
 	var tween = create_tween()
-	var shake = 10
+	var shake = 5
 	var shake_duration = 0.05
 	var shake_count = 20
 	var originalPosition = node.position
+	tween.finished.connect(func():
+		node.position = originalPos
+	)
 
 	for i in shake_count:
 		tween.tween_property(node, "position", Vector2(originalPosition.x + randf_range(-shake, shake), originalPosition.y + randf_range(-shake, shake)), 

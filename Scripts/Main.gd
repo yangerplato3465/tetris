@@ -187,7 +187,7 @@ func hardDrop():
 		updateEnemyHealth(damageDealt)
 
 func updateEnemyHealth(damageDealt):
-	Utilities.shakeNode(enemyHealth)
+	Utilities.shakeNode(enemyHealth, Vector2(862, 85))
 	currentEnemyHealth -= damageDealt
 	enemyHealth.text = str(Utilities.floorNum(currentEnemyHealth)) + " / " + str(currentEnemyMaxHealth)
 	if currentEnemyHealth <= 0:

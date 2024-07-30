@@ -10,3 +10,7 @@ func swapPiece(piece: Piece):
 	Utilities.delete_children(self)
 	drawPiece(piece, 0)
 	return returnPiece
+
+func reset():
+	holdPiece = null
+	Utilities.delete_children(self)
