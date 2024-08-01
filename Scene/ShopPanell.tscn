@@ -28,6 +28,7 @@ grow_vertical = 2
 script = ExtResource("1_r22dp")
 
 [node name="ColorRect" type="ColorRect" parent="."]
+visible = false
 layout_mode = 2
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -124,3 +125,5 @@ grow_horizontal = 2
 grow_vertical = 0
 pivot_offset = Vector2(40, 40)
 texture_normal = ExtResource("7_ut8dc")
+
+[connection signal="pressed" from="Skip" to="." method="_on_skip_pressed"]

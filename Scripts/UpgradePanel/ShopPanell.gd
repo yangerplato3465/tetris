@@ -5,22 +5,27 @@ extends Control
 @onready var equipmentItem = preload("res://Scene/Component/Equipment.tscn")
 @onready var coinLabel = $CoinIcon/Label
 @onready var skipButton = $Skip
+var currentItemData = []
 
 func _ready():
-	generateItems()
-	coinLabel.text = str(PlayerManager.coin)
 	skipButton.connect("mouse_entered", Utilities.scaleUp.bind(skipButton))
 	skipButton.connect("mouse_exited", Utilities.scaleDown.bind(skipButton))
+	SignalManager.victory.connect(generateItems)
 
 func generateItems():
+	currentItemData = []
+	coinLabel.text = str(PlayerManager.coin) # Init coin count
 	for item in container.get_children():
 		item.queue_free()
 	
-	for index in Utilities.chooseRandom(Consts.alchemyItems.size(), 5):
-		setItem(Consts.alchemyItems[index], true)
+	for index in Utilities.chooseRandom(PlayerManager.alchemyArray.size(), 5):
+		setItem(PlayerManager.alchemyArray[index], true)
+		currentItemData.append(PlayerManager.alchemyArray[index])
 	
-	var equipmentData = Consts.equipmentNormalItems[randi_range(0, Consts.equipmentNormalItems.size())]
-	setItem(equipmentData, false)
+	if PlayerManager.equipmentArray.size() > 0:
+		var equipmentData = Consts.equipmentCommonItems[randi_range(0, PlayerManager.equipmentArray.size() - 1)]
+		currentItemData.append(equipmentData)
+		setItem(equipmentData, false)
 
 func setItem(itemData, isAlchemy):
 	var item
@@ -32,24 +37,87 @@ func setItem(itemData, isAlchemy):
 	var price = item.find_child("Price")
 	var itemName = item.find_child("Name")
 	itemName.label_settings = LabelSettings.new()
+	price.label_settings = LabelSettings.new()
 
 	icon.frame = itemData.frame
 	price.text = str(itemData.price)
 	itemName.text = itemData.name
-	var color
+	var tierColor
+	var priceColor = Color.BLACK
 	match itemData.tier:
 		Consts.COMMON:
-			color = Color.GREEN
+			tierColor = Color.SEA_GREEN
 		Consts.RARE:
-			color = Color.BLUE
+			tierColor = Color.STEEL_BLUE
 		Consts.EPIC:
-			color = Color.PURPLE
+			tierColor = Color.REBECCA_PURPLE
 		Consts.LEGENDARY:
-			color = Color.GOLD
+			tierColor = Color.GOLDENROD
+	
+	if itemData.price > PlayerManager.coin:
+		priceColor = Color.RED
 			
-	itemName.label_settings.font_color = color
-	item.tooltip_text = itemData.description
+	itemName.label_settings.font_color = tierColor
+	price.label_settings.font_color = priceColor
+	item.tooltip_text = formatDescriptionText(itemData.description, itemData.id)
 	item.connect("mouse_entered", Utilities.scaleUp.bind(item))
 	item.connect("mouse_exited", Utilities.scaleDown.bind(item))
+	item.gui_input.connect(onPressed.bind(itemData, item))
 	container.add_child(item)
 
+func onPressed(event: InputEvent, itemData, node):
+	if(event.is_pressed()):
+		if PlayerManager.coin < itemData.price:
+			return
+		AudioManager.money.play()
+		node.tooltip_text = ""
+		shrinkAndHide(node)
+		node.gui_input.disconnect(onPressed)
+		PlayerManager.applyUpgrades(itemData.id, itemData.price)
+		coinLabel.text = str(PlayerManager.coin) # coin count
+		PlayerManager.coinsSpent += itemData.price # End stats
+		PlayerManager.itemsBought += 1 # End stats
+		updateTooltipInfoAndPrice()
+
+func updateTooltipInfoAndPrice():
+	var child = container.get_children()
+	for index in range(container.get_child_count()):
+		child[index].tooltip_text = formatDescriptionText(currentItemData[index].description, currentItemData[index].id)
+		if currentItemData[index].price > PlayerManager.coin:
+			var price = child[index].find_child("Price")
+			price.label_settings.font_color = Color.RED
+
+
+func shrinkAndHide(node):
+	var tween = create_tween()
+	tween.finished.connect(func():
+		node.modulate.a = 0
+		node.scale = Vector2(0, 0)
+	)
+	tween.set_trans(Tween.TRANS_BACK) 
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(node, "scale", Vector2(0.3, 0.3), 0.2)
+
+
+func formatDescriptionText(text, id):
+	var finalText = text
+	match id:
+		0, 6, 13, 19:
+			finalText = text.replace("%1", str(PlayerManager.singleDamage))
+		1, 7, 14:
+			finalText = text.replace("%1", str(PlayerManager.doubleDamage))
+		2, 8, 15:
+			finalText = text.replace("%1", str(PlayerManager.tripleDamage))
+		3, 9, 16:
+			finalText = text.replace("%1", str(PlayerManager.tetrisDamage))
+		4, 12, 18:
+			finalText = text.replace("%1", str(PlayerManager.comboMult))
+		5, 10:
+			finalText = text.replace("%1", str(PlayerManager.timer))
+	return finalText
+			
+
+func _on_skip_pressed():
+	AudioManager.kaching.play()
+	Utilities.onPressed(skipButton)
+	SignalManager.shopFinished.emit()

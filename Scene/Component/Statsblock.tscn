@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=3 uid="uid://cw4tlrgmwn2lt"]
+
+[ext_resource type="Texture2D" uid="uid://dn7de5o0sb7i2" path="res://Sprite/Cards/setting_buttons.png" id="1_8pkjx"]
+[ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="2_uwkkc"]
+
+[node name="StatsBlock" type="NinePatchRect"]
+custom_minimum_size = Vector2(0, 50)
+size_flags_vertical = 0
+texture = ExtResource("1_8pkjx")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="StatName" type="Label" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 11.0
+offset_right = 299.0
+offset_bottom = 41.0
+theme_override_fonts/font = ExtResource("2_uwkkc")
+theme_override_font_sizes/font_size = 32
+text = "total damage dealt:"
+vertical_alignment = 1
+
+[node name="StatNum" type="Label" parent="."]
+layout_mode = 0
+offset_left = 315.0
+offset_top = 11.0
+offset_right = 530.0
+offset_bottom = 41.0
+theme_override_fonts/font = ExtResource("2_uwkkc")
+theme_override_font_sizes/font_size = 32
+text = "1231231"
+horizontal_alignment = 2
+vertical_alignment = 1

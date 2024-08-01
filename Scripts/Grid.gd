@@ -19,6 +19,10 @@ const darkMaterial = preload("res://extras/DarkMaterial.tres")
 
 const DropParticle = preload("res://Scene/DropParticle.tscn")
 const ClearParticle = preload("res://Scene/ClearParticle.tscn")
+@onready var gridBg = $UI/GridBackground
+@onready var border = $UI/Border
+const GRIDBG_POS = Vector2(230, 101)
+const BORDER_POS = Vector2(218, 88)
 
 var timer = 0
 var deltaSum = 0
@@ -33,6 +37,7 @@ var speed = 1
 var hasSwapped = false
 var hasCleared = false
 var combo = 0
+var startingBoard = []
 
 var currentBag
 var nextBag
@@ -44,20 +49,50 @@ enum Direction {CLOCKWISE, ANTICLOCKWISE}
 func _ready():
 	gridOffsetX = $UI/Border.position.x + BORDER_OFFSET
 	gridOffsetY = $UI/Border.position.y - (vanishZone-1)*spriteSize
-	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, PlayerManager.startGrid)
+	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, Utilities.generateMediumMessyBoard())
 	
 	currentBag = newBag()
 	nextBag = newBag()
 	spawnFromBag()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
 	SignalManager.stageReady.connect(stageReady)
+	SignalManager.stopGrid.connect(stopGrid)
+	SignalManager.resetGrid.connect(resetGrid)
+	SignalManager.setStage.connect(setStage)
+
+func setStage(enemyInfo): # Set stage base on enemy abilities and stats
+	match enemyInfo.id:
+		3, 16:
+			startingBoard = Utilities.generateSmallMessyBoard()
+		6, 8, 9, 10, 17, 18, 12, 13, 15:
+			startingBoard = Utilities.generateMediumMessyBoard()
+		11, 20:
+			startingBoard = Utilities.generateLargeMessyBoard()
+		14:
+			startingBoard = Utilities.generateMediumMessyBoard()
+		19:
+			startingBoard = Utilities.generateLargeMessyBoard()
+		_:
+			startingBoard = PlayerManager.startGrid
+		
+
+func stopGrid():
+	set_physics_process(false)
+
+func resetGrid():
+	set_physics_process(true)
+	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, startingBoard)
+	currentBag = newBag()
+	nextBag = newBag()
+	spawnFromBag()
+	$UI/Hold.reset()
 
 func stageReady():
 	drawGrid()
 	drawDroppingPoint()
 
 func newBag():
-	var bagIndexes = [0,1,2,3,4,5,6]
+	var bagIndexes = PlayerManager.spawnBag
 	var newBagIndexes = bagIndexes.duplicate()
 	newBagIndexes.shuffle()
 	var bag = []
@@ -96,6 +131,7 @@ func _physics_process(delta):
 		#get_tree().quit()
 	if Input.is_action_just_pressed("right"):
 		if canPieceMoveRight():
+			AudioManager.move.play()
 			movePieceInGrid(1,0)
 			sthHappened = true
 			actions += 1
@@ -103,6 +139,7 @@ func _physics_process(delta):
 		dasCounter = 0
 	if Input.is_action_just_pressed("left"):
 		if canPieceMoveLeft():
+			AudioManager.move.play()
 			movePieceInGrid(-1,0)
 			sthHappened = true
 			actions += 1
@@ -113,11 +150,13 @@ func _physics_process(delta):
 	if (deltaSum > 2*delta) && (dasCounter>dasDelay):
 		if Input.is_action_pressed("right"):
 			if canPieceMoveRight():
+				AudioManager.move.play()
 				movePieceInGrid(1,0)
 				sthHappened = true
 				actions += 1
 		if Input.is_action_pressed("left"):
 			if canPieceMoveLeft():
+				AudioManager.move.play()
 				movePieceInGrid(-1,0)
 				sthHappened = true
 				actions += 1
@@ -137,22 +176,25 @@ func _physics_process(delta):
 		timer=0
 		actions = 0
 	if Input.is_action_just_pressed("rotate_right"):
+		AudioManager.rotatePiece.play()
 		var kickValues = getPosibleRotation(Direction.CLOCKWISE)
 		if kickValues != null:
 			rotatePiece(Direction.CLOCKWISE, kickValues)
 			sthHappened = true
 			actions += 1
 	if Input.is_action_just_pressed("rotate_left"):
+		AudioManager.rotatePiece.play()
 		var kickValues = getPosibleRotation(Direction.ANTICLOCKWISE)
 		if kickValues != null:
 			rotatePiece(Direction.ANTICLOCKWISE, kickValues)
 			sthHappened = true
 			actions += 1
 	if Input.is_action_just_pressed("hold_piece"):
-		if (!hasSwapped && PlayerManager.canHoldPiece):
+		if (!hasSwapped && PlayerManager.canHoldPiece && !PlayerManager.holdPieceDebuff):
+			AudioManager.drop.play()
 			deletePieceFromGrid()
 			
-			#Particle
+			# Particle
 			# var particle = HoldParticle.instantiate()
 			# particle.setDestination($UI/Hold.position + $UI/Hold.size/2)
 			# particle.texture = currentPiece.getTextureForPiece()
@@ -195,6 +237,8 @@ func _on_LockTimer_timeout():
 		prevActions = actions
 
 func afterDrop():
+	AudioManager.drop.play()
+	hardDropShake()
 	lastPiece = currentPiece;
 	currentPiece = Piece.new()
 	checkAndClearFullLines()
@@ -241,6 +285,7 @@ func drawDroppingPoint():
 					add_child(circle)
 	
 func hardDropPiece():
+	SignalManager.hardDrop.emit()
 	while (canPieceMoveDown()):
 		score += 2
 		$UI/Score/ScoreNumber.text = str(score)
@@ -452,3 +497,11 @@ func deletePieceFromGrid():
 			if currentPiece.shape[x][y] != 0:
 				grid[x+currentPiece.positionInGrid.x][y+currentPiece.positionInGrid.y] = 0
 	
+func hardDropShake():
+	var tween = create_tween()
+	tween.finished.connect(func():
+		position = Vector2(0, 0)
+	)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.tween_property(self, "position:y", 2, 0.1)
