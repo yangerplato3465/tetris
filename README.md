@@ -1,34 +1,8 @@
-# PokeTetris - Modern Tetris in Godot
+# Alchetris - a submission for pirate software game jam
 
-Updated for Godot 4.
-A Godot clone of modern versions of tetris. With Pokeballs.
+Made with Godot 4.2
 
-![gameplay](https://github.com/jpcerrone/tetrisGodot/blob/master/spr/ReadmeDemo.gif)
+Alchetris is a roguelike puzzle game, you play as an alchemist trying to defeat a secret evil cult, the combat system will be similar to the game “Tetris Battle”, Throughout the run you’ll acquire upgrades, potions and weapons to help you.
 
-## Features
-* Super Rotation System (With wallkicks).
-* Hard and soft dropping.
-* Hold piece.
-* Next pieces.
-* 7-Bagging algorithm for piece generation.
-* Ghost piece.
-* Levels/Lines/Scoring system.
-* Infinity.
-* DAS delay.
+Tetris base game made by [Juan Cerrone](https://www.youtube.com/user/jpcerrone)
 
-## Controls:
-* Arrow keys (L-R): Move left and right
-* Z: Rotate left
-* X: Rotate right
-* Up Key: Hard Drop
-* Down Key: Soft Drop
-* CTRL: Hold piece
-* ESC: Quit game
-
-## Author
-Juan Cerrone
-
-If you like my work you can follow me here:
-* https://www.youtube.com/user/jpcerrone (Music/Programming)
-* https://www.instagram.com/juan.cerrone.pixel.art/ (Pixel Art)
-* https://open.spotify.com/artist/6H2QtCjF5ANcG7PhiRWNCq?si=3t06lhQ2RVm1r3B7c1vHDA (Spotify)
