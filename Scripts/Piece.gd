@@ -52,4 +52,3 @@ func getShapeName():
 		5: return "T"
 		6: return "Z"
 		7: return "S"
-

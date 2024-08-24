@@ -241,12 +241,45 @@ func afterDrop():
 	hardDropShake()
 	lastPiece = currentPiece;
 	currentPiece = Piece.new()
-	checkAndClearFullLines()
+	# Check for T-spin before clearing lines
+	var tSpinType = checkTSpin()
+	checkAndClearFullLines(tSpinType)
 	if (checkGameOver()):
 		SignalManager.gameoverFromTimer.emit()
 		gameover()
 	spawnFromBag()
 	hasSwapped = false
+
+func checkTSpin():
+	if lastPiece.getShapeName() != "T" or lastPiece.rotationState == 0:
+		return null
+	
+	var cornersFilled = 0
+	var frontCornersFilled = 0
+	var x = lastPiece.positionInGrid.x
+	var y = lastPiece.positionInGrid.y
+	
+	# Check all four corners
+	if x > 0 and y > 0 and grid[x-1][y-1] != 0: cornersFilled += 1
+	if x > 0 and y+2 < gridHeight and grid[x-1][y+2] != 0: cornersFilled += 1
+	if x+2 < gridWidth and y > 0 and grid[x+2][y-1] != 0: cornersFilled += 1
+	if x+2 < gridWidth and y+2 < gridHeight and grid[x+2][y+2] != 0: cornersFilled += 1
+	
+	# Check front corners based on rotation state
+	match lastPiece.rotationState:
+		1: # Right
+			if x > 0 and y > 0 and grid[x-1][y-1] != 0: frontCornersFilled += 1
+			if x > 0 and y+2 < gridHeight and grid[x-1][y+2] != 0: frontCornersFilled += 1
+		2: # Down
+			if x > 0 and y+2 < gridHeight and grid[x-1][y+2] != 0: frontCornersFilled += 1
+			if x+2 < gridWidth and y+2 < gridHeight and grid[x+2][y+2] != 0: frontCornersFilled += 1
+		3: # Left
+			if x+2 < gridWidth and y > 0 and grid[x+2][y-1] != 0: frontCornersFilled += 1
+			if x+2 < gridWidth and y+2 < gridHeight and grid[x+2][y+2] != 0: frontCornersFilled += 1
+	
+	if cornersFilled >= 3:
+		return "Full" if frontCornersFilled == 2 else "Mini"
+	return null
 
 func gameover():
 	set_physics_process(false)
@@ -313,7 +346,7 @@ func checkGameOver():
 			return true
 	return false
 
-func checkAndClearFullLines():
+func checkAndClearFullLines(tSpinType = null):
 	var cleared = 0
 	for y in range(gridHeight):
 		var fullLine = true
@@ -345,6 +378,8 @@ func checkAndClearFullLines():
 		hasCleared = true
 		combo += 1
 		var newScore
+		if tSpinType:
+			print("T-Spin detected: " + tSpinType)
 		match (cleared):
 			1: newScore=100*level
 			2: newScore=300*level

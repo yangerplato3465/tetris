@@ -268,5 +268,3 @@ func showTreasureboxReward():
 	tween.finished.connect(func():
 		rewardLabel.visible = false
 	)
-
-
