@@ -7,6 +7,9 @@ export_templates/
 # 所有匯入快取檔案
 *.import
 
+# Godot 4.x UID 檔案
+*.uid
+
 # 系統檔案
 .DS_Store
 Thumbs.db
