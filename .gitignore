@@ -1,12 +1,20 @@
-# Godot-specific ignores
-.import/
+# Godot 4+ 專案檔案
 .godot/
-export.cfg
+.import/
 export_presets.cfg
+export_templates/
 
-# Imported translations (automatically generated from CSV files)
-*.translation
+# 所有匯入快取檔案
+*.import
 
-# Mono-specific ignores
-.mono/
-data_*/
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# IDE 檔案
+.vscode/
+.idea/
+
+# 備份檔案
+*.bak
+*.tmp
