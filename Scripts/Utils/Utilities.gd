@@ -50,18 +50,21 @@ func slideOut(outNode):
 	tween.tween_property(outNode, "position:y", outNode.position.y + 500, 0.5)
 	tween.finished.connect(func():
 		outNode.visible = false
+		# 重置位置，避免下次 slideIn 時位置錯誤
+		outNode.position.y = 0
 	)
 
-func slideIn(node, callback: Callable = func():):
+func slideIn(node, callback: Callable = Callable()):
 	node.visible = true
 	node.position.y = 900
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_QUINT) 
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(node, "position:y", 0, 1).set_delay(1)
-	tween.finished.connect(func():
-		callback.call()
-	)
+	if callback.is_valid():
+		tween.finished.connect(func():
+			callback.call()
+		)
 
 func chooseRandom(arraySize: int, size: int):
 	var indices = []

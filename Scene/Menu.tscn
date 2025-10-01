@@ -1,9 +1,9 @@
 [gd_scene load_steps=27 format=3 uid="uid://boi74rmhircqc"]
 
-[ext_resource type="Script" path="res://Scripts/Menu.gd" id="1_ay6wy"]
-[ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_7qibs"]
-[ext_resource type="Shader" path="res://Shader/TransitionIn.gdshader" id="2_bti5n"]
-[ext_resource type="Shader" path="res://Shader/TransitionOut.gdshader" id="2_cmgbi"]
+[ext_resource type="Script" uid="uid://g02sasiyswxi" path="res://Scripts/Menu.gd" id="1_ay6wy"]
+[ext_resource type="Shader" uid="uid://cii88wev2kbnl" path="res://Shader/Background.gdshader" id="2_7qibs"]
+[ext_resource type="Shader" uid="uid://eryupsfxricg" path="res://Shader/TransitionIn.gdshader" id="2_bti5n"]
+[ext_resource type="Shader" uid="uid://41j2ydfh2saq" path="res://Shader/TransitionOut.gdshader" id="2_cmgbi"]
 [ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="3_wde31"]
 [ext_resource type="Texture2D" uid="uid://c8axk1wq1awhf" path="res://Sprite/pallette.png" id="3_y3v8b"]
 [ext_resource type="Texture2D" uid="uid://decvwuodicu0" path="res://Sprite/bg/025.png" id="4_5a6tp"]
@@ -13,7 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://bhwmx8lr2ruro" path="res://Sprite/Cards/exit.png" id="11_k6ab6"]
 [ext_resource type="Texture2D" uid="uid://dag1kuse68ky4" path="res://Sprite/Cards/UI_panel.png" id="12_6bv47"]
 [ext_resource type="PackedScene" uid="uid://cuniow6nu4gtf" path="res://Scene/Component/button.tscn" id="13_232uo"]
-[ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="14_c6aba"]
+[ext_resource type="Shader" uid="uid://o6q41yd3ggi3" path="res://Shader/WavyText.gdshader" id="14_c6aba"]
 [ext_resource type="Texture2D" uid="uid://dxnfbt3cw5jmg" path="res://Sprite/Character/rogues.png" id="15_ohg24"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_v1mak"]
@@ -125,9 +125,9 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ggal3"]
 _data = {
-"FadeIn": SubResource("Animation_og2y8"),
-"FadeOut": SubResource("Animation_50ha7"),
-"RESET": SubResource("Animation_acykq")
+&"FadeIn": SubResource("Animation_og2y8"),
+&"FadeOut": SubResource("Animation_50ha7"),
+&"RESET": SubResource("Animation_acykq")
 }
 
 [sub_resource type="LabelSettings" id="LabelSettings_byx5h"]
@@ -317,6 +317,7 @@ vframes = 5
 frame = 20
 
 [node name="TransitionIn" type="Sprite2D" parent="."]
+visible = false
 modulate = Color(0.133333, 0.133333, 0.133333, 1)
 self_modulate = Color(0, 0, 0, 1)
 show_behind_parent = true
@@ -336,7 +337,7 @@ texture = ExtResource("3_wde31")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_ggal3")
+&"": SubResource("AnimationLibrary_ggal3")
 }
 autoplay = "FadeIn"
 
@@ -389,15 +390,15 @@ label_settings = SubResource("LabelSettings_byx5h")
 
 [node name="Close" type="TextureButton" parent="RulesPanel"]
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -98.0
-offset_right = 40.0
-offset_bottom = -18.0
+anchors_preset = -1
+anchor_left = 0.98200005
+anchor_top = 0.008
+anchor_right = 0.98200005
+anchor_bottom = 0.008
+offset_left = -40.216064
+offset_top = -40.232002
+offset_right = 39.783936
+offset_bottom = 39.767998
 grow_horizontal = 2
 grow_vertical = 0
 pivot_offset = Vector2(40, 40)
@@ -466,15 +467,15 @@ text = "Keybind settings"
 
 [node name="Close" type="TextureButton" parent="Settings"]
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -90.0
-offset_right = 40.0
-offset_bottom = -10.0
+anchors_preset = -1
+anchor_left = 0.9850001
+anchor_top = 0.008
+anchor_right = 0.9850001
+anchor_bottom = 0.008
+offset_left = -39.960083
+offset_top = -40.088
+offset_right = 40.039917
+offset_bottom = 39.912
 grow_horizontal = 2
 grow_vertical = 0
 pivot_offset = Vector2(40, 40)

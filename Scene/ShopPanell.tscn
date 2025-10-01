@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://c207dqp8bvfn6"]
 
-[ext_resource type="Script" path="res://Scripts/UpgradePanel/ShopPanell.gd" id="1_r22dp"]
-[ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="4_01mgo"]
+[ext_resource type="Script" uid="uid://dend1tgye70pt" path="res://Scripts/UpgradePanel/ShopPanell.gd" id="1_r22dp"]
+[ext_resource type="Shader" uid="uid://o6q41yd3ggi3" path="res://Shader/WavyText.gdshader" id="4_01mgo"]
 [ext_resource type="Texture2D" uid="uid://dag1kuse68ky4" path="res://Sprite/Cards/UI_panel.png" id="4_u68ra"]
 [ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="5_3ist3"]
 [ext_resource type="Texture2D" uid="uid://dsgrdlsg4whoe" path="res://Sprite/Cards/coins_icon.png" id="6_d6dv6"]
@@ -29,7 +29,7 @@ script = ExtResource("1_r22dp")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 visible = false
-layout_mode = 2
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -76,6 +76,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = 60.0
+offset_right = -100.0
+offset_bottom = -125.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 80
@@ -85,6 +89,8 @@ theme_override_constants/margin_bottom = 40
 
 [node name="GridContainer" type="GridContainer" parent="ShopPanel/MarginContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme_override_constants/h_separation = 65
 theme_override_constants/v_separation = 35
 columns = 3
