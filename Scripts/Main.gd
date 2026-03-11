@@ -1,5 +1,8 @@
 extends Control
 
+signal timer_gameover
+signal stage_victory
+
 # UI
 @onready var singleText = $Stats/Single/Number
 @onready var doubleText = $Stats/Double/Number
@@ -42,16 +45,13 @@ func _ready():
 	timeLabel.label_settings.font_size = 80
 
 func connectSignals():
-	SignalManager.setStage.connect(setStage)
-	SignalManager.stageReady.connect(stageReady)
-	# SignalManager.gameoverFromTimer.connect(gameover)
-	SignalManager.clearLines.connect(attack)
-	SignalManager.unlockHold.connect(unlockHold)
-	SignalManager.unlockNextPiece.connect(unlockNextPiece)
-	SignalManager.hardDrop.connect(hardDrop)
-	SignalManager.shieldChanged.connect(updateShieldUI)
+	$Grid.clearLines.connect(attack)
+	$Grid.hardDrop.connect(hardDrop)
+	$Grid.shieldChanged.connect(updateShieldUI)
+	PlayerManager.unlockHold.connect(unlockHold)
+	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
 	timer.timeout.connect(func():
-		SignalManager.gameoverFromTimer.emit()
+		timer_gameover.emit()
 		gameover()
 	)
 
@@ -125,7 +125,7 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 
 
 func gameover():
-	SignalManager.stopGrid.emit()
+	$Grid.stopGrid()
 	timerStarted = false
 	timer.stop()
 	set_process(false)
@@ -218,7 +218,7 @@ func updateEnemyHealth(damageDealt):
 func victory():
 	PlayerManager.currentLevel += 1
 	animationPlayer.play("EnemyDeath")
-	SignalManager.stopGrid.emit()
+	$Grid.stopGrid()
 	showVictory()
 	timer.stop()
 	set_process(false)
@@ -259,7 +259,7 @@ func showReward():
 	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 2)
 	tween.finished.connect(func():
 		rewardLabel.visible = false
-		SignalManager.victory.emit()
+		stage_victory.emit()
 	)
 
 func showTreasureboxReward():

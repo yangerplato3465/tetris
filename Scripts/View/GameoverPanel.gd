@@ -16,7 +16,7 @@ var statsToShow = [
 ]
 
 func _ready():
-	SignalManager.setStats.connect(setStats)
+	pass
 
 func setStats(isWin = false):
 	endLabel.text = "you win!!" if isWin else "Game over!"

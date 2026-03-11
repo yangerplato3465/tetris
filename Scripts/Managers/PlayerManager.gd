@@ -1,5 +1,8 @@
 extends Node
 
+signal unlockHold(unlock)
+signal unlockNextPiece
+
 # Level vars============
 var currentLevel = 1
 
@@ -123,19 +126,19 @@ func applyUpgrades(id, price):
 			comboMult += 0.5
 		19: # Equipments
 			canHoldPiece = true
-			SignalManager.unlockHold.emit(false)
+			unlockHold.emit(false)
 			removeEquipment(19)
 		20:
 			visibleNextPiece += 1
-			SignalManager.unlockNextPiece.emit()
+			unlockNextPiece.emit()
 			removeEquipment(20)
 		21:
 			visibleNextPiece += 1
-			SignalManager.unlockNextPiece.emit()
+			unlockNextPiece.emit()
 			removeEquipment(21)
 		22:
 			visibleNextPiece += 1
-			SignalManager.unlockNextPiece.emit()
+			unlockNextPiece.emit()
 			removeEquipment(22)
 		23:
 			updateItemArrays(1)

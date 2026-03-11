@@ -1,5 +1,10 @@
 extends Node2D
 
+signal clearLines(cleared, combo)
+signal hardDrop
+signal shieldChanged
+signal grid_gameover
+
 var grid = []
 const gridWidth = 10
 const gridHeight = 23
@@ -55,10 +60,6 @@ func _ready():
 	nextBag = newBag()
 	spawnFromBag()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
-	SignalManager.stageReady.connect(stageReady)
-	SignalManager.stopGrid.connect(stopGrid)
-	SignalManager.resetGrid.connect(resetGrid)
-	SignalManager.setStage.connect(setStage)
 
 func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	match enemyInfo.id:
@@ -247,7 +248,7 @@ func afterDrop():
 	var tSpinType = checkTSpin()
 	checkAndClearFullLines(tSpinType)
 	if (checkGameOver()):
-		SignalManager.gameoverFromTimer.emit()
+		grid_gameover.emit()
 		gameover()
 	spawnFromBag()
 	hasSwapped = false
@@ -321,7 +322,7 @@ func drawDroppingPoint():
 					add_child(circle)
 	
 func hardDropPiece():
-	SignalManager.hardDrop.emit()
+	hardDrop.emit()
 	while (canPieceMoveDown()):
 		score += 2
 		$UI/Score/ScoreNumber.text = str(score)
@@ -363,7 +364,7 @@ func printClearedBlockTypes(y):
 	print("Cleared line — normal: %d, fire: %d, ice: %d, poison: %d" % [normal, fire, ice, poison])
 	if ice > 0:
 		PlayerManager.shieldNum = mini(PlayerManager.shieldNum + ice, PlayerManager.maxShieldNum)
-		SignalManager.shieldChanged.emit()
+		shieldChanged.emit()
 
 func checkAndClearFullLines(tSpinType = null):
 	var cleared = 0
@@ -417,7 +418,7 @@ func checkAndClearFullLines(tSpinType = null):
 			# level+=1
 			# speed = pow(0.8-(level-1)*0.007,level-1)
 			# $UI/Level/LevelNumber.text = str(level)
-		SignalManager.clearLines.emit(cleared, combo)
+		clearLines.emit(cleared, combo)
 	else:
 		hasCleared = false
 		combo = 0

@@ -1,5 +1,7 @@
 extends Control
 
+signal shopFinished
+
 @onready var container = $ShopPanel/MarginContainer/GridContainer
 @onready var shopItem = preload("res://Scene/Component/Item.tscn")
 @onready var equipmentItem = preload("res://Scene/Component/Equipment.tscn")
@@ -10,7 +12,6 @@ var currentItemData = []
 func _ready():
 	skipButton.connect("mouse_entered", Utilities.scaleUp.bind(skipButton))
 	skipButton.connect("mouse_exited", Utilities.scaleDown.bind(skipButton))
-	SignalManager.victory.connect(generateItems)
 
 func generateItems():
 	currentItemData = []
@@ -120,4 +121,4 @@ func formatDescriptionText(text, id):
 func _on_skip_pressed():
 	AudioManager.kaching.play()
 	Utilities.onPressed(skipButton)
-	SignalManager.shopFinished.emit()
+	shopFinished.emit()

@@ -4,6 +4,7 @@ extends Control
 @onready var MainScene = $Main
 @onready var GameoverPanel = $GameoverPanel
 @onready var ShopPanel = $ShopPanel
+@onready var grid = $Main/Grid
 
 @onready var enemyOptionPrefab = preload("res://Scene/Component/enemyOption.tscn")
 @onready var enemyOptionContainer = $PrepareScene/EnemyOptionContainer
@@ -16,10 +17,11 @@ func _ready():
 	generateRandomEnemies()
 	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
-	SignalManager.gameoverFromGrid.connect(showGameoverPanel)
-	SignalManager.gameoverFromTimer.connect(showGameoverPanel)
-	SignalManager.victory.connect(victory)
-	SignalManager.shopFinished.connect(shopFinished)
+	grid.grid_gameover.connect(showGameoverPanel)
+	MainScene.timer_gameover.connect(showGameoverPanel)
+	MainScene.stage_victory.connect(victory)
+	MainScene.stage_victory.connect(ShopPanel.generateItems)
+	ShopPanel.shopFinished.connect(shopFinished)
 
 func generateRandomEnemies():
 	levelText.text = "level %d" % PlayerManager.currentLevel
@@ -72,12 +74,14 @@ func onPressed(event: InputEvent, enemy, node: Control):
 		disableOthers()
 		PlayerManager.currentEnemy = enemy
 		Utilities.onPressed(node)
-		SignalManager.setStage.emit(enemy)
+		MainScene.setStage(enemy)
+		grid.setStage(enemy)
 		await Utilities.slideOut(PrepareScene)
-		Utilities.slideIn(MainScene, func(): 
-			SignalManager.stageReady.emit()	
+		Utilities.slideIn(MainScene, func():
+			MainScene.stageReady()
+			grid.stageReady()
 		)
-		SignalManager.resetGrid.emit()
+		grid.resetGrid()
 
 func disableOthers():
 	for child in enemyOptionContainer.get_children():
@@ -89,7 +93,7 @@ func _on_close_pressed():
 	Utilities.onPressed(gameoverClose)
 
 func showGameoverPanel():
-	SignalManager.setStats.emit()
+	GameoverPanel.setStats()
 	Utilities.slideIn(GameoverPanel)
 
 func _on_animation_player_animation_finished(anim_name):
@@ -101,7 +105,7 @@ func backToMenu():
 
 func victory():
 	if PlayerManager.currentLevel > 15:
-		SignalManager.setStats.emit(true)
+		GameoverPanel.setStats(true)
 		Utilities.slideIn(GameoverPanel)
 	else:
 		await Utilities.slideOut(MainScene)

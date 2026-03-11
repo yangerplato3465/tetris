@@ -1,10 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://cvpblfhm2at7x"]
+[gd_scene format=3 uid="uid://cvpblfhm2at7x"]
 
-[ext_resource type="Texture2D" uid="uid://b8tc86y4x66ja" path="res://Sprite/Logo/chowdog studio LOGO-08.png" id="1_ox2t1"]
-[ext_resource type="Script" path="res://Scripts/Splash.gd" id="1_pkorl"]
-[ext_resource type="Texture2D" uid="uid://b215tteqecew" path="res://Sprite/Logo/chowdog studio LOGO-05.png" id="2_2yrur"]
+[ext_resource type="Texture2D" uid="uid://cptho82yo4o7i" path="res://Sprite/Logo/chowdog studio LOGO-08.png" id="1_ox2t1"]
+[ext_resource type="Script" uid="uid://bmf0kngx13gfs" path="res://Scripts/Splash.gd" id="1_pkorl"]
+[ext_resource type="Texture2D" uid="uid://cbunfre8swn4t" path="res://Sprite/Logo/chowdog studio LOGO-05.png" id="2_2yrur"]
 
-[node name="Splash" type="Control"]
+[node name="Splash" type="Control" unique_id=1338811077]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_pkorl")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=662302649]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +23,7 @@ grow_vertical = 2
 color = Color(0.54902, 0.184314, 0.223529, 1)
 metadata/_edit_use_anchors_ = true
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="TextureRect" type="TextureRect" parent="." unique_id=203698404]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = 8
@@ -40,7 +40,7 @@ grow_vertical = 2
 scale = Vector2(0.09, 0.09)
 texture = ExtResource("1_ox2t1")
 
-[node name="TextureRect2" type="TextureRect" parent="."]
+[node name="TextureRect2" type="TextureRect" parent="." unique_id=196916827]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = 8
