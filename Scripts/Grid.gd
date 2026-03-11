@@ -98,7 +98,8 @@ func newBag():
 	var bag = []
 	while (!newBagIndexes.is_empty()):
 		var piece = Piece.new()
-		piece.shape = Constants.SHAPES[newBagIndexes.pop_back()]
+		piece.shape = Constants.SHAPES[newBagIndexes.pop_back()].duplicate(true)
+		piece.assignRandomElemental()
 		bag.append(piece)
 	return bag
 
@@ -114,6 +115,7 @@ func drawGrid():
 			else:
 				circle.position = Vector2(x*spriteSize + gridOffsetX,y*spriteSize + gridOffsetY)
 			circle.texture = Textures.getTextureForColorIndex(grid[x][y])
+			circle.self_modulate = Textures.getElementalColor(grid[x][y])
 			circle.scale = Vector2(2,2)
 			circle.centered = false
 			add_child(circle)
@@ -312,6 +314,7 @@ func drawDroppingPoint():
 					var circle = Sprite2D.new()
 					circle.position = Vector2(currentPiece.positionInGrid.x*spriteSize + x*spriteSize + gridOffsetX,droppingY*spriteSize+y*spriteSize + gridOffsetY)
 					circle.texture = currentPiece.getTextureForPiece()
+					circle.self_modulate = Textures.getElementalColor(currentPiece.shape[x][y])
 					circle.material = darkMaterial
 					circle.scale = Vector2(2,2)
 					circle.centered = false
@@ -346,6 +349,22 @@ func checkGameOver():
 			return true
 	return false
 
+func printClearedBlockTypes(y):
+	var normal = 0
+	var fire = 0
+	var ice = 0
+	var poison = 0
+	for x in range(gridWidth):
+		match (grid[x][y] / 10):
+			1: fire += 1
+			2: ice += 1
+			3: poison += 1
+			_: normal += 1
+	print("Cleared line — normal: %d, fire: %d, ice: %d, poison: %d" % [normal, fire, ice, poison])
+	if ice > 0:
+		PlayerManager.shieldNum = mini(PlayerManager.shieldNum + ice, PlayerManager.maxShieldNum)
+		SignalManager.shieldChanged.emit()
+
 func checkAndClearFullLines(tSpinType = null):
 	var cleared = 0
 	for y in range(gridHeight):
@@ -356,6 +375,7 @@ func checkAndClearFullLines(tSpinType = null):
 				break;
 		if fullLine:
 			cleared+=1
+			printClearedBlockTypes(y)
 			#Clear line
 			for x in range(gridWidth):
 				grid[x][y] = 0

@@ -21,6 +21,8 @@ var spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
 var alchemyArray = []
 var equipmentArray = []
 var holdPieceDebuff = false
+var shieldNum = 0
+var maxShieldNum = 100
 
 var startGrid = [
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
@@ -65,6 +67,8 @@ func reset():
 	alchemyArray = Consts.alchemyCommonItems
 	equipmentArray = Consts.equipmentCommonItems
 	holdPieceDebuff = false
+	shieldNum = 0
+	maxShieldNum = 100
 
 	currentEnemy = null;
 	coinsSpent = 0

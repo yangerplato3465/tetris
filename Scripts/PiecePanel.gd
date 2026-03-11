@@ -18,5 +18,6 @@ func drawPiece(piece: Piece, yOffset):
 				circle.position = Vector2(origin.x + spriteSize*i ,origin.y + spriteSize*j)
 				circle.centered = false
 				circle.texture = piece.getTextureForPiece()
+				circle.self_modulate = Textures.getElementalColor(shapeWithoutBorders[i][j])
 				add_child(circle)
 			

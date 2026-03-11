@@ -6,6 +6,7 @@ extends Control
 @onready var tripleText = $Stats/Triple/Number
 @onready var tetrisText = $Stats/Tetris/Number
 @onready var comboMultText = $Stats/ComboMult/Number
+@onready var shieldText = $Stats/Shield/Number
 
 @onready var timeLabel = $Timer/TimeLabel
 @onready var timer = $Timer/Timer
@@ -48,6 +49,7 @@ func connectSignals():
 	SignalManager.unlockHold.connect(unlockHold)
 	SignalManager.unlockNextPiece.connect(unlockNextPiece)
 	SignalManager.hardDrop.connect(hardDrop)
+	SignalManager.shieldChanged.connect(updateShieldUI)
 	timer.timeout.connect(func():
 		SignalManager.gameoverFromTimer.emit()
 		gameover()
@@ -147,6 +149,10 @@ func updateUI():
 	tripleText.text = str(PlayerManager.tripleDamage)
 	tetrisText.text = str(PlayerManager.tetrisDamage)
 	comboMultText.text = str(PlayerManager.comboMult)
+	updateShieldUI()
+
+func updateShieldUI():
+	shieldText.text = str(PlayerManager.shieldNum) + " / " + str(PlayerManager.maxShieldNum)
 
 func timerLeft(isInit = false, initTime = 30):
 	var timeLeft
