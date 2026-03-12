@@ -139,7 +139,9 @@ func attack(clearedLines, combo):
 		_:
 			AudioManager.combo_5.play()
 
-	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction
+	var elementalBonus = PlayerManager.pendingElementalBonus
+	PlayerManager.pendingElementalBonus = 0
+	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction + elementalBonus
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	PlayerManager.totalDamageDealt += damageDealt
 	PlayerManager.linesCleared += clearedLines

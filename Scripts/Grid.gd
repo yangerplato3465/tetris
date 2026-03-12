@@ -351,7 +351,6 @@ func checkGameOver():
 	return false
 
 func printClearedBlockTypes(y):
-	var normal = 0
 	var fire = 0
 	var ice = 0
 	var poison = 0
@@ -360,11 +359,13 @@ func printClearedBlockTypes(y):
 			1: fire += 1
 			2: ice += 1
 			3: poison += 1
-			_: normal += 1
-	print("Cleared line — normal: %d, fire: %d, ice: %d, poison: %d" % [normal, fire, ice, poison])
 	if ice > 0:
 		PlayerManager.shieldNum = mini(PlayerManager.shieldNum + ice, PlayerManager.maxShieldNum)
 		shieldChanged.emit()
+	if fire > 0:
+		PlayerManager.pendingElementalBonus += fire * 15
+	if poison > 0:
+		PlayerManager.pendingElementalBonus += poison * 8
 
 func checkAndClearFullLines(tSpinType = null):
 	var cleared = 0

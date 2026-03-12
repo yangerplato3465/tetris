@@ -11,8 +11,14 @@ func getColorIndex():
 				return shape[i][j] % 10
 	return 0
 
-# Assigns a random elemental type (1=fire, 2=ice, 3=poison) to one random block in the piece
+# Assigns a random elemental type to one random block in the piece.
+# Fire (1) and poison (3) only appear if unlocked via upgrades. Ice (2) is always available.
 func assignRandomElemental():
+	var available = [2]  # ice always available
+	if PlayerManager.fireBlocks:
+		available.append(1)
+	if PlayerManager.poisonBlocks:
+		available.append(3)
 	var cells = []
 	for x in range(shape.size()):
 		for y in range(shape[0].size()):
@@ -21,7 +27,7 @@ func assignRandomElemental():
 	if cells.is_empty():
 		return
 	var chosen = cells[randi() % cells.size()]
-	var elemental_type = 1 + randi() % 3
+	var elemental_type = available[randi() % available.size()]
 	shape[chosen.x][chosen.y] += elemental_type * 10
 	
 func getShapeWithoutBorders():

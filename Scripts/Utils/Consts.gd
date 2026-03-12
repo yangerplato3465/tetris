@@ -220,6 +220,22 @@ var alchemyCommonItems = [
 		"frame": 331,
 		"tier": COMMON
 	},
+	{
+		"id": 28,
+		"name": "Fire Shard",
+		"description": "Fire blocks appear in pieces. Clearing fire blocks deals +15 bonus damage each",
+		"price": 40,
+		"frame": 242,
+		"tier": COMMON
+	},
+	{
+		"id": 29,
+		"name": "Poison Vial",
+		"description": "Poison blocks appear in pieces. Clearing poison blocks deals +8 bonus damage each",
+		"price": 30,
+		"frame": 244,
+		"tier": COMMON
+	},
 ]
 
 var alchemyRareItems = [
