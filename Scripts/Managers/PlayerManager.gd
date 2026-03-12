@@ -7,25 +7,25 @@ signal unlockNextPiece
 var currentLevel = 1
 
 # Player stat vars============
-var visibleNextPiece = 1
-var canHoldPiece = false
-var singleDamage = 10
-var doubleDamage = 30
-var tripleDamage = 50
-var tetrisDamage = 80
-var comboMult = 1.1
-var numberStoreItem = 6
-var timer = 60
-var coin = 10
-var hardDropDamage = false
-var treasureBox = false
-var ocarina = false
-var spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
-var alchemyArray = []
-var equipmentArray = []
-var holdPieceDebuff = false
-var shieldNum = 0
-var maxShieldNum = 100
+var visibleNextPiece
+var canHoldPiece
+var singleDamage
+var doubleDamage
+var tripleDamage
+var tetrisDamage
+var comboMult
+var numberStoreItem
+var timer
+var coin
+var hardDropDamage
+var treasureBox
+var ocarina
+var spawnBag
+var alchemyArray
+var equipmentArray
+var holdPieceDebuff
+var shieldNum
+var maxShieldNum
 
 var startGrid = [
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
@@ -41,18 +41,17 @@ var startGrid = [
 ]
 
 # End stats
-var currentEnemy = null;
-var coinsSpent = 0
-var itemsBought = 0
-var linesCleared = 0
-var highestCombo = 0
-var totalDamageDealt = 0
+var currentEnemy
+var coinsSpent
+var itemsBought
+var linesCleared
+var highestCombo
+var totalDamageDealt
 
 func _ready():
-	pass
+	_set_defaults()
 
-func reset(): 
-	currentLevel = 1
+func _set_defaults():
 	visibleNextPiece = 1
 	canHoldPiece = false
 	singleDamage = 10
@@ -72,13 +71,16 @@ func reset():
 	holdPieceDebuff = false
 	shieldNum = 0
 	maxShieldNum = 100
-
-	currentEnemy = null;
+	currentEnemy = null
 	coinsSpent = 0
 	itemsBought = 0
 	linesCleared = 0
 	highestCombo = 0
 	totalDamageDealt = 0
+
+func reset():
+	currentLevel = 1
+	_set_defaults()
 
 func applyUpgrades(id, price):
 	coin -= price
@@ -166,9 +168,9 @@ func updateItemArrays(tier):
 			equipmentArray.append_array(Consts.equipmentLegendaryItems)
 
 func removeEquipment(id):
-	for index in range(equipmentArray.size() - 1):
+	for index in range(equipmentArray.size()):
 		if equipmentArray[index]["id"] == id:
 			equipmentArray.remove_at(index)
-	print(equipmentArray)
+			return
 
 			
