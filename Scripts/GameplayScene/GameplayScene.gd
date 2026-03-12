@@ -18,7 +18,7 @@ func _ready():
 	generateRandomEnemies()
 	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
-	grid.grid_gameover.connect(showGameoverPanel)
+	MainScene.stage_gameover.connect(showGameoverPanel)
 	MainScene.stage_victory.connect(victory)
 	MainScene.stage_victory.connect(ShopPanel.generateItems)
 	ShopPanel.shopFinished.connect(shopFinished)

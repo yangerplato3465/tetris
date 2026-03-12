@@ -1,6 +1,7 @@
 extends Control
 
 signal stage_victory
+signal stage_gameover
 
 # UI
 @onready var singleText = $Stats/Single/Number
@@ -49,6 +50,7 @@ func connectSignals():
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
 	enemyAttackTimer.timeout.connect(enemyAttack)
+	$Grid.grid_gameover.connect(gameover)
 
 func unlockHold(unlock):
 	holdLock.visible = unlock
@@ -112,6 +114,7 @@ func _process(_delta):
 func gameover():
 	enemyAttackTimer.stop()
 	$Grid.stopGrid()
+	stage_gameover.emit()
 
 func stageReady():
 	enemyAttackBar.max_value = enemyAttackInterval

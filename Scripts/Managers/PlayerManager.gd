@@ -78,8 +78,8 @@ func _setDefaults():
 	holdPieceDebuff = false
 	shieldNum = 0
 	maxShieldNum = 100
-	playerHealth = 99
-	maxPlayerHealth = 99
+	playerHealth = 1
+	maxPlayerHealth = 1
 	currentEnemy = null
 	coinsSpent = 0
 	itemsBought = 0
