@@ -15,11 +15,9 @@ var tripleDamage
 var tetrisDamage
 var comboMult
 var numberStoreItem
-var timer
 var coin
 var hardDropDamage
 var treasureBox
-var ocarina
 var spawnBag
 var alchemyArray
 var equipmentArray
@@ -63,11 +61,9 @@ func _setDefaults():
 	tetrisDamage = 80
 	comboMult = 1.1
 	numberStoreItem = 6
-	timer = 60
 	coin = 50
 	hardDropDamage = false
 	treasureBox = false
-	ocarina = false
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
 	alchemyArray = Consts.alchemyCommonItems
 	equipmentArray = Consts.equipmentCommonItems
@@ -92,12 +88,10 @@ func _initUpgradeEffects():
 		2:  func(): tripleDamage += 20,
 		3:  func(): tetrisDamage += 20,
 		4:  func(): comboMult += 0.1,
-		5:  func(): timer += 10,
 		6:  func(): singleDamage += 40,
 		7:  func(): doubleDamage += 40,
 		8:  func(): tripleDamage += 40,
 		9:  func(): tetrisDamage += 40,
-		10: func(): timer += 15,
 		11: func(): spawnBag.append_array([0, 0]),
 		12: func(): comboMult += 0.1,
 		13: func(): _applyAllDamage(30),
@@ -114,7 +108,6 @@ func _initUpgradeEffects():
 		24: func(): hardDropDamage = true; removeEquipment(24),
 		25: func(): treasureBox = true; removeEquipment(25),
 		26: func(): _applyTierUnlock(2, 26),
-		27: func(): ocarina = true; removeEquipment(27),
 	}
 
 func applyUpgrades(id: int, price: int):

@@ -31,7 +31,7 @@ var tier1Enemy = [
 		"health": 60,
 		"reward": 60,
 		"frame": 42,
-		"description": "Start with 10 less sec on the timer"
+		"description": ""
 	},
 	{
 		"id": 5,
@@ -58,7 +58,7 @@ var tier2Enemy = [
 		"health": 250,
 		"reward": 100,
 		"frame": 28,
-		"description": "Start with 15 less sec on the timer"
+		"description": ""
 	},
 	{
 		"id": 8,
@@ -66,7 +66,7 @@ var tier2Enemy = [
 		"health": 250,
 		"reward": 150,
 		"frame": 32,
-		"description": "Start with a messy board, -20 sec on the timer"
+		"description": "Start with a messy board"
 	},
 	{
 		"id": 9,
@@ -82,7 +82,7 @@ var tier2Enemy = [
 		"health": 250,
 		"reward": 200,
 		"frame": 36,
-		"description": "Start with a messy board, -10 on all damage, -10 sec on the timer"
+		"description": "Start with a messy board, -10 on all damage"
 	},
 ]
 
@@ -109,7 +109,7 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 200,
 		"frame": 37,
-		"description": "Start with a messy board, 15 less sec on the timer"
+		"description": "Start with a messy board"
 	},
 	{
 		"id": 14,
@@ -136,7 +136,7 @@ var BossEnemy = [
 		"health": 200,
 		"reward": 120,
 		"frame": 51,
-		"description": "Start with a small messy board, 15 less sec on the timer"
+		"description": "Start with a small messy board"
 	},
 	{
 		"id": 17,
@@ -152,7 +152,7 @@ var BossEnemy = [
 		"health": 800,
 		"reward": 200,
 		"frame": 52,
-		"description": "Start with a messy board, -15 on all damage, 20 less sec on the timer"
+		"description": "Start with a messy board, -15 on all damage"
 	},
 	{
 		"id": 19,
@@ -220,14 +220,6 @@ var alchemyCommonItems = [
 		"frame": 331,
 		"tier": COMMON
 	},
-	{
-		"id": 5,
-		"name": "Hourglass",
-		"description": "Increase timer by 10 seconds (Current %1)",
-		"price": 30,
-		"frame": 175,
-		"tier": COMMON
-	},
 ]
 
 var alchemyRareItems = [
@@ -261,14 +253,6 @@ var alchemyRareItems = [
 		"description": "Increase tetris damage by 40 (Current %1)",
 		"price": 70,
 		"frame":151,
-		"tier": RARE
-	},
-	{
-		"id": 10,
-		"name": "Magic mirror",
-		"description": "Increase timer by 15 seconds (Current %1)",
-		"price": 60,
-		"frame":177,
 		"tier": RARE
 	},
 	{
@@ -410,22 +394,12 @@ var equipmentRareItems = [
 	},
 ]
 
-var equipmentLegendaryItems = [
-	{
-		"id": 27,
-		"name": "Ocarina of Time",
-		"description": "Every time you score a double, gain 5 second on the timer",
-		"price": 500,
-		"frame": 181,
-		"tier": LEGENDARY
-	},
-]
+var equipmentLegendaryItems = []
 
 var howToPlay = "-Deal damage by clearing lines on a tetris board
 -consecutively clearing lines deals more damage
--you lose a run when the timer runs out or the tetrimino
-reaches the top, base timer is 60 seconds
--you start with 50 coins, item shop shows up when you 
+-you lose a run when the tetrimino reaches the top
+-you start with 50 coins, item shop shows up when you
 defeat an enemy,gather coins to spend at the shop
 -hover on shop items to see what it does
 -you can rebind control in the settings menu

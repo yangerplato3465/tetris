@@ -1,6 +1,5 @@
 extends Control
 
-signal timer_gameover
 signal stage_victory
 
 # UI
@@ -11,8 +10,6 @@ signal stage_victory
 @onready var comboMultText = $Stats/ComboMult/Number
 @onready var shieldText = $Stats/Shield/Number
 
-@onready var timeLabel = $Timer/TimeLabel
-@onready var timer = $Timer/Timer
 @onready var enemyHealth = $EnemyHealth
 @onready var victoryLabel = $VictoryLabel
 @onready var rewardLabel = $RewardLabel
@@ -22,8 +19,6 @@ signal stage_victory
 @onready var nextPieceLock3 = $Grid/UI/NextPieces/VBoxContainer/TextureRect3/Lock3
 @onready var nextPieceLock4 = $Grid/UI/NextPieces/VBoxContainer/TextureRect4/Lock4
 @onready var nextPieceLock5 = $Grid/UI/NextPieces/VBoxContainer/TextureRect5/Lock5
-var timerStarted = false
-
 # Battle
 @onready var player = $Battle/Player
 @onready var enemy = $Battle/Enemy
@@ -31,7 +26,6 @@ var timerStarted = false
 var currentEnemyHealth = 0
 var currentEnemyMaxHealth = 0
 var reward = 0
-var timerReduction = 0
 var damageReductionFlat = 0
 var damageReduction = 1
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
@@ -41,8 +35,6 @@ func _ready():
 	updateUI()
 	randomize()
 	connectSignals()
-	timeLabel.label_settings = LabelSettings.new()
-	timeLabel.label_settings.font_size = 80
 
 func connectSignals():
 	$Grid.clearLines.connect(attack)
@@ -50,10 +42,6 @@ func connectSignals():
 	$Grid.shieldChanged.connect(updateShieldUI)
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
-	timer.timeout.connect(func():
-		timer_gameover.emit()
-		gameover()
-	)
 
 func unlockHold(unlock):
 	holdLock.visible = unlock
@@ -79,33 +67,21 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	currentEnemyMaxHealth = enemyInfo.health
 	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
 	match enemyInfo.id:
-		4:
-			timerReduction = 10
 		5:
 			damageReductionFlat = 5
-		7:
-			timerReduction = 15
-		8:
-			timerReduction = 20
 		9:
 			damageReductionFlat = 15
 		10:
 			damageReductionFlat = 10
-			timerReduction = 10
-		13:
-			timerReduction = 15
 		14:
 			PlayerManager.holdPieceDebuff = true
 			unlockHold(true)
 		15:
 			damageReductionFlat = 20
-		16:
-			timerReduction = 15
 		17:
 			damageReductionFlat = 10
 		18:
 			damageReductionFlat = 15
-			timerReduction = 20
 		19:
 			PlayerManager.holdPieceDebuff = true
 			damageReductionFlat = 10
@@ -113,35 +89,18 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 		20:
 			damageReduction = 0.5
 		_:
-			timerReduction = 0
 			damageReductionFlat = 0
 			damageReduction = 1
 			PlayerManager.holdPieceDebuff = false
 			if(PlayerManager.canHoldPiece):
 				unlockHold(false)
 
-	timer.wait_time = PlayerManager.timer - timerReduction
-	timeLabel.text = "%d" % timerLeft(true, PlayerManager.timer - timerReduction)
-
 
 func gameover():
 	$Grid.stopGrid()
-	timerStarted = false
-	timer.stop()
-	set_process(false)
 
 func stageReady():
-	set_process(true)
-	timer.start()
-	timerStarted = true
-
-func _process(delta):
-	if timerStarted:
-		if timerLeft() < 10:
-			timeLabel.label_settings.font_color = Color.RED
-		else:
-			timeLabel.label_settings.font_color = Color.FLORAL_WHITE
-		timeLabel.text = "%d" % timerLeft()
+	pass
 
 func updateUI():
 	singleText.text = str(PlayerManager.singleDamage)
@@ -154,15 +113,6 @@ func updateUI():
 func updateShieldUI():
 	shieldText.text = str(PlayerManager.shieldNum) + " / " + str(PlayerManager.maxShieldNum)
 
-func timerLeft(isInit = false, initTime = 30):
-	var timeLeft
-	if isInit:
-		timeLeft = initTime
-	else:
-		timeLeft = timer.time_left
-	
-	return timeLeft
-
 func attack(clearedLines, combo):
 	var damageDealt = 0
 	attackAnim()
@@ -171,11 +121,6 @@ func attack(clearedLines, combo):
 			damageDealt = PlayerManager.singleDamage
 		2:
 			damageDealt = PlayerManager.doubleDamage
-			if PlayerManager.ocarina:
-				var timeLeft = timer.time_left
-				timer.stop()
-				timer.wait_time = timeLeft + 5
-				timer.start()
 		3:
 			damageDealt = PlayerManager.tripleDamage
 		4:
@@ -220,8 +165,6 @@ func victory():
 	animationPlayer.play("EnemyDeath")
 	$Grid.stopGrid()
 	showVictory()
-	timer.stop()
-	set_process(false)
 
 func attackAnim():
 	var tween = create_tween()

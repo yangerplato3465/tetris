@@ -113,8 +113,6 @@ func formatDescriptionText(text, id):
 			finalText = text.replace("%1", str(PlayerManager.tetrisDamage))
 		4, 12, 18:
 			finalText = text.replace("%1", str(PlayerManager.comboMult))
-		5, 10:
-			finalText = text.replace("%1", str(PlayerManager.timer))
 	return finalText
 			
 

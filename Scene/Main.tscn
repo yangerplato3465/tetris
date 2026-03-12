@@ -73,27 +73,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_grhrx")
 
-[node name="Timer" type="Control" parent="."]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="TimeLabel" type="Label" parent="Timer"]
-layout_mode = 0
-offset_left = 319.0
-offset_top = 16.0
-offset_right = 456.0
-offset_bottom = 90.0
-theme_override_fonts/font = ExtResource("3_vuny0")
-theme_override_font_sizes/font_size = 80
-text = "120"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Timer" type="Timer" parent="Timer"]
-process_callback = 0
-one_shot = true
-
 [node name="Stats" type="VBoxContainer" parent="."]
 layout_mode = 0
 offset_left = 638.0
