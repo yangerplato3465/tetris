@@ -27,6 +27,8 @@ var equipmentArray
 var holdPieceDebuff
 var shieldNum
 var maxShieldNum
+var playerHealth
+var maxPlayerHealth
 
 var startGrid = [
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
@@ -76,6 +78,8 @@ func _setDefaults():
 	holdPieceDebuff = false
 	shieldNum = 0
 	maxShieldNum = 100
+	playerHealth = 99
+	maxPlayerHealth = 99
 	currentEnemy = null
 	coinsSpent = 0
 	itemsBought = 0

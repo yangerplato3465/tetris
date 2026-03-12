@@ -7,7 +7,10 @@ var tier1Enemy = [
 		"health": 100,
 		"reward": 80,
 		"frame": 0,
-		"description": ""
+		"description": "",
+		"attackInterval": 7,
+		"attackDamage": 15,
+		"attackAddsGarbage": false
 	},
 	{
 		"id": 2,
@@ -15,7 +18,10 @@ var tier1Enemy = [
 		"health": 60,
 		"reward": 40,
 		"frame": 2,
-		"description": ""
+		"description": "",
+		"attackInterval": 8,
+		"attackDamage": 12,
+		"attackAddsGarbage": false
 	},
 	{
 		"id": 3,
@@ -23,7 +29,10 @@ var tier1Enemy = [
 		"health": 60,
 		"reward": 60,
 		"frame": 15,
-		"description": "Start with small messy board"
+		"description": "Start with small messy board",
+		"attackInterval": 7,
+		"attackDamage": 15,
+		"attackAddsGarbage": false
 	},
 	{
 		"id": 4,
@@ -31,7 +40,10 @@ var tier1Enemy = [
 		"health": 60,
 		"reward": 60,
 		"frame": 42,
-		"description": ""
+		"description": "",
+		"attackInterval": 6,
+		"attackDamage": 18,
+		"attackAddsGarbage": false
 	},
 	{
 		"id": 5,
@@ -39,7 +51,10 @@ var tier1Enemy = [
 		"health": 60,
 		"reward": 60,
 		"frame": 48,
-		"description": "-5 on all damage"
+		"description": "-5 on all damage",
+		"attackInterval": 8,
+		"attackDamage": 10,
+		"attackAddsGarbage": false
 	},
 ]
 
@@ -50,7 +65,10 @@ var tier2Enemy = [
 		"health": 200,
 		"reward": 100,
 		"frame": 1,
-		"description": "Start with a messy board"
+		"description": "Start with a messy board",
+		"attackInterval": 6,
+		"attackDamage": 25,
+		"attackAddsGarbage": false
 	},
 	{
 		"id": 7,
@@ -58,7 +76,10 @@ var tier2Enemy = [
 		"health": 250,
 		"reward": 100,
 		"frame": 28,
-		"description": ""
+		"description": "",
+		"attackInterval": 5,
+		"attackDamage": 28,
+		"attackAddsGarbage": false
 	},
 	{
 		"id": 8,
@@ -66,7 +87,10 @@ var tier2Enemy = [
 		"health": 250,
 		"reward": 150,
 		"frame": 32,
-		"description": "Start with a messy board"
+		"description": "Start with a messy board",
+		"attackInterval": 6,
+		"attackDamage": 25,
+		"attackAddsGarbage": true
 	},
 	{
 		"id": 9,
@@ -74,7 +98,10 @@ var tier2Enemy = [
 		"health": 250,
 		"reward": 150,
 		"frame": 35,
-		"description": "Start with a messy board, -15 on all damage"
+		"description": "Start with a messy board, -15 on all damage",
+		"attackInterval": 5,
+		"attackDamage": 30,
+		"attackAddsGarbage": false
 	},
 	{
 		"id": 10,
@@ -82,7 +109,10 @@ var tier2Enemy = [
 		"health": 250,
 		"reward": 200,
 		"frame": 36,
-		"description": "Start with a messy board, -10 on all damage"
+		"description": "Start with a messy board, -10 on all damage",
+		"attackInterval": 5,
+		"attackDamage": 32,
+		"attackAddsGarbage": true
 	},
 ]
 
@@ -93,7 +123,10 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 150,
 		"frame": 7,
-		"description": "Start with a very messy board"
+		"description": "Start with a very messy board",
+		"attackInterval": 5,
+		"attackDamage": 38,
+		"attackAddsGarbage": true
 	},
 	{
 		"id": 12,
@@ -101,7 +134,10 @@ var tier3Enemy = [
 		"health": 800,
 		"reward": 200,
 		"frame": 44,
-		"description": "Start with a messy board"
+		"description": "Start with a messy board",
+		"attackInterval": 4,
+		"attackDamage": 35,
+		"attackAddsGarbage": true
 	},
 	{
 		"id": 13,
@@ -109,7 +145,10 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 200,
 		"frame": 37,
-		"description": "Start with a messy board"
+		"description": "Start with a messy board",
+		"attackInterval": 4,
+		"attackDamage": 40,
+		"attackAddsGarbage": true
 	},
 	{
 		"id": 14,
@@ -117,7 +156,10 @@ var tier3Enemy = [
 		"health": 600,
 		"reward": 200,
 		"frame": 16,
-		"description": "Start with a messy board, You cannot hold pieces"
+		"description": "Start with a messy board, You cannot hold pieces",
+		"attackInterval": 5,
+		"attackDamage": 35,
+		"attackAddsGarbage": true
 	},
 	{
 		"id": 15,
@@ -125,7 +167,10 @@ var tier3Enemy = [
 		"health": 500,
 		"reward": 200,
 		"frame": 29,
-		"description": "Start with a messy board, -20 on all damage"
+		"description": "Start with a messy board, -20 on all damage",
+		"attackInterval": 5,
+		"attackDamage": 40,
+		"attackAddsGarbage": false
 	},
 ]
 
@@ -136,7 +181,10 @@ var BossEnemy = [
 		"health": 200,
 		"reward": 120,
 		"frame": 51,
-		"description": "Start with a small messy board"
+		"description": "Start with a small messy board",
+		"attackInterval": 4,
+		"attackDamage": 40,
+		"attackAddsGarbage": true
 	},
 	{
 		"id": 17,
@@ -144,7 +192,10 @@ var BossEnemy = [
 		"health": 400,
 		"reward": 150,
 		"frame": 50,
-		"description": "Start with a messy board, -15 on all damage"
+		"description": "Start with a messy board, -15 on all damage",
+		"attackInterval": 4,
+		"attackDamage": 45,
+		"attackAddsGarbage": false
 	},
 	{
 		"id": 18,
@@ -152,7 +203,10 @@ var BossEnemy = [
 		"health": 800,
 		"reward": 200,
 		"frame": 52,
-		"description": "Start with a messy board, -15 on all damage"
+		"description": "Start with a messy board, -15 on all damage",
+		"attackInterval": 4,
+		"attackDamage": 45,
+		"attackAddsGarbage": true
 	},
 	{
 		"id": 19,
@@ -160,7 +214,10 @@ var BossEnemy = [
 		"health": 1200,
 		"reward": 300,
 		"frame": 30,
-		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces"
+		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces",
+		"attackInterval": 3,
+		"attackDamage": 50,
+		"attackAddsGarbage": true
 	},
 	{
 		"id": 20,
@@ -168,7 +225,10 @@ var BossEnemy = [
 		"health": 1000,
 		"reward": 0,
 		"frame": 30,
-		"description": "Final boss, Start with a very messy board, all damage halfed"
+		"description": "Final boss, Start with a very messy board, all damage halfed",
+		"attackInterval": 3,
+		"attackDamage": 60,
+		"attackAddsGarbage": true
 	},
 ]
 

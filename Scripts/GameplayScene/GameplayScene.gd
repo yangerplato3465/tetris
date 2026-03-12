@@ -14,6 +14,7 @@ extends Control
 
 func _ready():
 	PlayerManager.reset() # Reset all upgrades and stats
+	grid.stopGrid()
 	generateRandomEnemies()
 	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))

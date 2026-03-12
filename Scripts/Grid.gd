@@ -554,6 +554,22 @@ func deletePieceFromGrid():
 			if currentPiece.shape[x][y] != 0:
 				grid[x+currentPiece.positionInGrid.x][y+currentPiece.positionInGrid.y] = 0
 	
+func addGarbageRows(count):
+	deletePieceFromGrid()
+	for _i in range(count):
+		for y in range(0, gridHeight - 1):
+			for x in range(gridWidth):
+				grid[x][y] = grid[x][y + 1]
+		var hole = randi() % gridWidth
+		for x in range(gridWidth):
+			grid[x][gridHeight - 1] = 0 if x == hole else 8
+	var isGameOver = checkGameOver()
+	addPiece()
+	drawGrid()
+	if isGameOver:
+		grid_gameover.emit()
+		gameover()
+
 func hardDropShake():
 	var tween = create_tween()
 	tween.finished.connect(func():

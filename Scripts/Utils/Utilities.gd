@@ -78,7 +78,7 @@ func generateLargeMessyBoard():
 	return _generateMessyBoard(6)
 
 func randomNum():
-	return randi_range(0, 1)
+	return 8 if randi_range(0, 1) == 1 else 0
 
 # --- Misc ---
 

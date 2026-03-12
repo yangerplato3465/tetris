@@ -13,6 +13,12 @@ signal stage_victory
 @onready var enemyHealth = $EnemyHealth
 @onready var victoryLabel = $VictoryLabel
 @onready var rewardLabel = $RewardLabel
+@onready var enemyAttackTimer = $EnemyAttackBar/EnemyAttackTimer
+@onready var enemyAttackBar = $EnemyAttackBar/ProgressBar
+@onready var playerHealthLabel = $PlayerHealthLabel
+var enemyAttackInterval = 10.0
+var enemyAttackDamage = 20
+var enemyAttackAddsGarbage = false
 
 @onready var holdLock = $Grid/UI/Hold/TextureRect/Lock
 @onready var nextPieceLock2 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock2
@@ -42,6 +48,7 @@ func connectSignals():
 	$Grid.shieldChanged.connect(updateShieldUI)
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
+	enemyAttackTimer.timeout.connect(enemyAttack)
 
 func unlockHold(unlock):
 	holdLock.visible = unlock
@@ -57,7 +64,7 @@ func unlockNextPiece():
 		5:
 			nextPieceLock5.visible = false
 
-			
+
 func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	updateUI()
 	reward = enemyInfo.reward
@@ -66,6 +73,9 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	currentEnemyHealth = enemyInfo.health
 	currentEnemyMaxHealth = enemyInfo.health
 	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
+	enemyAttackInterval = enemyInfo.attackInterval
+	enemyAttackDamage = enemyInfo.attackDamage
+	enemyAttackAddsGarbage = enemyInfo.attackAddsGarbage
 	match enemyInfo.id:
 		5:
 			damageReductionFlat = 5
@@ -96,11 +106,16 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 				unlockHold(false)
 
 
+func _process(_delta):
+	enemyAttackBar.value = enemyAttackInterval - enemyAttackTimer.time_left
+
 func gameover():
+	enemyAttackTimer.stop()
 	$Grid.stopGrid()
 
 func stageReady():
-	pass
+	enemyAttackBar.max_value = enemyAttackInterval
+	enemyAttackTimer.start(enemyAttackInterval)
 
 func updateUI():
 	singleText.text = str(PlayerManager.singleDamage)
@@ -109,6 +124,10 @@ func updateUI():
 	tetrisText.text = str(PlayerManager.tetrisDamage)
 	comboMultText.text = str(PlayerManager.comboMult)
 	updateShieldUI()
+	updatePlayerHealthUI()
+
+func updatePlayerHealthUI():
+	playerHealthLabel.text = "HP: %d / %d" % [PlayerManager.playerHealth, PlayerManager.maxPlayerHealth]
 
 func updateShieldUI():
 	shieldText.text = str(PlayerManager.shieldNum) + " / " + str(PlayerManager.maxShieldNum)
@@ -162,7 +181,22 @@ func updateEnemyHealth(damageDealt):
 	if currentEnemyHealth <= 0:
 		victory()
 
+func enemyAttack():
+	var overflow = enemyAttackDamage - PlayerManager.shieldNum
+	PlayerManager.shieldNum = maxi(PlayerManager.shieldNum - enemyAttackDamage, 0)
+	if overflow > 0:
+		PlayerManager.playerHealth -= 1
+	updateShieldUI()
+	updatePlayerHealthUI()
+	if enemyAttackAddsGarbage:
+		$Grid.addGarbageRows(1)
+	if PlayerManager.playerHealth <= 0:
+		gameover()
+		return
+	enemyAttackTimer.start(enemyAttackInterval)
+
 func victory():
+	enemyAttackTimer.stop()
 	PlayerManager.currentLevel += 1
 	animationPlayer.play("EnemyDeath")
 	$Grid.stopGrid()
@@ -173,17 +207,17 @@ func attackAnim():
 	tween.finished.connect(func():
 		player.position = PLAYER_ORIGINAL_POS
 	)
-	tween.set_trans(Tween.TRANS_BACK) 
+	tween.set_trans(Tween.TRANS_BACK)
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(player, "position:x", player.position.x + 100, 0.1)
-		
+
 func showVictory():
 	await get_tree().create_timer(1).timeout
 	AudioManager.victory.play()
 	victoryLabel.scale = Vector2(0.5, 0.5)
 	victoryLabel.visible = true
 	var tween = create_tween()
-	tween.set_trans(Tween.TRANS_ELASTIC) 
+	tween.set_trans(Tween.TRANS_ELASTIC)
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(victoryLabel, "scale", Vector2(1, 1), 1.2)
 	tween.finished.connect(func():
@@ -199,7 +233,7 @@ func showReward():
 	rewardLabel.scale = Vector2(0.5, 0.5)
 	rewardLabel.visible = true
 	rewardLabel.text = "+$%d" % reward
-	tween.set_trans(Tween.TRANS_ELASTIC) 
+	tween.set_trans(Tween.TRANS_ELASTIC)
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 2)
 	tween.finished.connect(func():
@@ -213,7 +247,7 @@ func showTreasureboxReward():
 	rewardLabel.scale = Vector2(0.5, 0.5)
 	rewardLabel.visible = true
 	rewardLabel.text = "+$%d" % 50
-	tween.set_trans(Tween.TRANS_ELASTIC) 
+	tween.set_trans(Tween.TRANS_ELASTIC)
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 2)
 	tween.finished.connect(func():
