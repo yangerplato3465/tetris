@@ -103,14 +103,6 @@ func shrinkAndHide(node):
 func formatDescriptionText(text, id):
 	var finalText = text
 	match id:
-		0, 6, 13, 19:
-			finalText = text.replace("%1", str(PlayerManager.singleDamage))
-		1, 7, 14:
-			finalText = text.replace("%1", str(PlayerManager.doubleDamage))
-		2, 8, 15:
-			finalText = text.replace("%1", str(PlayerManager.tripleDamage))
-		3, 9, 16:
-			finalText = text.replace("%1", str(PlayerManager.tetrisDamage))
 		4, 12, 18:
 			finalText = text.replace("%1", str(PlayerManager.comboMult))
 	return finalText

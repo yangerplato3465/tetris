@@ -198,6 +198,16 @@ func flashPlayer():
 	tween.tween_property(player, "self_modulate", Color.WHITE, 0.4)
 	tween.finished.connect(func(): _playerFlashing = false)
 
+func screenShake():
+	var tween = create_tween()
+	tween.finished.connect(func(): position = Vector2.ZERO)
+	for i in 10:
+		var intensity = 10.0 * (1.0 - i / 10.0)
+		tween.tween_property(self, "position", Vector2(
+			randf_range(-intensity, intensity),
+			randf_range(-intensity, intensity)
+		), 0.04)
+
 func updateEnemyHealth(damageDealt):
 	Utilities.shakeNode(enemyHealth, Vector2(862, 85))
 	flashEnemy()
@@ -212,6 +222,7 @@ func enemyAttack():
 	if overflow > 0:
 		PlayerManager.playerHealth -= 1
 	flashPlayer()
+	screenShake()
 	updateShieldUI()
 	updatePlayerHealthUI()
 	if enemyAttackAddsGarbage:
