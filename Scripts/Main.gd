@@ -4,10 +4,6 @@ signal stage_victory
 signal stage_gameover
 
 # UI
-@onready var singleText = $Stats/Single/Number
-@onready var doubleText = $Stats/Double/Number
-@onready var tripleText = $Stats/Triple/Number
-@onready var tetrisText = $Stats/Tetris/Number
 @onready var comboMultText = $Stats/ComboMult/Number
 @onready var shieldText = $Stats/Shield/Number
 
@@ -35,6 +31,8 @@ var currentEnemyMaxHealth = 0
 var reward = 0
 var damageReductionFlat = 0
 var damageReduction = 1
+var _enemyFlashing = false
+var _playerFlashing = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 
@@ -109,7 +107,19 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 
 
 func _process(_delta):
-	enemyAttackBar.value = enemyAttackInterval - enemyAttackTimer.time_left
+	if enemyAttackTimer.is_stopped():
+		return
+	var timeLeft = enemyAttackTimer.time_left
+	enemyAttackBar.value = enemyAttackInterval - timeLeft
+	if timeLeft <= 2.0:
+		var pulse = abs(sin(Time.get_ticks_msec() * 0.008))
+		enemyAttackBar.modulate = Color(1.0, pulse * 0.35, pulse * 0.1)
+		if not _enemyFlashing:
+			enemy.self_modulate = Color(1.0, 0.55 + pulse * 0.45, 0.55 + pulse * 0.45)
+	else:
+		enemyAttackBar.modulate = Color.WHITE
+		if not _enemyFlashing:
+			enemy.self_modulate = Color.WHITE
 
 func gameover():
 	enemyAttackTimer.stop()
@@ -118,13 +128,12 @@ func gameover():
 
 func stageReady():
 	enemyAttackBar.max_value = enemyAttackInterval
+	enemyAttackBar.modulate = Color.WHITE
+	enemy.self_modulate = Color.WHITE
+	player.self_modulate = Color.WHITE
 	enemyAttackTimer.start(enemyAttackInterval)
 
 func updateUI():
-	singleText.text = str(PlayerManager.singleDamage)
-	doubleText.text = str(PlayerManager.doubleDamage)
-	tripleText.text = str(PlayerManager.tripleDamage)
-	tetrisText.text = str(PlayerManager.tetrisDamage)
 	comboMultText.text = str(PlayerManager.comboMult)
 	updateShieldUI()
 	updatePlayerHealthUI()
@@ -136,19 +145,10 @@ func updateShieldUI():
 	shieldText.text = str(PlayerManager.shieldNum) + " / " + str(PlayerManager.maxShieldNum)
 
 func attack(clearedLines, combo):
-	var damageDealt = 0
 	attackAnim()
-	match clearedLines:
-		1:
-			damageDealt = PlayerManager.singleDamage
-		2:
-			damageDealt = PlayerManager.doubleDamage
-		3:
-			damageDealt = PlayerManager.tripleDamage
-		4:
-			damageDealt = PlayerManager.tetrisDamage
-			if PlayerManager.treasureBox:
-				showTreasureboxReward()
+	var damageDealt = clearedLines * 10
+	if clearedLines == 4 and PlayerManager.treasureBox:
+		showTreasureboxReward()
 	match combo:
 		1:
 			AudioManager.combo_1.play()
@@ -165,6 +165,13 @@ func attack(clearedLines, combo):
 	PlayerManager.pendingElementalBonus = 0
 	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction + elementalBonus
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
+	const ANNOUNCE_POS = Vector2(620, 160)
+	match clearedLines:
+		2: PopupNumbers.displayText("DOUBLE!", ANNOUNCE_POS, Color.CYAN)
+		3: PopupNumbers.displayText("TRIPLE!", ANNOUNCE_POS, Color.YELLOW)
+		4: PopupNumbers.displayText("TETRIS!", ANNOUNCE_POS, Color(1.0, 0.5, 0.0))
+	if combo >= 2:
+		PopupNumbers.displayText(str(combo) + "x COMBO!", ANNOUNCE_POS + Vector2(0, 70), Color(0.8, 0.3, 1.0))
 	PlayerManager.totalDamageDealt += damageDealt
 	PlayerManager.linesCleared += clearedLines
 	if (combo > PlayerManager.highestCombo):
@@ -177,8 +184,23 @@ func hardDrop():
 		PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 		updateEnemyHealth(damageDealt)
 
+func flashEnemy():
+	_enemyFlashing = true
+	enemy.self_modulate = Color.RED
+	var tween = create_tween()
+	tween.tween_property(enemy, "self_modulate", Color.WHITE, 0.3)
+	tween.finished.connect(func(): _enemyFlashing = false)
+
+func flashPlayer():
+	_playerFlashing = true
+	player.self_modulate = Color(1.0, 0.2, 0.2)
+	var tween = create_tween()
+	tween.tween_property(player, "self_modulate", Color.WHITE, 0.4)
+	tween.finished.connect(func(): _playerFlashing = false)
+
 func updateEnemyHealth(damageDealt):
 	Utilities.shakeNode(enemyHealth, Vector2(862, 85))
+	flashEnemy()
 	currentEnemyHealth -= damageDealt
 	enemyHealth.text = str(Utilities.floorNum(currentEnemyHealth)) + " / " + str(currentEnemyMaxHealth)
 	if currentEnemyHealth <= 0:
@@ -189,6 +211,7 @@ func enemyAttack():
 	PlayerManager.shieldNum = maxi(PlayerManager.shieldNum - enemyAttackDamage, 0)
 	if overflow > 0:
 		PlayerManager.playerHealth -= 1
+	flashPlayer()
 	updateShieldUI()
 	updatePlayerHealthUI()
 	if enemyAttackAddsGarbage:

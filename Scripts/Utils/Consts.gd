@@ -241,38 +241,6 @@ enum {
 
 var alchemyCommonItems = [
 	{
-		"id": 0,
-		"name": "Red Potion",
-		"description": "Increase single damage by 20 (Current %1)",
-		"price": 20,
-		"frame": 144,
-		"tier": COMMON
-	},
-	{
-		"id": 1,
-		"name": "Blue Potion",
-		"description": "Increase double damage by 20 (Current %1)",
-		"price": 30,
-		"frame": 145,
-		"tier": COMMON
-	},
-	{
-		"id": 2,
-		"name": "Green Potion",
-		"description": "Increase triple damage by 20 (Current %1)",
-		"price": 30,
-		"frame": 146,
-		"tier": COMMON
-	},
-	{
-		"id": 3,
-		"name": "Yellow Potion",
-		"description": "Increase tetris damage by 20 (Current %1)",
-		"price": 40,
-		"frame":147,
-		"tier": COMMON
-	},
-	{
 		"id": 4,
 		"name": "White Powder",
 		"description": "Increase combo multiplier by 0.1 (Current %1)",
@@ -300,38 +268,6 @@ var alchemyCommonItems = [
 
 var alchemyRareItems = [
 	{
-		"id": 6,
-		"name": "Red Potion+",
-		"description": "Increase single damage by 40 (Current %1)",
-		"price": 50,
-		"frame": 148,
-		"tier": RARE
-	},
-	{
-		"id": 7,
-		"name": "Blue Potion+",
-		"description": "Increase double damage by 40 (Current %1)",
-		"price": 60,
-		"frame": 149,
-		"tier": RARE
-	},
-	{
-		"id": 8,
-		"name": "Green Potion+",
-		"description": "Increase triple damage by 40 (Current %1)",
-		"price": 60,
-		"frame": 150,
-		"tier": RARE
-	},
-	{
-		"id": 9,
-		"name": "Yellow Potion+",
-		"description": "Increase tetris damage by 40 (Current %1)",
-		"price": 70,
-		"frame":151,
-		"tier": RARE
-	},
-	{
 		"id": 11,
 		"name": "Blue Powder",
 		"description": "'I' pieces appear 2X more often",
@@ -347,49 +283,9 @@ var alchemyRareItems = [
 		"frame": 329,
 		"tier": RARE
 	},
-	{
-		"id": 13,
-		"name": "Gray Powder",
-		"description": "Increase all type damage by 25",
-		"price": 80,
-		"frame": 332,
-		"tier": EPIC
-	},
 ]
 
 var alchemyLegendaryItems = [
-		{
-		"id": 14,
-		"name": "Red Glob",
-		"description": "Double your current single damage (Current %1)",
-		"price": 150,
-		"frame": 288,
-		"tier": LEGENDARY
-	},
-	{
-		"id": 15,
-		"name": "Blue Glob",
-		"description": "Double your current double damage (Current %1)",
-		"price": 200,
-		"frame": 289,
-		"tier": LEGENDARY
-	},
-	{
-		"id": 16,
-		"name": "Green Glob",
-		"description": "Double your current triple damage (Current %1)",
-		"price": 200,
-		"frame": 290,
-		"tier": LEGENDARY
-	},
-	{
-		"id": 17,
-		"name": "Yellow Glob",
-		"description": "Double your current tetris damage (Current %1)",
-		"price": 250,
-		"frame": 291,
-		"tier": LEGENDARY
-	},
 	{
 		"id": 18,
 		"name": "Purple Glob",
