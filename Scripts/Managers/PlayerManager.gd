@@ -109,7 +109,7 @@ func applyUpgrades(id: int, price: int):
 func _applyUnlockHold():
 	canHoldPiece = true
 	unlockHold.emit(false)
-	removeEquipment(Consts.UpgradeID.OLD_KEY)
+	removeEquipment(19)
 
 func _applyUnlockNext(equipment_id: int):
 	visibleNextPiece += 1
@@ -134,5 +134,3 @@ func removeEquipment(id: int):
 		if equipmentArray[index]["id"] == id:
 			equipmentArray.remove_at(index)
 			return
-
-
