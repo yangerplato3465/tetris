@@ -55,7 +55,7 @@ func _ready():
 	gridOffsetX = $UI/Border.position.x + BORDER_OFFSET
 	gridOffsetY = $UI/Border.position.y - (vanishZone-1)*spriteSize
 	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, Utilities.generateMediumMessyBoard())
-	
+
 	currentBag = newBag()
 	nextBag = newBag()
 	spawnFromBag()
@@ -75,7 +75,7 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 			startingBoard = Utilities.generateLargeMessyBoard()
 		_:
 			startingBoard = PlayerManager.startGrid
-		
+
 
 func stopGrid():
 	set_physics_process(false)
@@ -196,21 +196,21 @@ func _physics_process(delta):
 		if (!hasSwapped && PlayerManager.canHoldPiece && !PlayerManager.holdPieceDebuff):
 			AudioManager.drop.play()
 			deletePieceFromGrid()
-			
+
 			# Particle
 			# var particle = HoldParticle.instantiate()
 			# particle.setDestination($UI/Hold.position + $UI/Hold.size/2)
 			# particle.texture = currentPiece.getTextureForPiece()
 			# add_child(particle)
 			# particle.emit(Vector2(spriteSize*(currentPiece.positionInGrid.x + currentPiece.getShapeWithoutBorders().size()/2.0) + gridOffsetX ,spriteSize*(currentPiece.positionInGrid.y++ currentPiece.getShapeWithoutBorders()[0].size()/2.0) + gridOffsetY ))
-			
+
 			var heldPiece = $UI/Hold.swapPiece(currentPiece)
 			if heldPiece:
 				currentPiece = heldPiece
 				spawnPiece()
 			else:
 				spawnFromBag()
-				
+
 			sthHappened = true
 			hasSwapped = true
 			actions = 0
@@ -228,7 +228,7 @@ func _physics_process(delta):
 	if (sthHappened):
 		drawGrid()
 		drawDroppingPoint()
-	
+
 func _on_LockTimer_timeout():
 	if (actions > infinityValue) || (prevActions == actions):
 		if !canPieceMoveDown():
@@ -256,18 +256,18 @@ func afterDrop():
 func checkTSpin():
 	if lastPiece.getShapeName() != "T" or lastPiece.rotationState == 0:
 		return null
-	
+
 	var cornersFilled = 0
 	var frontCornersFilled = 0
 	var x = lastPiece.positionInGrid.x
 	var y = lastPiece.positionInGrid.y
-	
+
 	# Check all four corners
 	if x > 0 and y > 0 and grid[x-1][y-1] != 0: cornersFilled += 1
 	if x > 0 and y+2 < gridHeight and grid[x-1][y+2] != 0: cornersFilled += 1
 	if x+2 < gridWidth and y > 0 and grid[x+2][y-1] != 0: cornersFilled += 1
 	if x+2 < gridWidth and y+2 < gridHeight and grid[x+2][y+2] != 0: cornersFilled += 1
-	
+
 	# Check front corners based on rotation state
 	match lastPiece.rotationState:
 		1: # Right
@@ -279,7 +279,7 @@ func checkTSpin():
 		3: # Left
 			if x+2 < gridWidth and y > 0 and grid[x+2][y-1] != 0: frontCornersFilled += 1
 			if x+2 < gridWidth and y+2 < gridHeight and grid[x+2][y+2] != 0: frontCornersFilled += 1
-	
+
 	if cornersFilled >= 3:
 		return "Full" if frontCornersFilled == 2 else "Mini"
 	return null
@@ -306,7 +306,7 @@ func drawDroppingPoint():
 						break
 		droppingY+=1
 	addPiece()
-	
+
 	#draw shape with outline
 	if droppingY >= vanishZone:
 		for x in currentPiece.shape.size():
@@ -320,7 +320,7 @@ func drawDroppingPoint():
 					circle.scale = Vector2(2,2)
 					circle.centered = false
 					add_child(circle)
-	
+
 func hardDropPiece():
 	hardDrop.emit()
 	while (canPieceMoveDown()):
@@ -437,7 +437,7 @@ func movePieceInGrid(xMovement, yMovement):
 				grid[x+xMovement+currentPiece.positionInGrid.x][y+yMovement+currentPiece.positionInGrid.y] = currentPiece.shape[x][y]
 	currentPiece.positionInGrid.x = currentPiece.positionInGrid.x+xMovement
 	currentPiece.positionInGrid.y = currentPiece.positionInGrid.y+yMovement
-	
+
 func spawnFromBag():
 	if (!currentBag):
 		currentBag = nextBag.duplicate()
@@ -468,7 +468,7 @@ func canPieceMoveDown():
 					return false
 				else: break
 	return true
-	
+
 func canPieceMoveRight():
 	for j in currentPiece.shape[0].size():
 		for i in range (currentPiece.shape.size()-1,-1,-1):
@@ -510,19 +510,19 @@ func getPosibleRotation(direction):
 		newShape = MatrixOperations.swap2DMatrixColumns(newShape)
 	else:
 		newShape = MatrixOperations.swap2DMatrixRows(newShape)
-	
+
 	var rotationState = currentPiece.rotationState
-	# rotation state for 0>>1 is the same as 1>>0 but negative, 
+	# rotation state for 0>>1 is the same as 1>>0 but negative,
 	# so if anticlowise we go to the next state (0 to 1) by adding 3 and modding by 4
 	if (direction == Direction.ANTICLOCKWISE):
 		rotationState = (rotationState+3)%4
-	
+
 	var rotationArray
 	if (currentPiece.shape.size() == 4): #Check for I and O shapes
 		rotationArray = Constants.KICK_TABLE_I[rotationState]
 	else:
 		rotationArray = Constants.KICK_TABLE[rotationState]
-	
+
 	for r in rotationArray.size():
 		var kickValues = rotationArray[r]
 		if (direction == Direction.ANTICLOCKWISE):
@@ -557,7 +557,7 @@ func deletePieceFromGrid():
 		for y in currentPiece.shape[0].size():
 			if currentPiece.shape[x][y] != 0:
 				grid[x+currentPiece.positionInGrid.x][y+currentPiece.positionInGrid.y] = 0
-	
+
 func addGarbageRows(count):
 	deletePieceFromGrid()
 	for _i in range(count):
@@ -570,6 +570,7 @@ func addGarbageRows(count):
 	var isGameOver = checkGameOver()
 	addPiece()
 	drawGrid()
+	drawDroppingPoint()
 	if isGameOver:
 		grid_gameover.emit()
 		gameover()
