@@ -354,11 +354,13 @@ func printClearedBlockTypes(y):
 	var fire = 0
 	var ice = 0
 	var poison = 0
+	var gold = 0
 	for x in range(gridWidth):
 		match (grid[x][y] / 10):
 			1: fire += 1
 			2: ice += 1
 			3: poison += 1
+			4: gold += 1
 	if ice > 0:
 		PlayerManager.shieldNum = mini(PlayerManager.shieldNum + ice, PlayerManager.maxShieldNum)
 		shieldChanged.emit()
@@ -366,6 +368,8 @@ func printClearedBlockTypes(y):
 		PlayerManager.pendingElementalBonus += fire * 15
 	if poison > 0:
 		PlayerManager.pendingElementalBonus += poison * 8
+	if gold > 0:
+		PlayerManager.pendingGoldCoins += gold
 
 func checkAndClearFullLines(tSpinType = null):
 	var cleared = 0

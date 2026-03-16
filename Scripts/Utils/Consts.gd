@@ -264,6 +264,14 @@ var alchemyCommonItems = [
 		"frame": 244,
 		"tier": COMMON
 	},
+	{
+		"id": 30,
+		"name": "Gold Shard",
+		"description": "Gold blocks appear in pieces. Clearing gold blocks gives 1 coin each",
+		"price": 40,
+		"frame": 246,
+		"tier": COMMON
+	},
 ]
 
 var alchemyRareItems = [

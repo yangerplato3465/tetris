@@ -163,6 +163,11 @@ func attack(clearedLines, combo):
 
 	var elementalBonus = PlayerManager.pendingElementalBonus
 	PlayerManager.pendingElementalBonus = 0
+	var goldCoins = PlayerManager.pendingGoldCoins
+	PlayerManager.pendingGoldCoins = 0
+	if goldCoins > 0:
+		PlayerManager.coin += goldCoins
+		PopupNumbers.displayText("+$%d" % goldCoins, Vector2(620, 220), Color(1.0, 0.85, 0.0))
 	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction + elementalBonus
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	const ANNOUNCE_POS = Vector2(620, 160)

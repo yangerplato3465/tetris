@@ -16,7 +16,9 @@ var hardDropDamage
 var treasureBox
 var fireBlocks
 var poisonBlocks
+var goldBlocks
 var pendingElementalBonus
+var pendingGoldCoins
 var spawnBag
 var alchemyArray
 var equipmentArray
@@ -63,7 +65,9 @@ func _setDefaults():
 	treasureBox = false
 	fireBlocks = false
 	poisonBlocks = false
+	goldBlocks = false
 	pendingElementalBonus = 0
+	pendingGoldCoins = 0
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
 	alchemyArray = Consts.alchemyCommonItems
 	equipmentArray = Consts.equipmentCommonItems
@@ -99,6 +103,7 @@ func _initUpgradeEffects():
 		26: func(): _applyTierUnlock(2, 26),
 		28: func(): fireBlocks = true,
 		29: func(): poisonBlocks = true,
+		30: func(): goldBlocks = true,
 	}
 
 func applyUpgrades(id: int, price: int):

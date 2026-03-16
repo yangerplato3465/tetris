@@ -19,6 +19,8 @@ func assignRandomElemental():
 		available.append(1)
 	if PlayerManager.poisonBlocks:
 		available.append(3)
+	if PlayerManager.goldBlocks:
+		available.append(4)
 	var cells = []
 	for x in range(shape.size()):
 		for y in range(shape[0].size()):
