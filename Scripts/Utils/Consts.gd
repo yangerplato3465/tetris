@@ -4,7 +4,7 @@ var tier1Enemy = [
 	{
 		"id": 1,
 		"name": "Orc",
-		"health": 100,
+		"health": 1000,
 		"reward": 80,
 		"frame": 0,
 		"description": "",
@@ -15,7 +15,7 @@ var tier1Enemy = [
 	{
 		"id": 2,
 		"name": "Goblin",
-		"health": 60,
+		"health": 600,
 		"reward": 40,
 		"frame": 2,
 		"description": "",
@@ -26,7 +26,7 @@ var tier1Enemy = [
 	{
 		"id": 3,
 		"name": "Slime",
-		"health": 60,
+		"health": 600,
 		"reward": 60,
 		"frame": 15,
 		"description": "Start with small messy board",
@@ -37,7 +37,7 @@ var tier1Enemy = [
 	{
 		"id": 4,
 		"name": "Centipede",
-		"health": 60,
+		"health": 600,
 		"reward": 60,
 		"frame": 42,
 		"description": "",
@@ -48,7 +48,7 @@ var tier1Enemy = [
 	{
 		"id": 5,
 		"name": "Bat",
-		"health": 60,
+		"health": 600,
 		"reward": 60,
 		"frame": 48,
 		"description": "-5 on all damage",
@@ -62,7 +62,7 @@ var tier2Enemy = [
 	{
 		"id": 6,
 		"name": "Orc Wizard",
-		"health": 200,
+		"health": 2000,
 		"reward": 100,
 		"frame": 1,
 		"description": "Start with a messy board",
@@ -73,7 +73,7 @@ var tier2Enemy = [
 	{
 		"id": 7,
 		"name": "Skeleton",
-		"health": 250,
+		"health": 2500,
 		"reward": 100,
 		"frame": 28,
 		"description": "",
@@ -84,7 +84,7 @@ var tier2Enemy = [
 	{
 		"id": 8,
 		"name": "Zombie",
-		"health": 250,
+		"health": 2500,
 		"reward": 150,
 		"frame": 32,
 		"description": "Start with a messy board",
@@ -95,7 +95,7 @@ var tier2Enemy = [
 	{
 		"id": 9,
 		"name": "Banshee",
-		"health": 250,
+		"health": 2500,
 		"reward": 150,
 		"frame": 35,
 		"description": "Start with a messy board, -15 on all damage",
@@ -106,7 +106,7 @@ var tier2Enemy = [
 	{
 		"id": 10,
 		"name": "Reaper",
-		"health": 250,
+		"health": 2500,
 		"reward": 200,
 		"frame": 36,
 		"description": "Start with a messy board, -10 on all damage",
@@ -120,7 +120,7 @@ var tier3Enemy = [
 	{
 		"id": 11,
 		"name": "Ettin",
-		"health": 500,
+		"health": 5000,
 		"reward": 150,
 		"frame": 7,
 		"description": "Start with a very messy board",
@@ -131,7 +131,7 @@ var tier3Enemy = [
 	{
 		"id": 12,
 		"name": "huge worm",
-		"health": 800,
+		"health": 8000,
 		"reward": 200,
 		"frame": 44,
 		"description": "Start with a messy board",
@@ -142,7 +142,7 @@ var tier3Enemy = [
 	{
 		"id": 13,
 		"name": "Death",
-		"health": 500,
+		"health": 5000,
 		"reward": 200,
 		"frame": 37,
 		"description": "Start with a messy board",
@@ -153,7 +153,7 @@ var tier3Enemy = [
 	{
 		"id": 14,
 		"name": "slime body",
-		"health": 600,
+		"health": 6000,
 		"reward": 200,
 		"frame": 16,
 		"description": "Start with a messy board, You cannot hold pieces",
@@ -164,7 +164,7 @@ var tier3Enemy = [
 	{
 		"id": 15,
 		"name": "skeleton archer",
-		"health": 500,
+		"health": 5000,
 		"reward": 200,
 		"frame": 29,
 		"description": "Start with a messy board, -20 on all damage",
@@ -178,7 +178,7 @@ var BossEnemy = [
 	{
 		"id": 16,
 		"name": "rock golem",
-		"health": 200,
+		"health": 2000,
 		"reward": 120,
 		"frame": 51,
 		"description": "Start with a small messy board",
@@ -189,7 +189,7 @@ var BossEnemy = [
 	{
 		"id": 17,
 		"name": "wendigo",
-		"health": 400,
+		"health": 4000,
 		"reward": 150,
 		"frame": 50,
 		"description": "Start with a messy board, -15 on all damage",
@@ -200,7 +200,7 @@ var BossEnemy = [
 	{
 		"id": 18,
 		"name": "centaur",
-		"health": 800,
+		"health": 8000,
 		"reward": 200,
 		"frame": 52,
 		"description": "Start with a messy board, -15 on all damage",
@@ -211,7 +211,7 @@ var BossEnemy = [
 	{
 		"id": 19,
 		"name": "death knight",
-		"health": 1200,
+		"health": 12000,
 		"reward": 300,
 		"frame": 30,
 		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces",
@@ -222,7 +222,7 @@ var BossEnemy = [
 	{
 		"id": 20,
 		"name": "Shadow Lord",
-		"health": 1000,
+		"health": 10000,
 		"reward": 0,
 		"frame": 30,
 		"description": "Final boss, Start with a very messy board, all damage halfed",

@@ -34,9 +34,9 @@ AudioManager="*res://Scene/AudioManager.tscn"
 
 window/size/viewport_width=1200
 window/size/viewport_height=800
+window/size/mode=2
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/size/mode=2
 
 [global]
 

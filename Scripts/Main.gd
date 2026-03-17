@@ -146,7 +146,7 @@ func updateShieldUI():
 
 func attack(clearedLines, combo):
 	attackAnim()
-	var damageDealt = clearedLines * 10
+	var damageDealt = clearedLines * 100
 	if clearedLines == 4 and PlayerManager.treasureBox:
 		showTreasureboxReward()
 	match combo:
@@ -168,7 +168,7 @@ func attack(clearedLines, combo):
 	if goldCoins > 0:
 		PlayerManager.coin += goldCoins
 		PopupNumbers.displayText("+$%d" % goldCoins, Vector2(620, 220), Color(1.0, 0.85, 0.0))
-	damageDealt = ((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction + elementalBonus
+	damageDealt = roundi(((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction + elementalBonus)
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	const ANNOUNCE_POS = Vector2(620, 160)
 	match clearedLines:
@@ -185,7 +185,7 @@ func attack(clearedLines, combo):
 
 func hardDrop():
 	if PlayerManager.hardDropDamage:
-		var damageDealt = (20 - damageReductionFlat) * damageReduction
+		var damageDealt = roundi((20 - damageReductionFlat) * damageReduction)
 		PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 		updateEnemyHealth(damageDealt)
 
