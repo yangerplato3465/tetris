@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://bcharopt1scne"]
+
+[ext_resource type="Texture2D" uid="uid://cefkvdnrh7jae" path="res://Sprite/Cards/enemy_panel_bg.png" id="1_bg"]
+[ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="2_font"]
+[ext_resource type="Texture2D" uid="uid://dxnfbt3cw5jmg" path="res://Sprite/Character/rogues.png" id="3_rogues"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_cname"]
+line_spacing = 0.0
+font = ExtResource("2_font")
+font_size = 28
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_cdesc"]
+line_spacing = 0.0
+font = ExtResource("2_font")
+font_size = 18
+font_color = Color(0, 0, 0, 1)
+
+[node name="Option" type="TextureRect"]
+offset_right = 276.0
+offset_bottom = 480.0
+texture = ExtResource("1_bg")
+stretch_mode = 2
+
+[node name="Name" type="Label" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 12.0
+offset_right = 276.0
+offset_bottom = 52.0
+text = "Character"
+label_settings = SubResource("LabelSettings_cname")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="."]
+position = Vector2(138, 115)
+scale = Vector2(4, 4)
+texture = ExtResource("3_rogues")
+hframes = 5
+vframes = 5
+
+[node name="Description" type="Label" parent="."]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 200.0
+offset_right = 266.0
+offset_bottom = 468.0
+text = "Skills"
+label_settings = SubResource("LabelSettings_cdesc")
+horizontal_alignment = 1
+vertical_alignment = 0
+autowrap_mode = 2

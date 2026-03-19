@@ -1,5 +1,10 @@
 extends Control
 
+@onready var CharacterSelectScene = $CharacterSelectScene
+@onready var characterOptionPrefab = preload("res://Scene/Component/characterOption.tscn")
+@onready var characterOptionRow1 = $CharacterSelectScene/CharacterOptionContainer/Row1
+@onready var characterOptionRow2 = $CharacterSelectScene/CharacterOptionContainer/Row2
+
 @onready var PrepareScene = $PrepareScene
 @onready var MainScene = $Main
 @onready var GameoverPanel = $GameoverPanel
@@ -12,16 +17,79 @@ extends Control
 
 @onready var gameoverClose = $GameoverPanel/NinePatchRect/Close
 
+const CHARACTERS = [
+	{
+		"id": "wizard",
+		"name": "Wizard",
+		"frame": 0,
+		"description": "Amplification & Burst\n\n[1] Magic Bolt     1 orb\n[2] Earthquake     1 orb\n[3] Arcane Echo    2 orbs\n[4] Mana Burst     all orbs"
+	},
+	{
+		"id": "knight",
+		"name": "Knight",
+		"frame": 5,
+		"description": "Defense to Offense\n\n[1] Earthquake     1 orb\n[2] Shield Bash    1 orb\n[3] Battle Cry     2 orbs\n[4] Iron Wall      1 orb"
+	},
+	{
+		"id": "rogue",
+		"name": "Rogue",
+		"frame": 10,
+		"description": "Board Manipulation\n\n[1] Purify         1 orb\n[2] Venom          1 orb\n[3] Assassinate    2 orbs\n[4] Smoke Bomb     2 orbs"
+	},
+	{
+		"id": "cleric",
+		"name": "Cleric",
+		"frame": 15,
+		"description": "Sustain & Burst\n\n[1] Heal           1 orb\n[2] Holy Beam      1 orb\n[3] Smite          1 orb\n[4] Sanctuary      3 orbs"
+	}
+]
+
 func _ready():
 	PlayerManager.reset() # Reset all upgrades and stats
 	grid.stopGrid()
-	generateRandomEnemies()
+	generateCharacterOptions()
 	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
 	MainScene.stage_gameover.connect(showGameoverPanel)
 	MainScene.stage_victory.connect(victory)
 	MainScene.stage_victory.connect(ShopPanel.generateItems)
 	ShopPanel.shopFinished.connect(shopFinished)
+
+func generateCharacterOptions():
+	for child in characterOptionRow1.get_children():
+		child.queue_free()
+	for child in characterOptionRow2.get_children():
+		child.queue_free()
+	setCharacterOption(CHARACTERS[0], characterOptionRow1)
+	setCharacterOption(CHARACTERS[1], characterOptionRow1)
+	setCharacterOption(CHARACTERS[2], characterOptionRow2)
+	setCharacterOption(CHARACTERS[3], characterOptionRow2)
+
+func setCharacterOption(character, container):
+	var newOption = characterOptionPrefab.instantiate()
+	newOption.find_child("Name").text = character.name
+	newOption.find_child("Icon").frame = character.frame
+	newOption.find_child("Description").text = character.description
+	newOption.pivot_offset = Vector2(138, 240)
+	newOption.mouse_entered.connect(Utilities.scaleUp.bind(newOption))
+	newOption.mouse_exited.connect(Utilities.scaleDown.bind(newOption))
+	newOption.gui_input.connect(onCharacterPressed.bind(character, newOption))
+	container.add_child(newOption)
+
+func onCharacterPressed(event: InputEvent, character, node: Control):
+	if event.is_pressed():
+		disableCharacterOptions()
+		PlayerManager.characterClass = character.id
+		Utilities.onPressed(node)
+		generateRandomEnemies()
+		await Utilities.slideOut(CharacterSelectScene)
+		Utilities.slideIn(PrepareScene)
+
+func disableCharacterOptions():
+	for child in characterOptionRow1.get_children():
+		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for child in characterOptionRow2.get_children():
+		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func generateRandomEnemies():
 	levelText.text = "level %d" % PlayerManager.currentLevel
