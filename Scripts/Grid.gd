@@ -3,6 +3,7 @@ extends Node2D
 signal clearLines(cleared, combo)
 signal hardDrop
 signal shieldChanged
+signal magicMeterChanged
 signal grid_gameover
 
 var grid = []
@@ -46,6 +47,7 @@ var startingBoard = []
 
 var currentBag
 var nextBag
+var pieceCount = 0
 
 const BORDER_OFFSET = 10
 enum Direction {CLOCKWISE, ANTICLOCKWISE}
@@ -85,6 +87,7 @@ func resetGrid():
 	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, startingBoard)
 	currentBag = newBag()
 	nextBag = newBag()
+	pieceCount = 0
 	spawnFromBag()
 	$UI/Hold.reset()
 
@@ -355,12 +358,14 @@ func printClearedBlockTypes(y):
 	var ice = 0
 	var poison = 0
 	var gold = 0
+	var orb = 0
 	for x in range(gridWidth):
 		match (grid[x][y] / 10):
 			1: fire += 1
 			2: ice += 1
 			3: poison += 1
 			4: gold += 1
+			5: orb += 1
 	if ice > 0:
 		PlayerManager.shieldNum = mini(PlayerManager.shieldNum + ice, PlayerManager.maxShieldNum)
 		shieldChanged.emit()
@@ -370,6 +375,9 @@ func printClearedBlockTypes(y):
 		PlayerManager.pendingElementalBonus += poison * 8
 	if gold > 0:
 		PlayerManager.pendingGoldCoins += gold
+	if orb > 0:
+		PlayerManager.magicMeter = mini(PlayerManager.magicMeter + orb, PlayerManager.maxMagicMeter)
+		magicMeterChanged.emit()
 
 func checkAndClearFullLines(tSpinType = null):
 	var cleared = 0
@@ -443,6 +451,9 @@ func spawnFromBag():
 		currentBag = nextBag.duplicate()
 		nextBag = newBag()
 	currentPiece = currentBag.pop_front()
+	pieceCount += 1
+	if pieceCount % 3 == 0:
+		currentPiece.assignOrb()
 	spawnPiece()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
 

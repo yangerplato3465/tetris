@@ -6,6 +6,7 @@ signal stage_gameover
 # UI
 @onready var comboMultText = $Stats/ComboMult/Number
 @onready var shieldText = $Stats/Shield/Number
+@onready var magicMeterText = $Stats/MagicMeter/Number
 
 @onready var enemyHealth = $EnemyHealth
 @onready var victoryLabel = $VictoryLabel
@@ -45,6 +46,7 @@ func connectSignals():
 	$Grid.clearLines.connect(attack)
 	$Grid.hardDrop.connect(hardDrop)
 	$Grid.shieldChanged.connect(updateShieldUI)
+	$Grid.magicMeterChanged.connect(updateMagicMeterUI)
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
 	enemyAttackTimer.timeout.connect(enemyAttack)
@@ -136,6 +138,7 @@ func stageReady():
 func updateUI():
 	comboMultText.text = str(PlayerManager.comboMult)
 	updateShieldUI()
+	updateMagicMeterUI()
 	updatePlayerHealthUI()
 
 func updatePlayerHealthUI():
@@ -143,6 +146,9 @@ func updatePlayerHealthUI():
 
 func updateShieldUI():
 	shieldText.text = str(PlayerManager.shieldNum) + " / " + str(PlayerManager.maxShieldNum)
+
+func updateMagicMeterUI():
+	magicMeterText.text = str(PlayerManager.magicMeter) + " / " + str(PlayerManager.maxMagicMeter)
 
 func attack(clearedLines, combo):
 	attackAnim()

@@ -32,6 +32,17 @@ func assignRandomElemental():
 	var elemental_type = available[randi() % available.size()]
 	shape[chosen.x][chosen.y] += elemental_type * 10
 	
+func assignOrb():
+	var cells = []
+	for x in range(shape.size()):
+		for y in range(shape[0].size()):
+			if shape[x][y] != 0:
+				cells.append(Vector2(x, y))
+	if cells.is_empty():
+		return
+	var chosen = cells[randi() % cells.size()]
+	shape[chosen.x][chosen.y] = (shape[chosen.x][chosen.y] % 10) + 50
+
 func getShapeWithoutBorders():
 	var newShape = shape.duplicate(true)
 	

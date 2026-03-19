@@ -39,4 +39,5 @@ func getElementalColor(index):
 		2: return Color(0.25, 0.55, 1.0)  # Ice - blue
 		3: return Color(0.25, 1.0, 0.25)  # Poison - green
 		4: return Color(1.0, 0.85, 0.0)   # Gold - yellow
+		5: return Color(0.0, 0.5, 0.5)   # Orb - black
 		_: return Color.WHITE

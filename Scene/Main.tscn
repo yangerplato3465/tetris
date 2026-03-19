@@ -261,6 +261,35 @@ label_settings = SubResource("LabelSettings_8i7nl")
 horizontal_alignment = 2
 vertical_alignment = 1
 
+[node name="MagicMeter" type="NinePatchRect" parent="Stats"]
+custom_minimum_size = Vector2(300, 80)
+layout_mode = 2
+texture = ExtResource("2_woyar")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="Text" type="Label" parent="Stats/MagicMeter"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 24.0
+offset_right = 144.0
+offset_bottom = 54.0
+text = "magic :"
+label_settings = SubResource("LabelSettings_8i7nl")
+
+[node name="Number" type="Label" parent="Stats/MagicMeter"]
+layout_mode = 0
+offset_left = 362.0
+offset_top = 24.0
+offset_right = 466.0
+offset_bottom = 54.0
+text = "0 / 10"
+label_settings = SubResource("LabelSettings_8i7nl")
+horizontal_alignment = 2
+vertical_alignment = 1
+
 [node name="Grid" type="Node2D" parent="."]
 z_index = 1
 script = ExtResource("2_jk1g6")

@@ -19,6 +19,8 @@ var poisonBlocks
 var goldBlocks
 var pendingElementalBonus
 var pendingGoldCoins
+var magicMeter
+var maxMagicMeter
 var spawnBag
 var alchemyArray
 var equipmentArray
@@ -68,6 +70,8 @@ func _setDefaults():
 	goldBlocks = false
 	pendingElementalBonus = 0
 	pendingGoldCoins = 0
+	magicMeter = 0
+	maxMagicMeter = 10
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
 	alchemyArray = Consts.alchemyCommonItems
 	equipmentArray = Consts.equipmentCommonItems
