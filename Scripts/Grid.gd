@@ -454,6 +454,9 @@ func spawnFromBag():
 	pieceCount += 1
 	if pieceCount % 3 == 0:
 		currentPiece.assignOrb()
+	elif PlayerManager.nextPiecePoison:
+		currentPiece.assignAllElemental(3)
+		PlayerManager.nextPiecePoison = false
 	spawnPiece()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
 
@@ -586,6 +589,32 @@ func addGarbageRows(count):
 		grid_gameover.emit()
 		gameover()
 
+func clearBottomRows(count: int):
+	deletePieceFromGrid()
+	var cleared = 0
+	for i in range(count):
+		var y = gridHeight - 1
+		printClearedBlockTypes(y)
+		for x in range(gridWidth):
+			grid[x][y] = 0
+		for j in range(y, 0, -1):
+			for x in range(gridWidth):
+				if grid[x][j] == 0 and grid[x][j-1] != 0:
+					grid[x][j] = grid[x][j-1]
+					grid[x][j-1] = 0
+		cleared += 1
+		var particle = ClearParticle.instantiate()
+		particle.position.x = gridOffsetX + spriteSize * gridWidth / 2.0
+		particle.position.y = y * spriteSize + gridOffsetY
+		particle.setBoxRange(spriteSize * gridWidth / 2.0)
+		add_child(particle)
+		particle.emit()
+	addPiece()
+	combo += 1
+	clearLines.emit(cleared, combo)
+	drawGrid()
+	drawDroppingPoint()
+
 func hardDropShake():
 	var tween = create_tween()
 	tween.finished.connect(func():
@@ -594,3 +623,66 @@ func hardDropShake():
 	tween.set_ease(Tween.EASE_OUT)
 	tween.set_trans(Tween.TRANS_BACK)
 	tween.tween_property(self, "position:y", 2, 0.1)
+
+func purifyGarbage():
+	deletePieceFromGrid()
+	for x in range(gridWidth):
+		for y in range(gridHeight):
+			if grid[x][y] == 8:
+				grid[x][y] = 21
+	addPiece()
+	drawGrid()
+	drawDroppingPoint()
+
+func shuffleBottomRows(count: int):
+	deletePieceFromGrid()
+	var startY = gridHeight - count
+	var flat = []
+	for y in range(startY, gridHeight):
+		for x in range(gridWidth):
+			flat.append(grid[x][y])
+	flat.shuffle()
+	var idx = 0
+	for y in range(startY, gridHeight):
+		for x in range(gridWidth):
+			grid[x][y] = flat[idx]
+			idx += 1
+	addPiece()
+	drawGrid()
+	drawDroppingPoint()
+
+func holyBeam():
+	deletePieceFromGrid()
+	var bestRow = -1
+	var bestCount = 0
+	for y in range(vanishZone, gridHeight):
+		var count = 0
+		for x in range(gridWidth):
+			if grid[x][y] != 0:
+				count += 1
+		if count > bestCount:
+			bestCount = count
+			bestRow = y
+	if bestRow == -1 or bestCount == 0:
+		addPiece()
+		return
+	for x in range(gridWidth):
+		if grid[x][bestRow] != 0:
+			grid[x][bestRow] = (grid[x][bestRow] % 10) + 20
+	printClearedBlockTypes(bestRow)
+	for x in range(gridWidth):
+		grid[x][bestRow] = 0
+	for j in range(bestRow, 0, -1):
+		for x in range(gridWidth):
+			if grid[x][j] == 0 and grid[x][j-1] != 0:
+				grid[x][j] = grid[x][j-1]
+				grid[x][j-1] = 0
+	var particle = ClearParticle.instantiate()
+	particle.position.x = gridOffsetX + spriteSize * gridWidth / 2.0
+	particle.position.y = bestRow * spriteSize + gridOffsetY
+	particle.setBoxRange(spriteSize * gridWidth / 2.0)
+	add_child(particle)
+	particle.emit()
+	addPiece()
+	drawGrid()
+	drawDroppingPoint()

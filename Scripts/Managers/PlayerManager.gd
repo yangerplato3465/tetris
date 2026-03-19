@@ -29,6 +29,8 @@ var shieldNum
 var maxShieldNum
 var playerHealth
 var maxPlayerHealth
+var characterClass
+var nextPiecePoison
 
 var startGrid = [
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
@@ -70,7 +72,7 @@ func _setDefaults():
 	goldBlocks = false
 	pendingElementalBonus = 0
 	pendingGoldCoins = 0
-	magicMeter = 0
+	magicMeter = 5
 	maxMagicMeter = 10
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
 	alchemyArray = Consts.alchemyCommonItems
@@ -80,6 +82,8 @@ func _setDefaults():
 	maxShieldNum = 100
 	playerHealth = 100
 	maxPlayerHealth = 100
+	characterClass = "knight"
+	nextPiecePoison = false
 	currentEnemy = null
 	coinsSpent = 0
 	itemsBought = 0
