@@ -1,6 +1,6 @@
-# Alchetris - a submission for pirate software game jam
+# Alchetris
 
-Made with Godot 4.2
+Made with Godot 4.6
 
 Alchetris is a roguelike puzzle game, you play as an alchemist trying to defeat a secret evil cult, the combat system will be similar to the game “Tetris Battle”, Throughout the run you’ll acquire upgrades, potions and weapons to help you.
 
