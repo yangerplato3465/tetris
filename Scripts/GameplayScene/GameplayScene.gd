@@ -2,8 +2,7 @@ extends Control
 
 @onready var CharacterSelectScene = $CharacterSelectScene
 @onready var characterOptionPrefab = preload("res://Scene/Component/characterOption.tscn")
-@onready var characterOptionRow1 = $CharacterSelectScene/CharacterOptionContainer/Row1
-@onready var characterOptionRow2 = $CharacterSelectScene/CharacterOptionContainer/Row2
+@onready var characterOptionContainer = $CharacterSelectScene/CharacterOptionContainer
 
 @onready var PrepareScene = $PrepareScene
 @onready var MainScene = $Main
@@ -56,25 +55,21 @@ func _ready():
 	ShopPanel.shopFinished.connect(shopFinished)
 
 func generateCharacterOptions():
-	for child in characterOptionRow1.get_children():
+	for child in characterOptionContainer.get_children():
 		child.queue_free()
-	for child in characterOptionRow2.get_children():
-		child.queue_free()
-	setCharacterOption(CHARACTERS[0], characterOptionRow1)
-	setCharacterOption(CHARACTERS[1], characterOptionRow1)
-	setCharacterOption(CHARACTERS[2], characterOptionRow2)
-	setCharacterOption(CHARACTERS[3], characterOptionRow2)
+	for character in CHARACTERS:
+		setCharacterOption(character)
 
-func setCharacterOption(character, container):
+func setCharacterOption(character):
 	var newOption = characterOptionPrefab.instantiate()
 	newOption.find_child("Name").text = character.name
 	newOption.find_child("Icon").frame = character.frame
 	newOption.find_child("Description").text = character.description
-	newOption.pivot_offset = Vector2(138, 240)
+	newOption.pivot_offset = Vector2(110, 155)
 	newOption.mouse_entered.connect(Utilities.scaleUp.bind(newOption))
 	newOption.mouse_exited.connect(Utilities.scaleDown.bind(newOption))
 	newOption.gui_input.connect(onCharacterPressed.bind(character, newOption))
-	container.add_child(newOption)
+	characterOptionContainer.add_child(newOption)
 
 func onCharacterPressed(event: InputEvent, character, node: Control):
 	if event.is_pressed():
@@ -86,9 +81,7 @@ func onCharacterPressed(event: InputEvent, character, node: Control):
 		Utilities.slideIn(PrepareScene)
 
 func disableCharacterOptions():
-	for child in characterOptionRow1.get_children():
-		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for child in characterOptionRow2.get_children():
+	for child in characterOptionContainer.get_children():
 		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func generateRandomEnemies():
