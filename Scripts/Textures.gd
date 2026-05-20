@@ -10,9 +10,9 @@ const texture6 = preload("res://Sprite/block_L.png") #Z
 const texture7 = preload("res://Sprite/block_L.png") #S
 
 func getTextureForColorIndex(index):
-	if index == 8:
+	if index == Constants.GARBAGE:
 		return texture1
-	match (index % 10):
+	match (index % Constants.ELEMENTAL_MUL):
 		# (0): return texture0
 		(1): return texture1
 		(2): return texture2
@@ -32,12 +32,12 @@ func getTextureForColorIndex(index):
 # piece type  = value % 10
 # elemental   = value / 10
 func getElementalColor(index):
-	if index == 8:
+	if index == Constants.GARBAGE:
 		return Color(0.7, 0.2, 1.0)  # Garbage - purple
-	match (index / 10):
-		1: return Color(1.0, 0.25, 0.25)  # Fire - red
-		2: return Color(0.25, 0.55, 1.0)  # Ice - blue
-		3: return Color(0.25, 1.0, 0.25)  # Poison - green
-		4: return Color(1.0, 0.85, 0.0)   # Gold - yellow
-		5: return Color(0.0, 0.5, 0.5)   # Orb - black
+	match (index / Constants.ELEMENTAL_MUL):
+		Constants.Elemental.FIRE: return Color(1.0, 0.25, 0.25)   # Fire - red
+		Constants.Elemental.ICE: return Color(0.25, 0.55, 1.0)    # Ice - blue
+		Constants.Elemental.POISON: return Color(0.25, 1.0, 0.25) # Poison - green
+		Constants.Elemental.GOLD: return Color(1.0, 0.85, 0.0)    # Gold - yellow
+		Constants.Elemental.ORB: return Color(0.0, 0.5, 0.5)      # Orb - teal
 		_: return Color.WHITE

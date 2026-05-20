@@ -14,13 +14,13 @@ func getColorIndex():
 # Assigns a random elemental type to one random block in the piece.
 # Fire (1) and poison (3) only appear if unlocked via upgrades. Ice (2) is always available.
 func assignRandomElemental():
-	var available = [2]  # ice always available
+	var available = [Constants.Elemental.ICE]
 	if PlayerManager.fireBlocks:
-		available.append(1)
+		available.append(Constants.Elemental.FIRE)
 	if PlayerManager.poisonBlocks:
-		available.append(3)
+		available.append(Constants.Elemental.POISON)
 	if PlayerManager.goldBlocks:
-		available.append(4)
+		available.append(Constants.Elemental.GOLD)
 	var cells = []
 	for x in range(shape.size()):
 		for y in range(shape[0].size()):
@@ -30,13 +30,13 @@ func assignRandomElemental():
 		return
 	var chosen = cells[randi() % cells.size()]
 	var elemental_type = available[randi() % available.size()]
-	shape[chosen.x][chosen.y] += elemental_type * 10
-	
+	shape[chosen.x][chosen.y] += elemental_type * Constants.ELEMENTAL_MUL
+
 func assignAllElemental(elemental_type: int):
 	for x in range(shape.size()):
 		for y in range(shape[0].size()):
 			if shape[x][y] != 0:
-				shape[x][y] = (shape[x][y] % 10) + elemental_type * 10
+				shape[x][y] = (shape[x][y] % Constants.ELEMENTAL_MUL) + elemental_type * Constants.ELEMENTAL_MUL
 
 func assignOrb():
 	var cells = []
@@ -47,7 +47,7 @@ func assignOrb():
 	if cells.is_empty():
 		return
 	var chosen = cells[randi() % cells.size()]
-	shape[chosen.x][chosen.y] = (shape[chosen.x][chosen.y] % 10) + 50
+	shape[chosen.x][chosen.y] = (shape[chosen.x][chosen.y] % Constants.ELEMENTAL_MUL) + Constants.Elemental.ORB * Constants.ELEMENTAL_MUL
 
 func getShapeWithoutBorders():
 	var newShape = shape.duplicate(true)

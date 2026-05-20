@@ -70,4 +70,4 @@ Skills are activated with keys **1**, **2**, **3**, **4**. Each skill costs Magi
 ### Code
 - [ ] **Cache font in `PopupNumbers.gd`** — `load("res://Font/ThaleahFat/ThaleahFat.ttf")` is called on every damage popup. Change to a top-level `preload` constant.
 - [ ] **Replace inline skill routing in `Main.gd`** — The four `useSkill1/2/3/4` functions each repeat the same `match characterClass` block. A `Dictionary` mapping `[characterClass][skill_index]` to callables would replace ~80 lines with a data table.
-- [ ] **Add an enum for elemental block types** — The `/10` and `%10` encoding is used raw in at least four files. An `enum Elemental { NONE, FIRE, ICE, POISON, GOLD, ORB }` with a named constant for the multiplier (10) would make this self-documenting.
+- [x] **Add an enum for elemental block types** — The `/10` and `%10` encoding is used raw in at least four files. An `enum Elemental { NONE, FIRE, ICE, POISON, GOLD, ORB }` with a named constant for the multiplier (10) would make this self-documenting.

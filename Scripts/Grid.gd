@@ -387,12 +387,12 @@ func printClearedBlockTypes(y):
 	var gold = 0
 	var orb = 0
 	for x in range(gridWidth):
-		match (grid[x][y] / 10):
-			1: fire += 1
-			2: ice += 1
-			3: poison += 1
-			4: gold += 1
-			5: orb += 1
+		match (grid[x][y] / Constants.ELEMENTAL_MUL):
+			Constants.Elemental.FIRE: fire += 1
+			Constants.Elemental.ICE: ice += 1
+			Constants.Elemental.POISON: poison += 1
+			Constants.Elemental.GOLD: gold += 1
+			Constants.Elemental.ORB: orb += 1
 	if ice > 0:
 		PlayerManager.shieldNum = mini(PlayerManager.shieldNum + ice, PlayerManager.maxShieldNum)
 		shieldChanged.emit()
@@ -607,7 +607,7 @@ func addGarbageRows(count):
 				grid[x][y] = grid[x][y + 1]
 		var hole = randi() % gridWidth
 		for x in range(gridWidth):
-			grid[x][gridHeight - 1] = 0 if x == hole else 8
+			grid[x][gridHeight - 1] = 0 if x == hole else Constants.GARBAGE
 	var isGameOver = checkGameOver()
 	addPiece()
 	drawGrid()
@@ -655,8 +655,8 @@ func purifyGarbage():
 	deletePieceFromGrid()
 	for x in range(gridWidth):
 		for y in range(gridHeight):
-			if grid[x][y] == 8:
-				grid[x][y] = 21
+			if grid[x][y] == Constants.GARBAGE:
+				grid[x][y] = Constants.Elemental.ICE * Constants.ELEMENTAL_MUL + 1
 	addPiece()
 	drawGrid()
 	drawDroppingPoint()
@@ -695,7 +695,7 @@ func holyBeam():
 		return
 	for x in range(gridWidth):
 		if grid[x][bestRow] != 0:
-			grid[x][bestRow] = (grid[x][bestRow] % 10) + 20
+			grid[x][bestRow] = (grid[x][bestRow] % Constants.ELEMENTAL_MUL) + Constants.Elemental.ICE * Constants.ELEMENTAL_MUL
 	printClearedBlockTypes(bestRow)
 	for x in range(gridWidth):
 		grid[x][bestRow] = 0

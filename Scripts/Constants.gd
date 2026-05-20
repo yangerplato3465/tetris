@@ -1,4 +1,9 @@
 extends Node
+
+enum Elemental { NONE = 0, FIRE = 1, ICE = 2, POISON = 3, GOLD = 4, ORB = 5 }
+const ELEMENTAL_MUL = 10
+const GARBAGE = 8
+
 #Shape described by column:
 const I_SHAPE = [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]]
 const J_SHAPE = [[2,2,0],[0,2,0],[0,2,0]]
