@@ -49,6 +49,9 @@ var currentBag
 var nextBag
 var pieceCount = 0
 
+var _grid_sprites: Array = []
+var _ghost_sprites: Array = []
+
 const BORDER_OFFSET = 10
 enum Direction {CLOCKWISE, ANTICLOCKWISE}
 
@@ -56,12 +59,40 @@ enum Direction {CLOCKWISE, ANTICLOCKWISE}
 func _ready():
 	gridOffsetX = $UI/Border.position.x + BORDER_OFFSET
 	gridOffsetY = $UI/Border.position.y - (vanishZone-1)*spriteSize
+	_initSprites()
 	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, Utilities.generateMediumMessyBoard())
 
 	currentBag = newBag()
 	nextBag = newBag()
 	spawnFromBag()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
+
+func _initSprites():
+	_grid_sprites = []
+	for x in range(gridWidth):
+		var col = []
+		for y in range(gridHeight):
+			var sprite = Sprite2D.new()
+			sprite.scale = Vector2(2, 2)
+			sprite.centered = false
+			sprite.visible = false
+			if y == vanishZone - 1:
+				sprite.region_enabled = true
+				sprite.region_rect = Rect2(0, 6, 16, 10)
+				sprite.position = Vector2(x * spriteSize + gridOffsetX, y * spriteSize + gridOffsetY + 16)
+			else:
+				sprite.position = Vector2(x * spriteSize + gridOffsetX, y * spriteSize + gridOffsetY)
+			add_child(sprite)
+			col.append(sprite)
+		_grid_sprites.append(col)
+	for _i in range(4):
+		var ghost = Sprite2D.new()
+		ghost.scale = Vector2(2, 2)
+		ghost.centered = false
+		ghost.material = darkMaterial
+		ghost.visible = false
+		add_child(ghost)
+		_ghost_sprites.append(ghost)
 
 func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	match enemyInfo.id:
@@ -108,21 +139,16 @@ func newBag():
 	return bag
 
 func drawGrid():
-	Utilities.delete_children(self)
 	for x in range(gridWidth):
-		for y in range(vanishZone-1,gridHeight):
-			var circle = Sprite2D.new()
-			if (y == 2):
-				circle.region_enabled = true
-				circle.region_rect = Rect2(0,6,16,10)
-				circle.position = Vector2(x*spriteSize + gridOffsetX,y*spriteSize + gridOffsetY + 16)
+		for y in range(vanishZone - 1, gridHeight):
+			var value = grid[x][y]
+			var sprite = _grid_sprites[x][y]
+			if value == 0:
+				sprite.visible = false
 			else:
-				circle.position = Vector2(x*spriteSize + gridOffsetX,y*spriteSize + gridOffsetY)
-			circle.texture = Textures.getTextureForColorIndex(grid[x][y])
-			circle.self_modulate = Textures.getElementalColor(grid[x][y])
-			circle.scale = Vector2(2,2)
-			circle.centered = false
-			add_child(circle)
+				sprite.texture = Textures.getTextureForColorIndex(value)
+				sprite.self_modulate = Textures.getElementalColor(value)
+				sprite.visible = true
 
 func addPiece():
 	for x in currentPiece.shape.size():
@@ -291,6 +317,9 @@ func gameover():
 	set_physics_process(false)
 
 func drawDroppingPoint():
+	for ghost in _ghost_sprites:
+		ghost.visible = false
+
 	deletePieceFromGrid()
 	var droppingY = currentPiece.positionInGrid.y
 	var foundDroppingLine = false
@@ -310,19 +339,17 @@ func drawDroppingPoint():
 		droppingY+=1
 	addPiece()
 
-	#draw shape with outline
 	if droppingY >= vanishZone:
+		var ghostIdx = 0
 		for x in currentPiece.shape.size():
 			for y in currentPiece.shape[0].size():
-				if (currentPiece.shape[x][y] != 0) && (grid[currentPiece.positionInGrid.x + x][droppingY + y] == 0):
-					var circle = Sprite2D.new()
-					circle.position = Vector2(currentPiece.positionInGrid.x*spriteSize + x*spriteSize + gridOffsetX,droppingY*spriteSize+y*spriteSize + gridOffsetY)
-					circle.texture = currentPiece.getTextureForPiece()
-					circle.self_modulate = Textures.getElementalColor(currentPiece.shape[x][y])
-					circle.material = darkMaterial
-					circle.scale = Vector2(2,2)
-					circle.centered = false
-					add_child(circle)
+				if currentPiece.shape[x][y] != 0 and grid[currentPiece.positionInGrid.x + x][droppingY + y] == 0:
+					var ghost = _ghost_sprites[ghostIdx]
+					ghost.position = Vector2(currentPiece.positionInGrid.x*spriteSize + x*spriteSize + gridOffsetX, droppingY*spriteSize+y*spriteSize + gridOffsetY)
+					ghost.texture = currentPiece.getTextureForPiece()
+					ghost.self_modulate = Textures.getElementalColor(currentPiece.shape[x][y])
+					ghost.visible = true
+					ghostIdx += 1
 
 func hardDropPiece():
 	hardDrop.emit()

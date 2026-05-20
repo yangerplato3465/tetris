@@ -52,3 +52,22 @@ Skills are activated with keys **1**, **2**, **3**, **4**. Each skill costs Magi
 | 3 | Smite | 1 orb | Deal 10 + 3 × missing HP (up to massive damage when near death) |
 | 4 | Sanctuary | 3 orbs | Block the next enemy attack completely |
 
+---
+
+## TODO
+
+### Balance
+- [ ] **Nerf Wizard Mana Burst** — 60 dmg/orb reaches 600+ at max orbs, far above every other class. Lower to ~30 dmg/orb or add a total cap (~300 max).
+- [ ] **Buff Rogue** — Assassinate caps at ~115 damage with no scaling. Consider making it deal extra damage per garbage block specifically, rewarding the Purify → Assassinate combo.
+- [ ] **Activate T-spin bonus** — detection already works in `Grid.gd:checkTSpin()` and the result is passed through, but currently only `print()`s to console. Wire it to a small damage bonus or +1 orb reward.
+- [ ] **Raise elemental block bonus values** — Fire (+15/block) and Poison (+8/block) add ~7% to a Tetris clear. Raise to ~40 and ~25 respectively to make the alchemy upgrades feel meaningful.
+- [ ] **Cap the combo multiplier** — White Powder stacks infinitely; the exponential formula hits six-digit damage at 10× combo with a 2.0 multiplier. Add a soft cap (e.g. `min(comboMult, 2.5)`).
+
+### Content
+- [ ] **Add legendary equipment items** — `Consts.equipmentLegendaryItems` is an empty array. The "Legendary Chapter" item unlocks it but there is nothing to see.
+- [ ] **Differentiate the Magnifying Glass items** — IDs 20, 21, 22 are identical (same name, art, price, effect). Rename or replace later copies with distinct items.
+
+### Code
+- [ ] **Cache font in `PopupNumbers.gd`** — `load("res://Font/ThaleahFat/ThaleahFat.ttf")` is called on every damage popup. Change to a top-level `preload` constant.
+- [ ] **Replace inline skill routing in `Main.gd`** — The four `useSkill1/2/3/4` functions each repeat the same `match characterClass` block. A `Dictionary` mapping `[characterClass][skill_index]` to callables would replace ~80 lines with a data table.
+- [ ] **Add an enum for elemental block types** — The `/10` and `%10` encoding is used raw in at least four files. An `enum Elemental { NONE, FIRE, ICE, POISON, GOLD, ORB }` with a named constant for the multiplier (10) would make this self-documenting.

@@ -24,7 +24,7 @@ func generateItems():
 		currentItemData.append(PlayerManager.alchemyArray[index])
 	
 	if PlayerManager.equipmentArray.size() > 0:
-		var equipmentData = Consts.equipmentCommonItems[randi_range(0, PlayerManager.equipmentArray.size() - 1)]
+		var equipmentData = PlayerManager.equipmentArray[randi_range(0, PlayerManager.equipmentArray.size() - 1)]
 		currentItemData.append(equipmentData)
 		setItem(equipmentData, false)
 
