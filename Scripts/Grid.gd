@@ -89,7 +89,6 @@ func _initSprites():
 		var ghost = Sprite2D.new()
 		ghost.scale = Vector2(2, 2)
 		ghost.centered = false
-		ghost.material = darkMaterial
 		ghost.visible = false
 		add_child(ghost)
 		_ghost_sprites.append(ghost)
@@ -346,8 +345,9 @@ func drawDroppingPoint():
 				if currentPiece.shape[x][y] != 0 and grid[currentPiece.positionInGrid.x + x][droppingY + y] == 0:
 					var ghost = _ghost_sprites[ghostIdx]
 					ghost.position = Vector2(currentPiece.positionInGrid.x*spriteSize + x*spriteSize + gridOffsetX, droppingY*spriteSize+y*spriteSize + gridOffsetY)
-					ghost.texture = currentPiece.getTextureForPiece()
-					ghost.self_modulate = Textures.getElementalColor(currentPiece.shape[x][y])
+					ghost.texture = Textures.getTextureForColorIndex(currentPiece.shape[x][y])
+					var c = Textures.getElementalColor(currentPiece.shape[x][y])
+					ghost.self_modulate = Color(c.r, c.g, c.b, 0.4)
 					ghost.visible = true
 					ghostIdx += 1
 
