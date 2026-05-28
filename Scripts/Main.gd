@@ -18,8 +18,6 @@ var enemyAttackInterval = 10.0
 var enemyAttackDamage = 20
 var enemyAttackAddsGarbage = false
 var lastLineClearDamage = 0
-var battleCryCharges = 0
-var sanctuaryActive = false
 
 @onready var holdLock = $Grid/UI/Hold/TextureRect/Lock
 @onready var nextPieceLock2 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock2
@@ -122,32 +120,16 @@ func _input(event):
 		useSkill4()
 
 func useSkill1():
-	match PlayerManager.characterClass:
-		"wizard": _skillMagicBolt()
-		"knight": _skillEarthquake()
-		"rogue": _skillPurify()
-		"cleric": _skillHeal()
+	_skillMagicBolt()
 
 func useSkill2():
-	match PlayerManager.characterClass:
-		"wizard": _skillEarthquake()
-		"knight": _skillShieldBash()
-		"rogue": _skillVenom()
-		"cleric": _skillHolyBeam()
+	_skillEarthquake()
 
 func useSkill3():
-	match PlayerManager.characterClass:
-		"wizard": _skillArcaneEcho()
-		"knight": _skillBattleCry()
-		"rogue": _skillAssassinate()
-		"cleric": _skillSmite()
+	_skillArcaneEcho()
 
 func useSkill4():
-	match PlayerManager.characterClass:
-		"wizard": _skillManaBurst()
-		"knight": _skillIronWall()
-		"rogue": _skillSmokeBomb()
-		"cleric": _skillSanctuary()
+	_skillManaBurst()
 
 # --- Wizard Skills ---
 
@@ -190,119 +172,6 @@ func _skillManaBurst():
 	attackAnim()
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
-
-# --- Knight Skills ---
-
-func _skillShieldBash():
-	if PlayerManager.magicMeter < 1:
-		return
-	PlayerManager.magicMeter -= 1
-	updateMagicMeterUI()
-	var damageDealt = roundi((PlayerManager.shieldNum - damageReductionFlat) * damageReduction)
-	damageDealt = maxi(damageDealt, 0)
-	PlayerManager.shieldNum = 0
-	updateShieldUI()
-	attackAnim()
-	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
-	updateEnemyHealth(damageDealt)
-
-func _skillBattleCry():
-	if PlayerManager.magicMeter < 2:
-		return
-	PlayerManager.magicMeter -= 2
-	updateMagicMeterUI()
-	battleCryCharges += 4
-	PopupNumbers.displayText("BATTLE CRY!", Vector2(620, 160), Color(1.0, 0.6, 0.1))
-
-func _skillIronWall():
-	if PlayerManager.magicMeter < 1:
-		return
-	PlayerManager.magicMeter -= 1
-	updateMagicMeterUI()
-	PlayerManager.shieldNum = PlayerManager.maxShieldNum
-	updateShieldUI()
-	PopupNumbers.displayText("IRON WALL!", Vector2(620, 160), Color(0.6, 0.8, 1.0))
-
-# --- Rogue Skills ---
-
-func _skillPurify():
-	if PlayerManager.magicMeter < 1:
-		return
-	PlayerManager.magicMeter -= 1
-	updateMagicMeterUI()
-	$Grid.purifyGarbage()
-	PopupNumbers.displayText("PURIFIED!", Vector2(620, 160), Color(0.5, 1.0, 0.5))
-
-func _skillVenom():
-	if PlayerManager.magicMeter < 1:
-		return
-	PlayerManager.magicMeter -= 1
-	updateMagicMeterUI()
-	PlayerManager.nextPiecePoison = true
-	PopupNumbers.displayText("VENOM!", Vector2(620, 160), Color(0.5, 1.0, 0.2))
-
-func _skillAssassinate():
-	if PlayerManager.magicMeter < 2:
-		return
-	PlayerManager.magicMeter -= 2
-	updateMagicMeterUI()
-	var filledCells = 0
-	for x in range(10):
-		for y in range(23):
-			if $Grid.grid[x][y] != 0:
-				filledCells += 1
-	var damageDealt = roundi((filledCells * 5 - damageReductionFlat) * damageReduction)
-	damageDealt = maxi(damageDealt, 0)
-	attackAnim()
-	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
-	updateEnemyHealth(damageDealt)
-
-func _skillSmokeBomb():
-	if PlayerManager.magicMeter < 2:
-		return
-	PlayerManager.magicMeter -= 2
-	updateMagicMeterUI()
-	$Grid.shuffleBottomRows(6)
-	PopupNumbers.displayText("SMOKE BOMB!", Vector2(620, 160), Color(0.6, 0.6, 0.6))
-
-# --- Cleric Skills ---
-
-func _skillHeal():
-	if PlayerManager.magicMeter < 1:
-		return
-	PlayerManager.magicMeter -= 1
-	updateMagicMeterUI()
-	PlayerManager.playerHealth = mini(PlayerManager.playerHealth + 20, PlayerManager.maxPlayerHealth)
-	updatePlayerHealthUI()
-	PopupNumbers.displayText("+20 HP", Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.2, 1.0, 0.4))
-
-func _skillHolyBeam():
-	if PlayerManager.magicMeter < 1:
-		return
-	PlayerManager.magicMeter -= 1
-	updateMagicMeterUI()
-	$Grid.holyBeam()
-	PopupNumbers.displayText("HOLY BEAM!", Vector2(620, 160), Color(1.0, 1.0, 0.5))
-
-func _skillSmite():
-	if PlayerManager.magicMeter < 1:
-		return
-	PlayerManager.magicMeter -= 1
-	updateMagicMeterUI()
-	var missingHP = PlayerManager.maxPlayerHealth - PlayerManager.playerHealth
-	var damageDealt = roundi((10 + missingHP * 3 - damageReductionFlat) * damageReduction)
-	damageDealt = maxi(damageDealt, 0)
-	attackAnim()
-	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
-	updateEnemyHealth(damageDealt)
-
-func _skillSanctuary():
-	if PlayerManager.magicMeter < 3:
-		return
-	PlayerManager.magicMeter -= 3
-	updateMagicMeterUI()
-	sanctuaryActive = true
-	PopupNumbers.displayText("SANCTUARY!", Vector2(620, 160), Color(1.0, 1.0, 0.7))
 
 func _process(_delta):
 	if enemyAttackTimer.is_stopped():
@@ -371,9 +240,6 @@ func attack(clearedLines, combo):
 		PlayerManager.coin += goldCoins
 		PopupNumbers.displayText("+$%d" % goldCoins, Vector2(620, 220), Color(1.0, 0.85, 0.0))
 	damageDealt = roundi(((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction + elementalBonus)
-	if battleCryCharges > 0:
-		damageDealt = roundi(damageDealt * 2.0)
-		battleCryCharges -= 1
 	lastLineClearDamage = damageDealt
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	const ANNOUNCE_POS = Vector2(620, 160)
@@ -428,11 +294,6 @@ func updateEnemyHealth(damageDealt):
 		victory()
 
 func enemyAttack():
-	if sanctuaryActive:
-		sanctuaryActive = false
-		PopupNumbers.displayText("BLOCKED!", Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 1.0, 0.5))
-		enemyAttackTimer.start(enemyAttackInterval)
-		return
 	var overflow = enemyAttackDamage - PlayerManager.shieldNum
 	PlayerManager.shieldNum = maxi(PlayerManager.shieldNum - enemyAttackDamage, 0)
 	if overflow > 0:

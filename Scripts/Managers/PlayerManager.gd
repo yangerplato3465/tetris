@@ -82,7 +82,7 @@ func _setDefaults():
 	maxShieldNum = 100
 	playerHealth = 100
 	maxPlayerHealth = 100
-	characterClass = "knight"
+	characterClass = "wizard"
 	nextPiecePoison = false
 	currentEnemy = null
 	coinsSpent = 0

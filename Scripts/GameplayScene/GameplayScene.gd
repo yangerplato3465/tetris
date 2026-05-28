@@ -22,24 +22,6 @@ const CHARACTERS = [
 		"name": "Wizard",
 		"frame": 0,
 		"description": "Amplification & Burst\n\n[1] Magic Bolt     1 orb\n[2] Earthquake     1 orb\n[3] Arcane Echo    2 orbs\n[4] Mana Burst     all orbs"
-	},
-	{
-		"id": "knight",
-		"name": "Knight",
-		"frame": 5,
-		"description": "Defense to Offense\n\n[1] Earthquake     1 orb\n[2] Shield Bash    1 orb\n[3] Battle Cry     2 orbs\n[4] Iron Wall      1 orb"
-	},
-	{
-		"id": "rogue",
-		"name": "Rogue",
-		"frame": 10,
-		"description": "Board Manipulation\n\n[1] Purify         1 orb\n[2] Venom          1 orb\n[3] Assassinate    2 orbs\n[4] Smoke Bomb     2 orbs"
-	},
-	{
-		"id": "cleric",
-		"name": "Cleric",
-		"frame": 15,
-		"description": "Sustain & Burst\n\n[1] Heal           1 orb\n[2] Holy Beam      1 orb\n[3] Smite          1 orb\n[4] Sanctuary      3 orbs"
 	}
 ]
 
