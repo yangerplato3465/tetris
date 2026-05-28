@@ -38,7 +38,10 @@ var _playerFlashing = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 
+var _skill_rows: Array = []
+
 func _ready():
+	_skill_rows = [$SkillPanel/Skill1, $SkillPanel/Skill2, $SkillPanel/Skill3, $SkillPanel/Skill4]
 	updateUI()
 	randomize()
 	connectSignals()
@@ -214,6 +217,13 @@ func updateShieldUI():
 
 func updateMagicMeterUI():
 	magicMeterText.text = str(PlayerManager.magicMeter) + " / " + str(PlayerManager.maxMagicMeter)
+	_updateSkillAvailability()
+
+func _updateSkillAvailability():
+	for row in _skill_rows:
+		var cost = row.get_meta("cost")
+		var can_cast = cost == -1 or PlayerManager.magicMeter >= cost
+		row.modulate = Color.WHITE if can_cast else Color(0.35, 0.35, 0.35, 0.7)
 
 func attack(clearedLines, combo):
 	attackAnim()
