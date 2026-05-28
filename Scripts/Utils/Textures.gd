@@ -1,13 +1,13 @@
 extends Node
 
-const texture0 = preload("res://Sprite/grid_small.png")
-const texture1 = preload("res://Sprite/block_L.png") #I
-const texture2 = preload("res://Sprite/block_L.png") #J
-const texture3 = preload("res://Sprite/block_L.png") #L
-const texture4 = preload("res://Sprite/block_L.png") #O
-const texture5 = preload("res://Sprite/block_L.png") #T
-const texture6 = preload("res://Sprite/block_L.png") #Z
-const texture7 = preload("res://Sprite/block_L.png") #S
+const texture0 = preload("res://Sprite/Grid/grid_small.png")
+const texture1 = preload("res://Sprite/Blocks/block_L.png") #I
+const texture2 = preload("res://Sprite/Blocks/block_L.png") #J
+const texture3 = preload("res://Sprite/Blocks/block_L.png") #L
+const texture4 = preload("res://Sprite/Blocks/block_L.png") #O
+const texture5 = preload("res://Sprite/Blocks/block_L.png") #T
+const texture6 = preload("res://Sprite/Blocks/block_L.png") #Z
+const texture7 = preload("res://Sprite/Blocks/block_L.png") #S
 
 func getTextureForColorIndex(index):
 	if index == Constants.GARBAGE:

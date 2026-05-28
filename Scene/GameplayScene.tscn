@@ -8,7 +8,7 @@
 [ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="6_nyed1"]
 [ext_resource type="Shader" path="res://Shader/TransitionIn.gdshader" id="9_7tgni"]
 [ext_resource type="PackedScene" uid="uid://d3korpfrgseif" path="res://Scene/Main.tscn" id="9_f7h70"]
-[ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/icon.png" id="10_ojaq8"]
+[ext_resource type="Texture2D" uid="uid://b8ev7rwgjvay1" path="res://Sprite/UI/icon.png" id="10_ojaq8"]
 [ext_resource type="Shader" path="res://Shader/TransitionOut.gdshader" id="11_nob76"]
 [ext_resource type="PackedScene" uid="uid://3v75hcg5eaxn" path="res://Scene/Component/GameoverPanel.tscn" id="13_3fdth"]
 [ext_resource type="PackedScene" uid="uid://bcharopt1scne" path="res://Scene/Component/characterOption.tscn" id="15_copt"]
