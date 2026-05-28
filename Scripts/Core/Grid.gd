@@ -17,7 +17,7 @@ var gridOffsetY
 const dasDelay = 8
 const infinityValue = 15
 
-const Piece = preload("res://Scripts/Piece.gd")
+const Piece = preload("res://Scripts/Core/Piece.gd")
 var currentPiece: Piece
 var lastPiece: Piece
 

@@ -22,9 +22,9 @@ config/icon="res://Sprite/icon.png"
 [autoload]
 
 Utilities="*res://Scripts/Utils/Utilities.gd"
-Constants="*res://Scripts/Constants.gd"
+Constants="*res://Scripts/Utils/Constants.gd"
 MatrixOperations="*res://Scripts/Utils/MatrixOperations.gd"
-Textures="*res://Scripts/Textures.gd"
+Textures="*res://Scripts/Utils/Textures.gd"
 PlayerManager="*res://Scripts/Managers/PlayerManager.gd"
 PopupNumbers="*res://Scripts/Managers/PopupNumbers.gd"
 Consts="*res://Scripts/Utils/Consts.gd"

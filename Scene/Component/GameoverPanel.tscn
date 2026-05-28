@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://3v75hcg5eaxn"]
 
-[ext_resource type="Script" path="res://Scripts/View/GameoverPanel.gd" id="1_gc30t"]
+[ext_resource type="Script" path="res://Scripts/UI/GameoverPanel.gd" id="1_gc30t"]
 [ext_resource type="Texture2D" uid="uid://dag1kuse68ky4" path="res://Sprite/Cards/UI_panel.png" id="2_c0uw1"]
 [ext_resource type="Shader" path="res://Shader/WavyText.gdshader" id="3_svbsl"]
 [ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="4_o4g1i"]

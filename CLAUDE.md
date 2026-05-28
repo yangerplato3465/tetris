@@ -38,20 +38,20 @@ Defined in `project.godot` and available everywhere without `$`:
 |---|---|---|
 | `PlayerManager` | `Scripts/Managers/PlayerManager.gd` | All persistent run state (HP, shield, magic, coins, upgrades, character class) |
 | `Consts` | `Scripts/Utils/Consts.gd` | Static game data: enemy definitions by tier, shop item arrays |
-| `Constants` | `Scripts/Constants.gd` | Tetromino shapes and SRS wall-kick tables |
+| `Constants` | `Scripts/Utils/Constants.gd` | Tetromino shapes and SRS wall-kick tables |
 | `MatrixOperations` | `Scripts/Utils/MatrixOperations.gd` | 2D matrix helpers used for piece rotation |
-| `Textures` | `Scripts/Textures.gd` | Block texture and elemental color lookups |
+| `Textures` | `Scripts/Utils/Textures.gd` | Block texture and elemental color lookups |
 | `Utilities` | `Scripts/Utils/Utilities.gd` | Shared helpers: animations, board generators, UI utilities |
 | `PopupNumbers` | `Scripts/Managers/PopupNumbers.gd` | Floating damage/text popups |
 | `AudioManager` | `Scene/AudioManager.tscn` | Central audio node with named players |
 
 ### Core Scripts
 
-**`Scripts/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `hardDrop`, `shieldChanged`, `magicMeterChanged`, `grid_gameover`.
+**`Scripts/Core/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `hardDrop`, `shieldChanged`, `magicMeterChanged`, `grid_gameover`.
 
-**`Scripts/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attack timer, all 16 character skills, win/loss detection. Connects to Grid signals to respond to player actions.
+**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attack timer, all 16 character skills, win/loss detection. Connects to Grid signals to respond to player actions.
 
-**`Scripts/Piece.gd`** — A single tetromino. Stores its shape matrix and rotation state. Contains elemental block assignment logic (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
+**`Scripts/Core/Piece.gd`** — A single tetromino. Stores its shape matrix and rotation state. Contains elemental block assignment logic (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
 
 **`Scripts/Managers/PlayerManager.gd`** — Mutable singleton holding the entire run state. Call `PlayerManager.reset()` at the start of a new run. `applyUpgrades(id, price)` uses a dictionary of lambdas keyed by item ID to apply upgrade effects.
 

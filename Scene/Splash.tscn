@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cvpblfhm2at7x"]
 
 [ext_resource type="Texture2D" uid="uid://cptho82yo4o7i" path="res://Sprite/Logo/chowdog studio LOGO-08.png" id="1_ox2t1"]
-[ext_resource type="Script" uid="uid://bmf0kngx13gfs" path="res://Scripts/Splash.gd" id="1_pkorl"]
+[ext_resource type="Script" uid="uid://bmf0kngx13gfs" path="res://Scripts/Scenes/Splash.gd" id="1_pkorl"]
 [ext_resource type="Texture2D" uid="uid://cbunfre8swn4t" path="res://Sprite/Logo/chowdog studio LOGO-05.png" id="2_2yrur"]
 
 [node name="Splash" type="Control" unique_id=1338811077]

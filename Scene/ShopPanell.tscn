@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://c207dqp8bvfn6"]
 
-[ext_resource type="Script" uid="uid://dend1tgye70pt" path="res://Scripts/UpgradePanel/ShopPanell.gd" id="1_r22dp"]
+[ext_resource type="Script" uid="uid://dend1tgye70pt" path="res://Scripts/UI/ShopPanell.gd" id="1_r22dp"]
 [ext_resource type="Shader" uid="uid://o6q41yd3ggi3" path="res://Shader/WavyText.gdshader" id="4_01mgo"]
 [ext_resource type="Texture2D" uid="uid://dag1kuse68ky4" path="res://Sprite/Cards/UI_panel.png" id="4_u68ra"]
 [ext_resource type="FontFile" uid="uid://ds5x2rjnc24oi" path="res://Font/ThaleahFat/ThaleahFat.ttf" id="5_3ist3"]

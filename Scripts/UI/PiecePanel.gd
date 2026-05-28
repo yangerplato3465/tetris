@@ -1,7 +1,7 @@
 extends Control
 class_name PiecePanel
  
-const Piece = preload("res://Scripts/Piece.gd")
+const Piece = preload("res://Scripts/Core/Piece.gd")
 
 const spriteSize = 16
 
