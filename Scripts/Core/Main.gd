@@ -5,6 +5,7 @@ signal stage_gameover
 
 # UI
 @onready var comboMultText = $Stats/ComboMult/Number
+@onready var shieldText = $Stats/Shield/Number
 @onready var magicMeterText = $Stats/MagicMeter/Number
 
 @onready var enemyHealth = $EnemyHealth
@@ -17,7 +18,6 @@ var enemyAttackDamage = 20
 var enemyAttackAddsGarbage = false
 var dropsSinceAttack = 0
 var battleActive = false
-var lastLineClearDamage = 0
 
 @onready var holdLock = $Grid/UI/Hold/TextureRect/Lock
 @onready var nextPieceLock2 = $Grid/UI/NextPieces/VBoxContainer/TextureRect2/Lock2
@@ -41,7 +41,7 @@ const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 var _skill_rows: Array = []
 
 func _ready():
-	_skill_rows = [$SkillPanel/Skill1, $SkillPanel/Skill2, $SkillPanel/Skill3, $SkillPanel/Skill4]
+	_skill_rows = [$SkillPanel/Skill1, $SkillPanel/Skill2]
 	updateUI()
 	randomize()
 	connectSignals()
@@ -114,28 +114,20 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 
 
 func _input(event):
+	if not battleActive:
+		return
 	if event.is_action_pressed("skill_1"):
 		useSkill1()
 	if event.is_action_pressed("skill_2"):
 		useSkill2()
-	if event.is_action_pressed("skill_3"):
-		useSkill3()
-	if event.is_action_pressed("skill_4"):
-		useSkill4()
 
 func useSkill1():
 	_skillMagicBolt()
 
 func useSkill2():
-	_skillEarthquake()
+	_skillBarrier()
 
-func useSkill3():
-	_skillArcaneEcho()
-
-func useSkill4():
-	_skillManaBurst()
-
-# --- Wizard Skills ---
+# --- Abilities ---
 
 func _skillMagicBolt():
 	if PlayerManager.magicMeter < 1:
@@ -147,35 +139,14 @@ func _skillMagicBolt():
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
 
-func _skillEarthquake():
+func _skillBarrier():
 	if PlayerManager.magicMeter < 1:
 		return
 	PlayerManager.magicMeter -= 1
 	updateMagicMeterUI()
-	$Grid.clearBottomRows(3)
-
-func _skillArcaneEcho():
-	if PlayerManager.magicMeter < 2:
-		return
-	if lastLineClearDamage <= 0:
-		return
-	PlayerManager.magicMeter -= 2
-	updateMagicMeterUI()
-	attackAnim()
-	PopupNumbers.displayNumber(lastLineClearDamage, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
-	updateEnemyHealth(lastLineClearDamage)
-
-func _skillManaBurst():
-	if PlayerManager.magicMeter < 1:
-		return
-	var orbCount = PlayerManager.magicMeter
-	PlayerManager.magicMeter = 0
-	updateMagicMeterUI()
-	var damageDealt = roundi((orbCount * 60 - damageReductionFlat) * damageReduction)
-	damageDealt = maxi(damageDealt, 0)
-	attackAnim()
-	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
-	updateEnemyHealth(damageDealt)
+	PlayerManager.shieldNum += 20
+	updateShieldUI()
+	PopupNumbers.displayText("+20 SHIELD", Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
 
 func _process(_delta):
 	if not battleActive:
@@ -192,6 +163,7 @@ func _process(_delta):
 
 func gameover():
 	battleActive = false
+	_updateSkillAvailability()
 	$Grid.stopGrid()
 	stage_gameover.emit()
 
@@ -202,6 +174,7 @@ func stageReady():
 	enemy.self_modulate = Color.WHITE
 	player.self_modulate = Color.WHITE
 	battleActive = true
+	_updateSkillAvailability()
 
 func updateAttackStepsUI():
 	enemyAttackLabel.text = "attack : %d / %d" % [dropsSinceAttack, enemyAttackSteps]
@@ -216,11 +189,15 @@ func onPieceDropped():
 
 func updateUI():
 	comboMultText.text = str(PlayerManager.comboMult)
+	updateShieldUI()
 	updateMagicMeterUI()
 	updatePlayerHealthUI()
 
 func updatePlayerHealthUI():
 	playerHealthLabel.text = "HP: %d / %d" % [PlayerManager.playerHealth, PlayerManager.maxPlayerHealth]
+
+func updateShieldUI():
+	shieldText.text = str(PlayerManager.shieldNum)
 
 func updateMagicMeterUI():
 	magicMeterText.text = str(PlayerManager.magicMeter) + " / " + str(PlayerManager.maxMagicMeter)
@@ -229,7 +206,7 @@ func updateMagicMeterUI():
 func _updateSkillAvailability():
 	for row in _skill_rows:
 		var cost = row.get_meta("cost")
-		var can_cast = cost == -1 or PlayerManager.magicMeter >= cost
+		var can_cast = battleActive and (cost == -1 or PlayerManager.magicMeter >= cost)
 		row.modulate = Color.WHITE if can_cast else Color(0.35, 0.35, 0.35, 0.7)
 
 func attack(clearedLines, combo):
@@ -257,7 +234,6 @@ func attack(clearedLines, combo):
 		PlayerManager.coin += goldCoins
 		PopupNumbers.displayText("+$%d" % goldCoins, Vector2(620, 220), Color(1.0, 0.85, 0.0))
 	damageDealt = roundi(((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction + elementalBonus)
-	lastLineClearDamage = damageDealt
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	const ANNOUNCE_POS = Vector2(620, 160)
 	match clearedLines:
@@ -311,9 +287,13 @@ func updateEnemyHealth(damageDealt):
 		victory()
 
 func enemyAttack():
-	PlayerManager.playerHealth -= 1
+	var overflow = enemyAttackDamage - PlayerManager.shieldNum
+	PlayerManager.shieldNum = maxi(PlayerManager.shieldNum - enemyAttackDamage, 0)
+	if overflow > 0:
+		PlayerManager.playerHealth -= 1
 	flashPlayer()
 	screenShake()
+	updateShieldUI()
 	updatePlayerHealthUI()
 	if enemyAttackAddsGarbage:
 		$Grid.addGarbageRows(1)
@@ -325,6 +305,7 @@ func enemyAttack():
 
 func victory():
 	battleActive = false
+	_updateSkillAvailability()
 	PlayerManager.currentLevel += 1
 	animationPlayer.play("EnemyDeath")
 	$Grid.stopGrid()

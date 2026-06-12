@@ -36,7 +36,7 @@ Defined in `project.godot` and available everywhere without `$`:
 
 | Singleton | Script | Purpose |
 |---|---|---|
-| `PlayerManager` | `Scripts/Managers/PlayerManager.gd` | All persistent run state (HP, magic, coins, upgrades, character class) |
+| `PlayerManager` | `Scripts/Managers/PlayerManager.gd` | All persistent run state (HP, shield, magic, coins, upgrades, character class) |
 | `Consts` | `Scripts/Utils/Consts.gd` | Static game data: enemy definitions by tier, shop item arrays |
 | `Constants` | `Scripts/Utils/Constants.gd` | Tetromino shapes and SRS wall-kick tables |
 | `MatrixOperations` | `Scripts/Utils/MatrixOperations.gd` | 2D matrix helpers used for piece rotation |
@@ -49,7 +49,7 @@ Defined in `project.godot` and available everywhere without `$`:
 
 **`Scripts/Core/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `hardDrop`, `pieceDropped`, `magicMeterChanged`, `grid_gameover`.
 
-**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attacks triggered every `attackSteps` piece drops, all 16 character skills, win/loss detection. Connects to Grid signals to respond to player actions.
+**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attacks triggered every `attackSteps` piece drops, the two player abilities (Magic Bolt: 50 damage, Barrier: +20 shield), win/loss detection. Connects to Grid signals to respond to player actions.
 
 **`Scripts/Core/Piece.gd`** — A single tetromino. Stores its shape matrix and rotation state. Contains elemental block assignment logic (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
 

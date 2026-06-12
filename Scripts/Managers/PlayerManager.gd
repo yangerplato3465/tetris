@@ -25,6 +25,7 @@ var spawnBag
 var alchemyArray
 var equipmentArray
 var holdPieceDebuff
+var shieldNum
 var playerHealth
 var maxPlayerHealth
 var characterClass
@@ -76,6 +77,7 @@ func _setDefaults():
 	alchemyArray = Consts.alchemyCommonItems
 	equipmentArray = Consts.equipmentCommonItems
 	holdPieceDebuff = false
+	shieldNum = 0
 	playerHealth = 100
 	maxPlayerHealth = 100
 	characterClass = "wizard"
