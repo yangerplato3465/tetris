@@ -27,12 +27,11 @@ Skills are activated with keys **1**, **2**, **3**, **4**. Each skill costs Magi
 
 ## Block Types
 
-Every piece has one block randomly assigned an elemental type. Every 3rd piece gets an **Orb** block instead. Fire, Poison, and Gold blocks only appear after buying their respective shop upgrades. Elemental bonuses from cleared blocks are added to the next line-clear damage.
+Once an elemental type is unlocked via its shop upgrade, every piece has one block randomly assigned an unlocked elemental type. Every 3rd piece gets an **Orb** block instead. Elemental bonuses from cleared blocks are added to the next line-clear damage.
 
 | Block | Color | How it appears | Effect when cleared |
 |-------|-------|----------------|---------------------|
 | Normal | White | Always | No bonus |
-| Ice | Blue | Always (one block per piece) | +1 Shield per block |
 | Fire | Red | Fire Shard upgrade (one block per piece) | +15 bonus damage per block |
 | Poison | Green | Poison Vial upgrade (one block per piece); or Rogue's Venom (entire piece) | +8 bonus damage per block |
 | Gold | Yellow | Gold Shard upgrade (one block per piece) | +1 coin per block |

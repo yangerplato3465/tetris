@@ -12,15 +12,17 @@ func getColorIndex():
 	return 0
 
 # Assigns a random elemental type to one random block in the piece.
-# Fire (1) and poison (3) only appear if unlocked via upgrades. Ice (2) is always available.
+# Elementals only appear once unlocked via upgrades.
 func assignRandomElemental():
-	var available = [Constants.Elemental.ICE]
+	var available = []
 	if PlayerManager.fireBlocks:
 		available.append(Constants.Elemental.FIRE)
 	if PlayerManager.poisonBlocks:
 		available.append(Constants.Elemental.POISON)
 	if PlayerManager.goldBlocks:
 		available.append(Constants.Elemental.GOLD)
+	if available.is_empty():
+		return
 	var cells = []
 	for x in range(shape.size()):
 		for y in range(shape[0].size()):

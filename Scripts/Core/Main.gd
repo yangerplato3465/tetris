@@ -5,7 +5,6 @@ signal stage_gameover
 
 # UI
 @onready var comboMultText = $Stats/ComboMult/Number
-@onready var shieldText = $Stats/Shield/Number
 @onready var magicMeterText = $Stats/MagicMeter/Number
 
 @onready var enemyHealth = $EnemyHealth
@@ -49,7 +48,6 @@ func _ready():
 func connectSignals():
 	$Grid.clearLines.connect(attack)
 	$Grid.hardDrop.connect(hardDrop)
-	$Grid.shieldChanged.connect(updateShieldUI)
 	$Grid.magicMeterChanged.connect(updateMagicMeterUI)
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
@@ -205,15 +203,11 @@ func stageReady():
 
 func updateUI():
 	comboMultText.text = str(PlayerManager.comboMult)
-	updateShieldUI()
 	updateMagicMeterUI()
 	updatePlayerHealthUI()
 
 func updatePlayerHealthUI():
 	playerHealthLabel.text = "HP: %d / %d" % [PlayerManager.playerHealth, PlayerManager.maxPlayerHealth]
-
-func updateShieldUI():
-	shieldText.text = str(PlayerManager.shieldNum) + " / " + str(PlayerManager.maxShieldNum)
 
 func updateMagicMeterUI():
 	magicMeterText.text = str(PlayerManager.magicMeter) + " / " + str(PlayerManager.maxMagicMeter)
@@ -304,13 +298,9 @@ func updateEnemyHealth(damageDealt):
 		victory()
 
 func enemyAttack():
-	var overflow = enemyAttackDamage - PlayerManager.shieldNum
-	PlayerManager.shieldNum = maxi(PlayerManager.shieldNum - enemyAttackDamage, 0)
-	if overflow > 0:
-		PlayerManager.playerHealth -= 1
+	PlayerManager.playerHealth -= 1
 	flashPlayer()
 	screenShake()
-	updateShieldUI()
 	updatePlayerHealthUI()
 	if enemyAttackAddsGarbage:
 		$Grid.addGarbageRows(1)

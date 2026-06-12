@@ -2,7 +2,6 @@ extends Node2D
 
 signal clearLines(cleared, combo)
 signal hardDrop
-signal shieldChanged
 signal magicMeterChanged
 signal grid_gameover
 
@@ -382,20 +381,15 @@ func checkGameOver():
 
 func printClearedBlockTypes(y):
 	var fire = 0
-	var ice = 0
 	var poison = 0
 	var gold = 0
 	var orb = 0
 	for x in range(gridWidth):
 		match (grid[x][y] / Constants.ELEMENTAL_MUL):
 			Constants.Elemental.FIRE: fire += 1
-			Constants.Elemental.ICE: ice += 1
 			Constants.Elemental.POISON: poison += 1
 			Constants.Elemental.GOLD: gold += 1
 			Constants.Elemental.ORB: orb += 1
-	if ice > 0:
-		PlayerManager.shieldNum = mini(PlayerManager.shieldNum + ice, PlayerManager.maxShieldNum)
-		shieldChanged.emit()
 	if fire > 0:
 		PlayerManager.pendingElementalBonus += fire * 15
 	if poison > 0:
@@ -656,7 +650,7 @@ func purifyGarbage():
 	for x in range(gridWidth):
 		for y in range(gridHeight):
 			if grid[x][y] == Constants.GARBAGE:
-				grid[x][y] = Constants.Elemental.ICE * Constants.ELEMENTAL_MUL + 1
+				grid[x][y] = 1
 	addPiece()
 	drawGrid()
 	drawDroppingPoint()
@@ -693,10 +687,6 @@ func holyBeam():
 	if bestRow == -1 or bestCount == 0:
 		addPiece()
 		return
-	for x in range(gridWidth):
-		if grid[x][bestRow] != 0:
-			grid[x][bestRow] = (grid[x][bestRow] % Constants.ELEMENTAL_MUL) + Constants.Elemental.ICE * Constants.ELEMENTAL_MUL
-	printClearedBlockTypes(bestRow)
 	for x in range(gridWidth):
 		grid[x][bestRow] = 0
 	for j in range(bestRow, 0, -1):

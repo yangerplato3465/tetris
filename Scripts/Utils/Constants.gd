@@ -1,6 +1,6 @@
 extends Node
 
-enum Elemental { NONE = 0, FIRE = 1, ICE = 2, POISON = 3, GOLD = 4, ORB = 5 }
+enum Elemental { NONE = 0, FIRE = 1, POISON = 3, GOLD = 4, ORB = 5 }
 const ELEMENTAL_MUL = 10
 const GARBAGE = 8
 

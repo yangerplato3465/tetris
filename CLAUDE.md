@@ -36,7 +36,7 @@ Defined in `project.godot` and available everywhere without `$`:
 
 | Singleton | Script | Purpose |
 |---|---|---|
-| `PlayerManager` | `Scripts/Managers/PlayerManager.gd` | All persistent run state (HP, shield, magic, coins, upgrades, character class) |
+| `PlayerManager` | `Scripts/Managers/PlayerManager.gd` | All persistent run state (HP, magic, coins, upgrades, character class) |
 | `Consts` | `Scripts/Utils/Consts.gd` | Static game data: enemy definitions by tier, shop item arrays |
 | `Constants` | `Scripts/Utils/Constants.gd` | Tetromino shapes and SRS wall-kick tables |
 | `MatrixOperations` | `Scripts/Utils/MatrixOperations.gd` | 2D matrix helpers used for piece rotation |
@@ -47,7 +47,7 @@ Defined in `project.godot` and available everywhere without `$`:
 
 ### Core Scripts
 
-**`Scripts/Core/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `hardDrop`, `shieldChanged`, `magicMeterChanged`, `grid_gameover`.
+**`Scripts/Core/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `hardDrop`, `magicMeterChanged`, `grid_gameover`.
 
 **`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attack timer, all 16 character skills, win/loss detection. Connects to Grid signals to respond to player actions.
 
@@ -64,11 +64,11 @@ value = elemental_type * 10 + piece_color_index
 ```
 
 - `piece_color_index` 1–7 → I, J, L, O, T, Z, S pieces
-- Elemental multipliers: 0=none, 1=fire, 2=ice, 3=poison, 4=gold, 5=orb
+- Elemental multipliers: 0=none, 1=fire, 3=poison, 4=gold, 5=orb
 - `8` → garbage block (enemy attack)
 - `0` → empty cell
 
-Example: `23` = ice (2×10) + L piece (3). `grid[x][y] % 10` gives the piece type; `grid[x][y] / 10` gives the elemental type.
+Example: `33` = poison (3×10) + L piece (3). `grid[x][y] % 10` gives the piece type; `grid[x][y] / 10` gives the elemental type.
 
 ### Combat & Damage Formula
 

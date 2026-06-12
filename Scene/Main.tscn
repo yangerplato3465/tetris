@@ -232,35 +232,6 @@ label_settings = SubResource("LabelSettings_8i7nl")
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="Shield" type="NinePatchRect" parent="Stats" unique_id=1179401840]
-custom_minimum_size = Vector2(300, 80)
-layout_mode = 2
-texture = ExtResource("2_woyar")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="Text" type="Label" parent="Stats/Shield" unique_id=182173447]
-layout_mode = 0
-offset_left = 40.0
-offset_top = 24.0
-offset_right = 144.0
-offset_bottom = 54.0
-text = "shield :"
-label_settings = SubResource("LabelSettings_8i7nl")
-
-[node name="Number" type="Label" parent="Stats/Shield" unique_id=53327614]
-layout_mode = 0
-offset_left = 362.0
-offset_top = 24.0
-offset_right = 466.0
-offset_bottom = 54.0
-text = "0 / 100"
-label_settings = SubResource("LabelSettings_8i7nl")
-horizontal_alignment = 2
-vertical_alignment = 1
-
 [node name="MagicMeter" type="NinePatchRect" parent="Stats" unique_id=1539816688]
 custom_minimum_size = Vector2(300, 80)
 layout_mode = 2
