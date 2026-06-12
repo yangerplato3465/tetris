@@ -2,6 +2,7 @@ extends Node2D
 
 signal clearLines(cleared, combo)
 signal hardDrop
+signal pieceDropped
 signal magicMeterChanged
 signal grid_gameover
 
@@ -279,6 +280,7 @@ func afterDrop():
 		gameover()
 	spawnFromBag()
 	hasSwapped = false
+	pieceDropped.emit()
 
 func checkTSpin():
 	if lastPiece.getShapeName() != "T" or lastPiece.rotationState == 0:

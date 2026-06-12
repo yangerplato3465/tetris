@@ -10,12 +10,13 @@ signal stage_gameover
 @onready var enemyHealth = $EnemyHealth
 @onready var victoryLabel = $VictoryLabel
 @onready var rewardLabel = $RewardLabel
-@onready var enemyAttackTimer = $EnemyAttackBar/EnemyAttackTimer
-@onready var enemyAttackBar = $EnemyAttackBar/ProgressBar
+@onready var enemyAttackLabel = $EnemyAttackBar/StepsLabel
 @onready var playerHealthLabel = $PlayerHealthLabel
-var enemyAttackInterval = 10.0
+var enemyAttackSteps = 5
 var enemyAttackDamage = 20
 var enemyAttackAddsGarbage = false
+var dropsSinceAttack = 0
+var battleActive = false
 var lastLineClearDamage = 0
 
 @onready var holdLock = $Grid/UI/Hold/TextureRect/Lock
@@ -51,7 +52,7 @@ func connectSignals():
 	$Grid.magicMeterChanged.connect(updateMagicMeterUI)
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
-	enemyAttackTimer.timeout.connect(enemyAttack)
+	$Grid.pieceDropped.connect(onPieceDropped)
 	$Grid.grid_gameover.connect(gameover)
 
 func unlockHold(unlock):
@@ -77,9 +78,11 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	currentEnemyHealth = enemyInfo.health
 	currentEnemyMaxHealth = enemyInfo.health
 	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
-	enemyAttackInterval = enemyInfo.attackInterval
+	enemyAttackSteps = enemyInfo.attackSteps
 	enemyAttackDamage = enemyInfo.attackDamage
 	enemyAttackAddsGarbage = enemyInfo.attackAddsGarbage
+	dropsSinceAttack = 0
+	updateAttackStepsUI()
 	match enemyInfo.id:
 		5:
 			damageReductionFlat = 5
@@ -175,31 +178,41 @@ func _skillManaBurst():
 	updateEnemyHealth(damageDealt)
 
 func _process(_delta):
-	if enemyAttackTimer.is_stopped():
+	if not battleActive:
 		return
-	var timeLeft = enemyAttackTimer.time_left
-	enemyAttackBar.value = enemyAttackInterval - timeLeft
-	if timeLeft <= 2.0:
+	if enemyAttackSteps - dropsSinceAttack <= 1:
 		var pulse = abs(sin(Time.get_ticks_msec() * 0.008))
-		enemyAttackBar.modulate = Color(1.0, pulse * 0.35, pulse * 0.1)
+		enemyAttackLabel.modulate = Color(1.0, pulse * 0.35, pulse * 0.1)
 		if not _enemyFlashing:
 			enemy.self_modulate = Color(1.0, 0.55 + pulse * 0.45, 0.55 + pulse * 0.45)
 	else:
-		enemyAttackBar.modulate = Color.WHITE
+		enemyAttackLabel.modulate = Color.WHITE
 		if not _enemyFlashing:
 			enemy.self_modulate = Color.WHITE
 
 func gameover():
-	enemyAttackTimer.stop()
+	battleActive = false
 	$Grid.stopGrid()
 	stage_gameover.emit()
 
 func stageReady():
-	enemyAttackBar.max_value = enemyAttackInterval
-	enemyAttackBar.modulate = Color.WHITE
+	dropsSinceAttack = 0
+	updateAttackStepsUI()
+	enemyAttackLabel.modulate = Color.WHITE
 	enemy.self_modulate = Color.WHITE
 	player.self_modulate = Color.WHITE
-	enemyAttackTimer.start(enemyAttackInterval)
+	battleActive = true
+
+func updateAttackStepsUI():
+	enemyAttackLabel.text = "attack : %d / %d" % [dropsSinceAttack, enemyAttackSteps]
+
+func onPieceDropped():
+	if not battleActive:
+		return
+	dropsSinceAttack += 1
+	updateAttackStepsUI()
+	if dropsSinceAttack >= enemyAttackSteps:
+		enemyAttack()
 
 func updateUI():
 	comboMultText.text = str(PlayerManager.comboMult)
@@ -307,10 +320,11 @@ func enemyAttack():
 	if PlayerManager.playerHealth <= 0:
 		gameover()
 		return
-	enemyAttackTimer.start(enemyAttackInterval)
+	dropsSinceAttack = 0
+	updateAttackStepsUI()
 
 func victory():
-	enemyAttackTimer.stop()
+	battleActive = false
 	PlayerManager.currentLevel += 1
 	animationPlayer.play("EnemyDeath")
 	$Grid.stopGrid()

@@ -8,7 +8,7 @@ var tier1Enemy = [
 		"reward": 80,
 		"frame": 0,
 		"description": "",
-		"attackInterval": 7,
+		"attackSteps": 7,
 		"attackDamage": 15,
 		"attackAddsGarbage": false
 	},
@@ -19,7 +19,7 @@ var tier1Enemy = [
 		"reward": 40,
 		"frame": 2,
 		"description": "",
-		"attackInterval": 8,
+		"attackSteps": 8,
 		"attackDamage": 12,
 		"attackAddsGarbage": false
 	},
@@ -30,7 +30,7 @@ var tier1Enemy = [
 		"reward": 60,
 		"frame": 15,
 		"description": "Start with small messy board",
-		"attackInterval": 7,
+		"attackSteps": 7,
 		"attackDamage": 15,
 		"attackAddsGarbage": false
 	},
@@ -41,7 +41,7 @@ var tier1Enemy = [
 		"reward": 60,
 		"frame": 42,
 		"description": "",
-		"attackInterval": 6,
+		"attackSteps": 6,
 		"attackDamage": 18,
 		"attackAddsGarbage": false
 	},
@@ -52,7 +52,7 @@ var tier1Enemy = [
 		"reward": 60,
 		"frame": 48,
 		"description": "-5 on all damage",
-		"attackInterval": 8,
+		"attackSteps": 8,
 		"attackDamage": 10,
 		"attackAddsGarbage": false
 	},
@@ -66,7 +66,7 @@ var tier2Enemy = [
 		"reward": 100,
 		"frame": 1,
 		"description": "Start with a messy board",
-		"attackInterval": 6,
+		"attackSteps": 6,
 		"attackDamage": 25,
 		"attackAddsGarbage": false
 	},
@@ -77,7 +77,7 @@ var tier2Enemy = [
 		"reward": 100,
 		"frame": 28,
 		"description": "",
-		"attackInterval": 5,
+		"attackSteps": 5,
 		"attackDamage": 28,
 		"attackAddsGarbage": false
 	},
@@ -88,7 +88,7 @@ var tier2Enemy = [
 		"reward": 150,
 		"frame": 32,
 		"description": "Start with a messy board",
-		"attackInterval": 6,
+		"attackSteps": 6,
 		"attackDamage": 25,
 		"attackAddsGarbage": true
 	},
@@ -99,7 +99,7 @@ var tier2Enemy = [
 		"reward": 150,
 		"frame": 35,
 		"description": "Start with a messy board, -15 on all damage",
-		"attackInterval": 5,
+		"attackSteps": 5,
 		"attackDamage": 30,
 		"attackAddsGarbage": false
 	},
@@ -110,7 +110,7 @@ var tier2Enemy = [
 		"reward": 200,
 		"frame": 36,
 		"description": "Start with a messy board, -10 on all damage",
-		"attackInterval": 5,
+		"attackSteps": 5,
 		"attackDamage": 32,
 		"attackAddsGarbage": true
 	},
@@ -124,7 +124,7 @@ var tier3Enemy = [
 		"reward": 150,
 		"frame": 7,
 		"description": "Start with a very messy board",
-		"attackInterval": 5,
+		"attackSteps": 5,
 		"attackDamage": 38,
 		"attackAddsGarbage": true
 	},
@@ -135,7 +135,7 @@ var tier3Enemy = [
 		"reward": 200,
 		"frame": 44,
 		"description": "Start with a messy board",
-		"attackInterval": 4,
+		"attackSteps": 4,
 		"attackDamage": 35,
 		"attackAddsGarbage": true
 	},
@@ -146,7 +146,7 @@ var tier3Enemy = [
 		"reward": 200,
 		"frame": 37,
 		"description": "Start with a messy board",
-		"attackInterval": 4,
+		"attackSteps": 4,
 		"attackDamage": 40,
 		"attackAddsGarbage": true
 	},
@@ -157,7 +157,7 @@ var tier3Enemy = [
 		"reward": 200,
 		"frame": 16,
 		"description": "Start with a messy board, You cannot hold pieces",
-		"attackInterval": 5,
+		"attackSteps": 5,
 		"attackDamage": 35,
 		"attackAddsGarbage": true
 	},
@@ -168,7 +168,7 @@ var tier3Enemy = [
 		"reward": 200,
 		"frame": 29,
 		"description": "Start with a messy board, -20 on all damage",
-		"attackInterval": 5,
+		"attackSteps": 5,
 		"attackDamage": 40,
 		"attackAddsGarbage": false
 	},
@@ -182,7 +182,7 @@ var BossEnemy = [
 		"reward": 120,
 		"frame": 51,
 		"description": "Start with a small messy board",
-		"attackInterval": 4,
+		"attackSteps": 4,
 		"attackDamage": 40,
 		"attackAddsGarbage": true
 	},
@@ -193,7 +193,7 @@ var BossEnemy = [
 		"reward": 150,
 		"frame": 50,
 		"description": "Start with a messy board, -15 on all damage",
-		"attackInterval": 4,
+		"attackSteps": 4,
 		"attackDamage": 45,
 		"attackAddsGarbage": false
 	},
@@ -204,7 +204,7 @@ var BossEnemy = [
 		"reward": 200,
 		"frame": 52,
 		"description": "Start with a messy board, -15 on all damage",
-		"attackInterval": 4,
+		"attackSteps": 4,
 		"attackDamage": 45,
 		"attackAddsGarbage": true
 	},
@@ -215,7 +215,7 @@ var BossEnemy = [
 		"reward": 300,
 		"frame": 30,
 		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces",
-		"attackInterval": 3,
+		"attackSteps": 3,
 		"attackDamage": 50,
 		"attackAddsGarbage": true
 	},
@@ -226,7 +226,7 @@ var BossEnemy = [
 		"reward": 0,
 		"frame": 30,
 		"description": "Final boss, Start with a very messy board, all damage halfed",
-		"attackInterval": 3,
+		"attackSteps": 3,
 		"attackDamage": 60,
 		"attackAddsGarbage": true
 	},

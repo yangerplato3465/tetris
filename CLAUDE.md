@@ -47,9 +47,9 @@ Defined in `project.godot` and available everywhere without `$`:
 
 ### Core Scripts
 
-**`Scripts/Core/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `hardDrop`, `magicMeterChanged`, `grid_gameover`.
+**`Scripts/Core/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `hardDrop`, `pieceDropped`, `magicMeterChanged`, `grid_gameover`.
 
-**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attack timer, all 16 character skills, win/loss detection. Connects to Grid signals to respond to player actions.
+**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attacks triggered every `attackSteps` piece drops, all 16 character skills, win/loss detection. Connects to Grid signals to respond to player actions.
 
 **`Scripts/Core/Piece.gd`** — A single tetromino. Stores its shape matrix and rotation state. Contains elemental block assignment logic (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
 
