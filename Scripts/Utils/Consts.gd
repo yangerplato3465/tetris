@@ -236,38 +236,100 @@ var BossEnemy = [
 # These are the templates. A run keeps mutable copies in
 # PlayerManager.abilityState, so switching/upgrading abilities can change
 # their text, cost or effect "value" without touching these defaults.
+# "type" drives the battle effect: "attack" deals "value" damage,
+# "block" grants "value" shield. Swapping an ability changes the value the
+# slot uses, since Main.useSkill reads the equipped ability at cast time.
 var abilities = {
 	"magic_bolt": {
 		"id": "magic_bolt",
 		"name": "Magic Bolt",
+		"type": "attack",
 		"cost": 1,
 		"costLabel": "1 orb",
 		"value": 50,
+		"price": 40,
 		"description": "Deal 50 damage to the enemy"
 	},
 	"barrier": {
 		"id": "barrier",
 		"name": "Barrier",
+		"type": "block",
 		"cost": 1,
 		"costLabel": "1 orb",
 		"value": 20,
+		"price": 40,
 		"description": "Gain +20 shield"
 	},
+	# --- Placeholder abilities (generic attack/block for swap testing) ---
 	"earthquake": {
 		"id": "earthquake",
 		"name": "Earthquake",
+		"type": "attack",
 		"cost": 1,
 		"costLabel": "1 orb",
-		"value": 0,
-		"description": "Clear the bottom rows of the board"
+		"value": 80,
+		"price": 55,
+		"description": "Deal 80 damage to the enemy"
 	},
 	"mana_burst": {
 		"id": "mana_burst",
 		"name": "Mana Burst",
+		"type": "attack",
 		"cost": 1,
-		"costLabel": "all orbs",
-		"value": 0,
-		"description": "Spend all orbs to deal burst damage"
+		"costLabel": "1 orb",
+		"value": 120,
+		"price": 80,
+		"description": "Deal 120 damage to the enemy"
+	},
+	"frost_nova": {
+		"id": "frost_nova",
+		"name": "Frost Nova",
+		"type": "attack",
+		"cost": 2,
+		"costLabel": "2 orbs",
+		"value": 90,
+		"price": 60,
+		"description": "Deal 90 damage to the enemy"
+	},
+	"flame_wave": {
+		"id": "flame_wave",
+		"name": "Flame Wave",
+		"type": "attack",
+		"cost": 2,
+		"costLabel": "2 orbs",
+		"value": 100,
+		"price": 65,
+		"description": "Deal 100 damage to the enemy"
+	},
+	"lightning_strike": {
+		"id": "lightning_strike",
+		"name": "Lightning Strike",
+		"type": "attack",
+		"cost": 3,
+		"costLabel": "3 orbs",
+		"value": 150,
+		"price": 95,
+		"description": "Deal 150 damage to the enemy"
+	},
+	"time_warp": {
+		"id": "time_warp",
+		"name": "Time Warp",
+		"type": "block",
+		"cost": 1,
+		"costLabel": "1 orb",
+		"value": 40,
+		"price": 50,
+		"description": "Gain +40 shield"
+	},
+	"heal": {
+		"id": "heal",
+		"name": "Aegis",
+		"type": "block",
+		"cost": 2,
+		"costLabel": "2 orbs",
+		"value": 70,
+		"price": 70,
+		"description": "Gain +70 shield"
 	},
 }
 
@@ -280,7 +342,7 @@ var characters = [
 		"name": "Wizard",
 		"frame": 0,
 		"tagline": "Amplification & Burst",
-		"abilityPool": ["magic_bolt", "barrier", "earthquake", "mana_burst"],
+		"abilityPool": ["magic_bolt", "barrier", "earthquake", "mana_burst", "frost_nova", "flame_wave", "lightning_strike", "time_warp", "heal"],
 		"startingAbilities": ["magic_bolt", "barrier"]
 	}
 ]

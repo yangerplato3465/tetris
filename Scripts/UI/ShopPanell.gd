@@ -18,15 +18,50 @@ func generateItems():
 	coinLabel.text = str(PlayerManager.coin) # Init coin count
 	for item in container.get_children():
 		item.queue_free()
-	
-	for index in Utilities.chooseRandom(PlayerManager.alchemyArray.size(), 5):
-		setItem(PlayerManager.alchemyArray[index], true)
-		currentItemData.append(PlayerManager.alchemyArray[index])
-	
-	if PlayerManager.equipmentArray.size() > 0:
-		var equipmentData = PlayerManager.equipmentArray[randi_range(0, PlayerManager.equipmentArray.size() - 1)]
-		currentItemData.append(equipmentData)
-		setItem(equipmentData, false)
+
+	# --- Ability shop: show 3 random swappable abilities from the class pool ---
+	var pool = PlayerManager.getCharacter(PlayerManager.characterClass).abilityPool
+	for index in Utilities.chooseRandom(pool.size(), 3):
+		var ability = PlayerManager.getAbility(pool[index])
+		currentItemData.append(ability)
+		setAbilityItem(ability)
+
+	# --- OLD alchemy/equipment shop (commented out while testing ability swapping) ---
+	#for index in Utilities.chooseRandom(PlayerManager.alchemyArray.size(), 5):
+	#	setItem(PlayerManager.alchemyArray[index], true)
+	#	currentItemData.append(PlayerManager.alchemyArray[index])
+	#
+	#if PlayerManager.equipmentArray.size() > 0:
+	#	var equipmentData = PlayerManager.equipmentArray[randi_range(0, PlayerManager.equipmentArray.size() - 1)]
+	#	currentItemData.append(equipmentData)
+	#	setItem(equipmentData, false)
+
+# Reuses the equipment card (Equipment.tscn) to show an ability for swap testing.
+# Clicking swaps the ability into the first skill slot.
+func setAbilityItem(abilityData):
+	var item = equipmentItem.instantiate()
+	var price = item.find_child("Price")
+	var itemName = item.find_child("Name")
+	itemName.label_settings = LabelSettings.new()
+	price.label_settings = LabelSettings.new()
+
+	itemName.text = abilityData.name
+	price.text = str(abilityData.price)
+	itemName.label_settings.font_color = Color.REBECCA_PURPLE
+	price.label_settings.font_color = Color.BLACK
+	item.tooltip_text = abilityData.description
+	item.connect("mouse_entered", Utilities.scaleUp.bind(item))
+	item.connect("mouse_exited", Utilities.scaleDown.bind(item))
+	item.gui_input.connect(onAbilityPressed.bind(abilityData, item))
+	container.add_child(item)
+
+func onAbilityPressed(event: InputEvent, abilityData, node):
+	if event.is_pressed():
+		AudioManager.money.play()
+		PlayerManager.setEquippedAbility(0, abilityData.id) # swap into skill_1 slot
+		node.tooltip_text = ""
+		shrinkAndHide(node)
+		node.gui_input.disconnect(onAbilityPressed)
 
 func setItem(itemData, isAlchemy):
 	var item

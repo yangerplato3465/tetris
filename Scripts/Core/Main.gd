@@ -147,13 +147,14 @@ func useSkill(slot: int):
 	var ability = equipped[slot]
 	if PlayerManager.magicMeter < ability.cost:
 		return
-	match ability.id:
-		"magic_bolt":
-			_castMagicBolt(ability)
-		"barrier":
-			_castBarrier(ability)
+	# Dispatch by type so any equipped attack/block ability uses its own value.
+	match ability.get("type", ""):
+		"attack":
+			_castAttack(ability)
+		"block":
+			_castBlock(ability)
 
-func _castMagicBolt(ability):
+func _castAttack(ability):
 	PlayerManager.magicMeter -= ability.cost
 	updateMagicMeterUI()
 	var damageDealt = roundi((ability.value - damageReductionFlat) * damageReduction)
@@ -161,7 +162,7 @@ func _castMagicBolt(ability):
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
 
-func _castBarrier(ability):
+func _castBlock(ability):
 	PlayerManager.magicMeter -= ability.cost
 	updateMagicMeterUI()
 	PlayerManager.shieldNum += ability.value
