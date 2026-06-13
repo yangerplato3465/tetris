@@ -232,6 +232,59 @@ var BossEnemy = [
 	},
 ]
 
+# --- Ability definitions (initial/static data) ---
+# These are the templates. A run keeps mutable copies in
+# PlayerManager.abilityState, so switching/upgrading abilities can change
+# their text, cost or effect "value" without touching these defaults.
+var abilities = {
+	"magic_bolt": {
+		"id": "magic_bolt",
+		"name": "Magic Bolt",
+		"cost": 1,
+		"costLabel": "1 orb",
+		"value": 50,
+		"description": "Deal 50 damage to the enemy"
+	},
+	"barrier": {
+		"id": "barrier",
+		"name": "Barrier",
+		"cost": 1,
+		"costLabel": "1 orb",
+		"value": 20,
+		"description": "Gain +20 shield"
+	},
+	"earthquake": {
+		"id": "earthquake",
+		"name": "Earthquake",
+		"cost": 1,
+		"costLabel": "1 orb",
+		"value": 0,
+		"description": "Clear the bottom rows of the board"
+	},
+	"mana_burst": {
+		"id": "mana_burst",
+		"name": "Mana Burst",
+		"cost": 1,
+		"costLabel": "all orbs",
+		"value": 0,
+		"description": "Spend all orbs to deal burst damage"
+	},
+}
+
+# --- Character definitions ---
+# "abilityPool" is every ability the class may equip; "startingAbilities" are
+# the slots the player begins a run with (mapped to skill_1, skill_2, ...).
+var characters = [
+	{
+		"id": "wizard",
+		"name": "Wizard",
+		"frame": 0,
+		"tagline": "Amplification & Burst",
+		"abilityPool": ["magic_bolt", "barrier", "earthquake", "mana_burst"],
+		"startingAbilities": ["magic_bolt", "barrier"]
+	}
+]
+
 enum {
 	COMMON,
 	RARE,

@@ -16,15 +16,6 @@ extends Control
 
 @onready var gameoverClose = $GameoverPanel/NinePatchRect/Close
 
-const CHARACTERS = [
-	{
-		"id": "wizard",
-		"name": "Wizard",
-		"frame": 0,
-		"description": "Amplification & Burst\n\n[1] Magic Bolt     1 orb\n[2] Earthquake     1 orb\n[3] Arcane Echo    2 orbs\n[4] Mana Burst     all orbs"
-	}
-]
-
 func _ready():
 	PlayerManager.reset() # Reset all upgrades and stats
 	grid.stopGrid()
@@ -39,14 +30,14 @@ func _ready():
 func generateCharacterOptions():
 	for child in characterOptionContainer.get_children():
 		child.queue_free()
-	for character in CHARACTERS:
+	for character in Consts.characters:
 		setCharacterOption(character)
 
 func setCharacterOption(character):
 	var newOption = characterOptionPrefab.instantiate()
 	newOption.find_child("Name").text = character.name
 	newOption.find_child("Icon").frame = character.frame
-	newOption.find_child("Description").text = character.description
+	newOption.find_child("Description").text = PlayerManager.getCharacterDescription(character.id)
 	newOption.pivot_offset = Vector2(110, 155)
 	newOption.mouse_entered.connect(Utilities.scaleUp.bind(newOption))
 	newOption.mouse_exited.connect(Utilities.scaleDown.bind(newOption))

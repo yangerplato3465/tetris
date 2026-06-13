@@ -31,6 +31,10 @@ var maxPlayerHealth
 var characterClass
 var nextPiecePoison
 
+# Ability vars============
+var equippedAbilities   # Array of ability ids in slot order (skill_1, skill_2, ...)
+var abilityState        # Dictionary[id] -> mutable ability data (text/cost/value)
+
 var startGrid = [
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
 	[0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0,  0,0,0],
@@ -82,6 +86,7 @@ func _setDefaults():
 	maxPlayerHealth = 100
 	characterClass = "wizard"
 	nextPiecePoison = false
+	_initAbilities()
 	currentEnemy = null
 	coinsSpent = 0
 	itemsBought = 0
@@ -92,6 +97,58 @@ func _setDefaults():
 func reset():
 	currentLevel = 1
 	_setDefaults()
+
+# --- Abilities ---
+
+func _initAbilities():
+	# Mutable copies of the static definitions so a run can retext/upgrade
+	# abilities without mutating Consts.abilities.
+	abilityState = Consts.abilities.duplicate(true)
+	var character = getCharacter(characterClass)
+	equippedAbilities = character.startingAbilities.duplicate() if character else []
+
+func getCharacter(id: String) -> Dictionary:
+	for character in Consts.characters:
+		if character.id == id:
+			return character
+	return {}
+
+func getAbility(id: String) -> Dictionary:
+	return abilityState.get(id, {})
+
+func getEquippedAbilities() -> Array:
+	# Ability data in slot order, ready for the skill panel and casting.
+	var result = []
+	for id in equippedAbilities:
+		if abilityState.has(id):
+			result.append(abilityState[id])
+	return result
+
+func setEquippedAbility(slot: int, id: String):
+	if slot >= 0 and slot < equippedAbilities.size() and abilityState.has(id):
+		equippedAbilities[slot] = id
+
+func updateAbility(id: String, fields: Dictionary):
+	# Merge changed fields (name/cost/costLabel/value/description) into the
+	# runtime ability so the upgrade system can update its displayed text.
+	if abilityState.has(id):
+		for key in fields:
+			abilityState[id][key] = fields[key]
+
+func getCharacterDescription(charId: String) -> String:
+	# Built from current ability state so it reflects switches/upgrades.
+	var character = getCharacter(charId)
+	if character.is_empty():
+		return ""
+	var lines = [character.tagline, ""]
+	var slot = 1
+	for abilityId in character.startingAbilities:
+		var ability = abilityState.get(abilityId, {})
+		if ability.is_empty():
+			continue
+		lines.append("[%d] %s %s" % [slot, str(ability.name).rpad(14), ability.costLabel])
+		slot += 1
+	return "\n".join(lines)
 
 func _initUpgradeEffects():
 	_upgrade_effects = {

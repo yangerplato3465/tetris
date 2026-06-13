@@ -42,6 +42,7 @@ var _skill_rows: Array = []
 
 func _ready():
 	_skill_rows = [$SkillPanel/Skill1, $SkillPanel/Skill2]
+	populateSkillPanel()
 	updateUI()
 	randomize()
 	connectSignals()
@@ -71,6 +72,7 @@ func unlockNextPiece():
 
 
 func setStage(enemyInfo): # Set stage base on enemy abilities and stats
+	populateSkillPanel()
 	updateUI()
 	reward = enemyInfo.reward
 	animationPlayer.play("RESET")
@@ -117,36 +119,54 @@ func _input(event):
 	if not battleActive:
 		return
 	if event.is_action_pressed("skill_1"):
-		useSkill1()
+		useSkill(0)
 	if event.is_action_pressed("skill_2"):
-		useSkill2()
+		useSkill(1)
 
-func useSkill1():
-	_skillMagicBolt()
-
-func useSkill2():
-	_skillBarrier()
+# Mirror the equipped abilities into the skill panel rows. Slot order maps
+# skill_1 -> Skill1, skill_2 -> Skill2, ...
+func populateSkillPanel():
+	var equipped = PlayerManager.getEquippedAbilities()
+	for i in _skill_rows.size():
+		var row = _skill_rows[i]
+		if i < equipped.size():
+			var ability = equipped[i]
+			row.visible = true
+			row.set_meta("cost", ability.cost)
+			row.find_child("Name").text = ability.name
+			row.find_child("Cost").text = ability.costLabel
+		else:
+			row.visible = false
 
 # --- Abilities ---
 
-func _skillMagicBolt():
-	if PlayerManager.magicMeter < 1:
+func useSkill(slot: int):
+	var equipped = PlayerManager.getEquippedAbilities()
+	if slot >= equipped.size():
 		return
-	PlayerManager.magicMeter -= 1
+	var ability = equipped[slot]
+	if PlayerManager.magicMeter < ability.cost:
+		return
+	match ability.id:
+		"magic_bolt":
+			_castMagicBolt(ability)
+		"barrier":
+			_castBarrier(ability)
+
+func _castMagicBolt(ability):
+	PlayerManager.magicMeter -= ability.cost
 	updateMagicMeterUI()
-	var damageDealt = roundi((50 - damageReductionFlat) * damageReduction)
+	var damageDealt = roundi((ability.value - damageReductionFlat) * damageReduction)
 	attackAnim()
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
 
-func _skillBarrier():
-	if PlayerManager.magicMeter < 1:
-		return
-	PlayerManager.magicMeter -= 1
+func _castBarrier(ability):
+	PlayerManager.magicMeter -= ability.cost
 	updateMagicMeterUI()
-	PlayerManager.shieldNum += 20
+	PlayerManager.shieldNum += ability.value
 	updateShieldUI()
-	PopupNumbers.displayText("+20 SHIELD", Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
+	PopupNumbers.displayText("+%d SHIELD" % ability.value, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
 
 func _process(_delta):
 	if not battleActive:
