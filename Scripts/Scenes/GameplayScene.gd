@@ -8,6 +8,7 @@ extends Control
 @onready var MainScene = $Main
 @onready var GameoverPanel = $GameoverPanel
 @onready var ShopPanel = $ShopPanel
+@onready var AbilityDraftScene = $AbilityDraftScene
 @onready var grid = $Main/Grid
 
 @onready var enemyOptionPrefab = preload("res://Scene/Component/enemyOption.tscn")
@@ -24,8 +25,11 @@ func _ready():
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
 	MainScene.stage_gameover.connect(showGameoverPanel)
 	MainScene.stage_victory.connect(victory)
-	MainScene.stage_victory.connect(ShopPanel.generateItems)
-	ShopPanel.shopFinished.connect(shopFinished)
+	# --- OLD shop flow (replaced by the ability draft) ---
+	#MainScene.stage_victory.connect(ShopPanel.generateItems)
+	#ShopPanel.shopFinished.connect(shopFinished)
+	MainScene.stage_victory.connect(AbilityDraftScene.generateDraft)
+	AbilityDraftScene.draftFinished.connect(draftFinished)
 
 func generateCharacterOptions():
 	for child in characterOptionContainer.get_children():
@@ -143,7 +147,12 @@ func victory():
 		Utilities.slideIn(GameoverPanel)
 	else:
 		await Utilities.slideOut(MainScene)
-		Utilities.slideIn(ShopPanel)
+		Utilities.slideIn(AbilityDraftScene)
+
+func draftFinished():
+	await Utilities.slideOut(AbilityDraftScene)
+	generateRandomEnemies()
+	Utilities.slideIn(PrepareScene)
 
 func shopFinished():
 	await Utilities.slideOut(ShopPanel)

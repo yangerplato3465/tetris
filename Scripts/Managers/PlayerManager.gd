@@ -32,7 +32,8 @@ var characterClass
 var nextPiecePoison
 
 # Ability vars============
-var equippedAbilities   # Array of ability ids in slot order (skill_1, skill_2, ...)
+const ABILITY_SLOTS = 5
+var equippedAbilities   # Array of ABILITY_SLOTS ability ids in slot order ("" = empty)
 var abilityState        # Dictionary[id] -> mutable ability data (text/cost/value)
 
 var startGrid = [
@@ -104,8 +105,16 @@ func _initAbilities():
 	# Mutable copies of the static definitions so a run can retext/upgrade
 	# abilities without mutating Consts.abilities.
 	abilityState = Consts.abilities.duplicate(true)
+	# Fixed-size slot array: "" marks an empty slot. The first slots are filled
+	# with the class's starting abilities; the rest start empty for drafting.
+	equippedAbilities = []
+	for _i in ABILITY_SLOTS:
+		equippedAbilities.append("")
 	var character = getCharacter(characterClass)
-	equippedAbilities = character.startingAbilities.duplicate() if character else []
+	if character:
+		var starting = character.startingAbilities
+		for i in mini(starting.size(), ABILITY_SLOTS):
+			equippedAbilities[i] = starting[i]
 
 func getCharacter(id: String) -> Dictionary:
 	for character in Consts.characters:
@@ -117,12 +126,24 @@ func getAbility(id: String) -> Dictionary:
 	return abilityState.get(id, {})
 
 func getEquippedAbilities() -> Array:
-	# Ability data in slot order, ready for the skill panel and casting.
+	# Non-empty equipped ability data (skips empty slots).
 	var result = []
 	for id in equippedAbilities:
 		if abilityState.has(id):
 			result.append(abilityState[id])
 	return result
+
+func getAbilitySlots() -> Array:
+	# One entry per slot in order; empty slots are {}.
+	var slots = []
+	for id in equippedAbilities:
+		slots.append(abilityState.get(id, {}))
+	return slots
+
+func getEquippedAbilityAt(slot: int) -> Dictionary:
+	if slot < 0 or slot >= equippedAbilities.size():
+		return {}
+	return abilityState.get(equippedAbilities[slot], {})
 
 func setEquippedAbility(slot: int, id: String):
 	if slot >= 0 and slot < equippedAbilities.size() and abilityState.has(id):

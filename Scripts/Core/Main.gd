@@ -41,11 +41,22 @@ const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 var _skill_rows: Array = []
 
 func _ready():
-	_skill_rows = [$SkillPanel/Skill1, $SkillPanel/Skill2]
+	_buildSkillRows()
 	populateSkillPanel()
 	updateUI()
 	randomize()
 	connectSignals()
+
+# Two skill rows exist in the scene; duplicate the first to build the rest so
+# all PlayerManager.ABILITY_SLOTS slots have a matching panel row.
+func _buildSkillRows():
+	_skill_rows = [$SkillPanel/Skill1, $SkillPanel/Skill2]
+	for slot in range(_skill_rows.size(), PlayerManager.ABILITY_SLOTS):
+		var row = $SkillPanel/Skill1.duplicate()
+		row.name = "Skill%d" % (slot + 1)
+		row.get_node("Key").text = "[%d]" % (slot + 1)
+		$SkillPanel.add_child(row)
+		_skill_rows.append(row)
 
 func connectSignals():
 	$Grid.clearLines.connect(attack)
@@ -118,33 +129,33 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 func _input(event):
 	if not battleActive:
 		return
-	if event.is_action_pressed("skill_1"):
-		useSkill(0)
-	if event.is_action_pressed("skill_2"):
-		useSkill(1)
+	for slot in PlayerManager.ABILITY_SLOTS:
+		if event.is_action_pressed("skill_%d" % (slot + 1)):
+			useSkill(slot)
 
-# Mirror the equipped abilities into the skill panel rows. Slot order maps
-# skill_1 -> Skill1, skill_2 -> Skill2, ...
+# Mirror the equipped ability slots into the skill panel rows. Slot order maps
+# skill_1 -> Skill1, skill_2 -> Skill2, ... Empty slots show a placeholder.
 func populateSkillPanel():
-	var equipped = PlayerManager.getEquippedAbilities()
 	for i in _skill_rows.size():
 		var row = _skill_rows[i]
-		if i < equipped.size():
-			var ability = equipped[i]
-			row.visible = true
-			row.set_meta("cost", ability.cost)
-			row.find_child("Name").text = ability.name
-			row.find_child("Cost").text = ability.costLabel
+		var ability = PlayerManager.getEquippedAbilityAt(i)
+		row.visible = true
+		if ability.is_empty():
+			row.set_meta("cost", 9999) # unaffordable -> dimmed by _updateSkillAvailability
+			row.get_node("Name").text = "—"
+			row.get_node("Cost").text = ""
 		else:
-			row.visible = false
+			row.set_meta("cost", ability.cost)
+			row.get_node("Name").text = ability.name
+			row.get_node("Cost").text = ability.costLabel
+	_updateSkillAvailability()
 
 # --- Abilities ---
 
 func useSkill(slot: int):
-	var equipped = PlayerManager.getEquippedAbilities()
-	if slot >= equipped.size():
+	var ability = PlayerManager.getEquippedAbilityAt(slot)
+	if ability.is_empty():
 		return
-	var ability = equipped[slot]
 	if PlayerManager.magicMeter < ability.cost:
 		return
 	# Dispatch by type so any equipped attack/block ability uses its own value.
