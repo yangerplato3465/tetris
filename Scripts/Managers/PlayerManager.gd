@@ -149,6 +149,15 @@ func setEquippedAbility(slot: int, id: String):
 	if slot >= 0 and slot < equippedAbilities.size() and abilityState.has(id):
 		equippedAbilities[slot] = id
 
+func swapAbilitySlots(a: int, b: int):
+	# Swap two slots' contents. Works with empty ("") slots, so dragging onto an
+	# empty slot moves the ability and onto a filled slot swaps the two.
+	var n = equippedAbilities.size()
+	if a >= 0 and a < n and b >= 0 and b < n:
+		var tmp = equippedAbilities[a]
+		equippedAbilities[a] = equippedAbilities[b]
+		equippedAbilities[b] = tmp
+
 func updateAbility(id: String, fields: Dictionary):
 	# Merge changed fields (name/cost/costLabel/value/description) into the
 	# runtime ability so the upgrade system can update its displayed text.

@@ -1,5 +1,8 @@
 extends Control
 
+# Set false to hide the dev tools overlay (see _buildDevPanel).
+const DEV_MODE := true
+
 @onready var CharacterSelectScene = $CharacterSelectScene
 @onready var characterOptionPrefab = preload("res://Scene/Component/characterOption.tscn")
 @onready var characterOptionContainer = $CharacterSelectScene/CharacterOptionContainer
@@ -30,6 +33,39 @@ func _ready():
 	#ShopPanel.shopFinished.connect(shopFinished)
 	MainScene.stage_victory.connect(AbilityDraftScene.generateDraft)
 	AbilityDraftScene.draftFinished.connect(draftFinished)
+	if DEV_MODE:
+		_buildDevPanel()
+
+# --- Dev tools -------------------------------------------------------------
+# A code-built overlay (CanvasLayer so it sits above every panel) with buttons
+# to jump straight to features for testing. Add more buttons here as needed.
+func _buildDevPanel():
+	var layer = CanvasLayer.new()
+	layer.layer = 100
+	layer.name = "DevPanel"
+	add_child(layer)
+
+	var vbox = VBoxContainer.new()
+	vbox.position = Vector2(12, 12)
+	layer.add_child(vbox)
+
+	var header = Label.new()
+	header.text = "— DEV —"
+	vbox.add_child(header)
+
+	_addDevButton(vbox, "Open Ability Draft", _devOpenDraft)
+
+func _addDevButton(parent: Node, text: String, callback: Callable):
+	var btn = Button.new()
+	btn.text = text
+	btn.focus_mode = Control.FOCUS_NONE # don't steal keyboard focus from gameplay
+	btn.pressed.connect(callback)
+	parent.add_child(btn)
+
+func _devOpenDraft():
+	AbilityDraftScene.generateDraft()
+	AbilityDraftScene.visible = true
+	AbilityDraftScene.position.y = 0
 
 func generateCharacterOptions():
 	for child in characterOptionContainer.get_children():

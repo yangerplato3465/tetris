@@ -2,7 +2,8 @@ extends Control
 
 # Post-battle ability draft: offers 3 random abilities (free, choose 1) that the
 # player drags into one of the 5 ability slots. Slots 1-2 start filled with the
-# class's default abilities; dropping onto any slot fills or replaces it.
+# class's default abilities. Filled slots show the ability card and can be dragged
+# onto another slot to move (empty target) or swap (filled target) abilities.
 
 signal draftFinished
 
@@ -12,7 +13,6 @@ signal draftFinished
 
 const ABILITY_CARD = preload("res://Scene/Component/Equipment.tscn")
 const CARD_SIZE = Vector2(138, 186)
-const SLOT_SIZE = Vector2(150, 175)
 
 var _chosen = false
 
@@ -25,48 +25,75 @@ func generateDraft():
 	_buildSlots()
 	_buildOptions()
 
-# --- Slots (drop targets) ---
+# --- Slots (drop targets; filled slots are also drag sources) ---
 
 func _buildSlots():
 	for child in slotContainer.get_children():
 		child.queue_free()
 	for i in PlayerManager.ABILITY_SLOTS:
-		slotContainer.add_child(_makeSlot(i))
+		slotContainer.add_child(_makeSlotNode(i))
 
-func _makeSlot(index: int) -> Panel:
-	var slot = Panel.new()
-	slot.custom_minimum_size = SLOT_SIZE
-
-	var number = Label.new()
-	number.text = "[%d]" % (index + 1)
-	number.position = Vector2(8, 4)
-
-	var nameLabel = Label.new()
-	nameLabel.name = "AbilityName"
-	nameLabel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	nameLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	nameLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	nameLabel.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	nameLabel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	number.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
+func _makeSlotNode(index: int) -> Control:
 	var ability = PlayerManager.getEquippedAbilityAt(index)
-	nameLabel.text = ability.name if not ability.is_empty() else "Empty"
+	if ability.is_empty():
+		return _makeEmptySlot(index)
+	# Filled slot: show the ability card, draggable to move/swap between slots.
+	var card = _makeAbilityCard(ability)
+	card.add_child(_makeSlotNumber(index))
+	card.set_drag_forwarding(
+		_slotDragData.bind(card, index),
+		_canDropOnSlot.bind(index),
+		_dropOnSlot.bind(index))
+	return card
 
-	slot.add_child(nameLabel)
-	slot.add_child(number)
+func _makeEmptySlot(index: int) -> Panel:
+	var slot = Panel.new()
+	slot.custom_minimum_size = CARD_SIZE
+	var label = Label.new()
+	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.text = "Empty"
+	slot.add_child(label)
+	slot.add_child(_makeSlotNumber(index))
 	slot.set_drag_forwarding(Callable(), _canDropOnSlot.bind(index), _dropOnSlot.bind(index))
 	return slot
 
+func _makeSlotNumber(index: int) -> Label:
+	var number = Label.new()
+	number.text = "[%d]" % (index + 1)
+	number.position = Vector2(8, 4)
+	number.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return number
+
 func _canDropOnSlot(_at_position, data, _index) -> bool:
-	return not _chosen and data is Dictionary and data.has("abilityId")
+	if not (data is Dictionary and data.has("abilityId")):
+		return false
+	if data.get("from") == "slot":
+		return true             # rearranging existing slots is always allowed
+	return not _chosen          # option cards: only one pick per draft
 
 func _dropOnSlot(_at_position, data, index) -> void:
-	PlayerManager.setEquippedAbility(index, data["abilityId"])
-	_chosen = true
-	AudioManager.money.play()
-	_buildSlots()      # refresh to show the placed ability
-	_clearOptions()    # 3-choose-1: the offer is consumed once a card is placed
+	if data.get("from") == "slot":
+		if data["slotIndex"] == index:
+			return
+		PlayerManager.swapAbilitySlots(data["slotIndex"], index)
+		AudioManager.money.play()
+		_buildSlots()
+	else:
+		if _chosen:
+			return
+		PlayerManager.setEquippedAbility(index, data["abilityId"])
+		_chosen = true
+		AudioManager.money.play()
+		_buildSlots()
+		_clearOptions()         # 3-choose-1: the offer is consumed once placed
+
+func _slotDragData(_at_position, card, index):
+	var id = PlayerManager.equippedAbilities[index]
+	card.set_drag_preview(_makeDragPreview(card))
+	return {"abilityId": id, "from": "slot", "slotIndex": index}
 
 # --- Options (3 draggable ability cards) ---
 
@@ -74,13 +101,24 @@ func _buildOptions():
 	_clearOptions()
 	var pool = PlayerManager.getCharacter(PlayerManager.characterClass).abilityPool
 	for index in Utilities.chooseRandom(pool.size(), 3):
-		optionContainer.add_child(_makeCard(PlayerManager.getAbility(pool[index])))
+		var ability = PlayerManager.getAbility(pool[index])
+		var card = _makeAbilityCard(ability)
+		card.set_drag_forwarding(_optionDragData.bind(card, ability.id), Callable(), Callable())
+		optionContainer.add_child(card)
 
 func _clearOptions():
 	for child in optionContainer.get_children():
 		child.queue_free()
 
-func _makeCard(ability: Dictionary) -> Control:
+func _optionDragData(_at_position, card, abilityId):
+	if _chosen:
+		return null
+	card.set_drag_preview(_makeDragPreview(card))
+	return {"abilityId": abilityId, "from": "option"}
+
+# --- Shared card visuals ---
+
+func _makeAbilityCard(ability: Dictionary) -> Control:
 	var card = ABILITY_CARD.instantiate()
 	var nameLabel = card.find_child("Name")
 	var valueLabel = card.find_child("Price")
@@ -93,19 +131,15 @@ func _makeCard(ability: Dictionary) -> Control:
 	card.tooltip_text = ability.description
 	card.mouse_entered.connect(Utilities.scaleUp.bind(card))
 	card.mouse_exited.connect(Utilities.scaleDown.bind(card))
-	card.set_drag_forwarding(_getCardDrag.bind(card, ability.id), Callable(), Callable())
 	return card
 
-func _getCardDrag(_at_position, card, abilityId):
-	if _chosen:
-		return null
+func _makeDragPreview(card: Control) -> TextureRect:
 	var preview = TextureRect.new()
 	preview.texture = card.texture
 	preview.custom_minimum_size = CARD_SIZE
 	preview.size = CARD_SIZE
-	preview.modulate = Color(1, 1, 1, 0.8)
-	card.set_drag_preview(preview)
-	return {"abilityId": abilityId, "card": card}
+	preview.modulate = Color(1, 1, 1, 0.85)
+	return preview
 
 # --- Continue ---
 
