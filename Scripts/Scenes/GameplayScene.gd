@@ -54,6 +54,11 @@ func _buildDevPanel():
 	vbox.add_child(header)
 
 	_addDevButton(vbox, "Open Ability Draft", _devOpenDraft)
+	_addDevButton(vbox, "Win Battle", _devWinBattle)
+	_addDevButton(vbox, "Fill Magic", _devFillMagic)
+	_addDevButton(vbox, "Full Heal", _devFullHeal)
+	_addDevButton(vbox, "+100 Coins", _devAddCoins)
+	_addDevButton(vbox, "Add Garbage Row", _devAddGarbage)
 
 func _addDevButton(parent: Node, text: String, callback: Callable):
 	var btn = Button.new()
@@ -66,6 +71,25 @@ func _devOpenDraft():
 	AbilityDraftScene.generateDraft()
 	AbilityDraftScene.visible = true
 	AbilityDraftScene.position.y = 0
+
+func _devWinBattle():
+	MainScene.devKillEnemy()
+
+func _devFillMagic():
+	PlayerManager.magicMeter = PlayerManager.maxMagicMeter
+	MainScene.updateMagicMeterUI()
+
+func _devFullHeal():
+	PlayerManager.playerHealth = PlayerManager.maxPlayerHealth
+	PlayerManager.shieldNum = 0
+	MainScene.updateUI()
+
+func _devAddCoins():
+	PlayerManager.coin += 100
+
+func _devAddGarbage():
+	if MainScene.battleActive:
+		grid.addGarbageRows(1)
 
 func generateCharacterOptions():
 	for child in characterOptionContainer.get_children():

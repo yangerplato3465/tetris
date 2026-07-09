@@ -126,6 +126,12 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 				unlockHold(false)
 
 
+# --- Dev helpers (called from the GameplayScene dev panel) ---
+
+func devKillEnemy():
+	if battleActive:
+		updateEnemyHealth(currentEnemyHealth)
+
 func _input(event):
 	if not battleActive:
 		return
