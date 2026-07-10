@@ -8,6 +8,7 @@ const DEV_MODE := true
 @onready var characterOptionContainer = $CharacterSelectScene/CharacterOptionContainer
 
 @onready var PrepareScene = $PrepareScene
+@onready var MapScene = $MapScene
 @onready var MainScene = $Main
 @onready var GameoverPanel = $GameoverPanel
 @onready var ShopPanel = $ShopPanel
@@ -33,6 +34,7 @@ func _ready():
 	#ShopPanel.shopFinished.connect(shopFinished)
 	MainScene.stage_victory.connect(AbilityDraftScene.generateDraft)
 	AbilityDraftScene.draftFinished.connect(draftFinished)
+	MapScene.nodeSelected.connect(onMapNodeSelected)
 	if DEV_MODE:
 		_buildDevPanel()
 
@@ -54,6 +56,7 @@ func _buildDevPanel():
 	vbox.add_child(header)
 
 	_addDevButton(vbox, "Open Ability Draft", _devOpenDraft)
+	_addDevButton(vbox, "Show Map", _devShowMap)
 	_addDevButton(vbox, "Win Battle", _devWinBattle)
 	_addDevButton(vbox, "Fill Magic", _devFillMagic)
 	_addDevButton(vbox, "Full Heal", _devFullHeal)
@@ -71,6 +74,13 @@ func _devOpenDraft():
 	AbilityDraftScene.generateDraft()
 	AbilityDraftScene.visible = true
 	AbilityDraftScene.position.y = 0
+
+func _devShowMap():
+	if MapScene.columns.is_empty():
+		MapScene.generateMap()
+	MapScene.reopen()
+	MapScene.visible = true
+	MapScene.position.y = 0
 
 func _devWinBattle():
 	MainScene.devKillEnemy()
@@ -113,9 +123,13 @@ func onCharacterPressed(event: InputEvent, character, node: Control):
 		disableCharacterOptions()
 		PlayerManager.characterClass = character.id
 		Utilities.onPressed(node)
-		generateRandomEnemies()
+		# --- OLD prepare flow (replaced by the run map) ---
+		#generateRandomEnemies()
+		#await Utilities.slideOut(CharacterSelectScene)
+		#Utilities.slideIn(PrepareScene)
+		MapScene.generateMap()
 		await Utilities.slideOut(CharacterSelectScene)
-		Utilities.slideIn(PrepareScene)
+		Utilities.slideIn(MapScene)
 
 func disableCharacterOptions():
 	for child in characterOptionContainer.get_children():
@@ -185,6 +199,18 @@ func disableOthers():
 	for child in enemyOptionContainer.get_children():
 		child.gui_input.disconnect(onPressed)
 
+# A reachable map node was clicked: start the battle against its enemy.
+func onMapNodeSelected(enemy):
+	PlayerManager.currentEnemy = enemy
+	MainScene.setStage(enemy)
+	grid.setStage(enemy)
+	await Utilities.slideOut(MapScene)
+	Utilities.slideIn(MainScene, func():
+		MainScene.stageReady()
+		grid.stageReady()
+	)
+	grid.resetGrid()
+
 func _on_close_pressed():
 	$AnimationPlayer.play("FadeOut")
 	gameoverClose.disabled = true
@@ -211,8 +237,8 @@ func victory():
 
 func draftFinished():
 	await Utilities.slideOut(AbilityDraftScene)
-	generateRandomEnemies()
-	Utilities.slideIn(PrepareScene)
+	MapScene.reopen()
+	Utilities.slideIn(MapScene)
 
 func shopFinished():
 	await Utilities.slideOut(ShopPanel)
