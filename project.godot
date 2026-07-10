@@ -29,6 +29,7 @@ PlayerManager="*res://Scripts/Managers/PlayerManager.gd"
 PopupNumbers="*res://Scripts/Managers/PopupNumbers.gd"
 Consts="*res://Scripts/Utils/Consts.gd"
 Events="*res://Scripts/Utils/Events.gd"
+Keepsakes="*res://Scripts/Utils/Keepsakes.gd"
 AudioManager="*res://Scene/AudioManager.tscn"
 
 [display]

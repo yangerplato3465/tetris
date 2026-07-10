@@ -30,9 +30,7 @@ func _ready():
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
 	MainScene.stage_gameover.connect(showGameoverPanel)
 	MainScene.stage_victory.connect(victory)
-	# --- OLD shop flow (replaced by the ability draft) ---
-	#MainScene.stage_victory.connect(ShopPanel.generateItems)
-	#ShopPanel.shopFinished.connect(shopFinished)
+	ShopPanel.shopFinished.connect(shopFinished)
 	MainScene.stage_victory.connect(AbilityDraftScene.generateDraft)
 	AbilityDraftScene.draftFinished.connect(draftFinished)
 	MapScene.nodeSelected.connect(onMapNodeSelected)
@@ -65,6 +63,7 @@ func _buildDevPanel():
 	header.pressed.connect(func(): buttons.visible = not buttons.visible)
 
 	_addDevButton(buttons, "Open Ability Draft", _devOpenDraft)
+	_addDevButton(buttons, "Open Shop", _devOpenShop)
 	_addDevButton(buttons, "Show Map", _devShowMap)
 	_addDevButton(buttons, "Show Event", _devShowEvent)
 	_addDevButton(buttons, "Win Battle", _devWinBattle)
@@ -84,6 +83,11 @@ func _devOpenDraft():
 	AbilityDraftScene.generateDraft()
 	AbilityDraftScene.visible = true
 	AbilityDraftScene.position.y = 0
+
+func _devOpenShop():
+	ShopPanel.generateItems()
+	ShopPanel.visible = true
+	ShopPanel.position.y = 0
 
 func _devShowMap():
 	if MapScene.columns.is_empty():
@@ -269,7 +273,7 @@ func eventFinished():
 	MapScene.reopen()
 	Utilities.slideIn(MapScene)
 
+# Shop closed: for now just slide the panel away (the shop is only reachable
+# from the dev panel; map-flow wiring will decide where to go next).
 func shopFinished():
 	await Utilities.slideOut(ShopPanel)
-	generateRandomEnemies()
-	Utilities.slideIn(PrepareScene)
