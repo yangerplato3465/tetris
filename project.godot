@@ -28,6 +28,7 @@ Textures="*res://Scripts/Utils/Textures.gd"
 PlayerManager="*res://Scripts/Managers/PlayerManager.gd"
 PopupNumbers="*res://Scripts/Managers/PopupNumbers.gd"
 Consts="*res://Scripts/Utils/Consts.gd"
+Events="*res://Scripts/Utils/Events.gd"
 AudioManager="*res://Scene/AudioManager.tscn"
 
 [display]

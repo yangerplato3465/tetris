@@ -5,14 +5,17 @@ extends Control
 # start marker; columns 1..15 correspond to the 15 run levels, with bosses on
 # their usual levels (3/6/9/12/15) as single mandatory nodes.
 #
-# Every node is an enemy encounter for now. Other node types (shop, event,
-# rest, ...) should later be added in _assignEncounters / _onNodePressed.
+# Node types: enemy encounters, bosses, and "?" event nodes (randomly
+# sprinkled outside the opening column and boss columns). Other types
+# (shop, rest, ...) can later be added the same way in _assignEncounters.
 
-signal nodeSelected(enemy)
+signal nodeSelected(node)
 
 const LEVELS = 15
 const MAX_ROWS = 4
 const BOSS_LEVELS = [15]
+const EVENT_CHANCE = 0.25   # roll per eligible node
+const FIRST_EVENT_LEVEL = 2 # level 1 is always a fight
 
 const LEFT_X = 60.0
 const COLUMN_SPACING = 72.0
@@ -28,7 +31,7 @@ const FONT = preload("res://Font/ThaleahFat/ThaleahFat.ttf")
 class MapNode:
 	var col: int
 	var row: int
-	var type: String # "start" | "enemy" | "boss"
+	var type: String # "start" | "enemy" | "boss" | "event"
 	var enemy: Dictionary
 	var next: Array = [] # MapNodes in the following column
 	var visited := false
@@ -121,11 +124,17 @@ func _assignEncounters():
 		if level in BOSS_LEVELS:
 			colArr[0].enemy = Consts.BossEnemy[BOSS_LEVELS.find(level)]
 			continue
+		# Sprinkle "?" event nodes among the regular encounters.
+		if level >= FIRST_EVENT_LEVEL:
+			for node in colArr:
+				if randf() < EVENT_CHANCE:
+					node.type = "event"
 		# Distinct picks so one column never offers the same enemy twice.
 		var pool = _tierPool(level)
 		var picks = Utilities.chooseRandom(pool.size(), colArr.size())
 		for k in colArr.size():
-			colArr[k].enemy = pool[picks[k]]
+			if colArr[k].type == "enemy":
+				colArr[k].enemy = pool[picks[k]]
 
 func _tierPool(level: int) -> Array:
 	match level:
@@ -150,6 +159,11 @@ func _buildNodeButton(node: MapNode):
 	btn.pressed.connect(_onNodePressed.bind(node))
 	if node.type == "start":
 		btn.text = "GO"
+	elif node.type == "event":
+		btn.text = "?"
+		btn.add_theme_font_override("font", FONT)
+		btn.add_theme_font_size_override("font_size", 34)
+		btn.tooltip_text = "Something awaits..."
 	else:
 		btn.tooltip_text = "%s\nHP: %d  ATK: %d\n%s" % [
 			node.enemy.name, node.enemy.health, node.enemy.attackDamage, node.enemy.description
@@ -208,7 +222,7 @@ func _onNodePressed(node: MapNode):
 	currentNode = node
 	node.visited = true
 	refreshMap()
-	nodeSelected.emit(node.enemy)
+	nodeSelected.emit(node)
 
 # Called by GameplayScene before sliding the map back in after a battle.
 func reopen():

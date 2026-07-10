@@ -9,6 +9,7 @@ const DEV_MODE := true
 
 @onready var PrepareScene = $PrepareScene
 @onready var MapScene = $MapScene
+@onready var EventScene = $EventScene
 @onready var MainScene = $Main
 @onready var GameoverPanel = $GameoverPanel
 @onready var ShopPanel = $ShopPanel
@@ -35,6 +36,7 @@ func _ready():
 	MainScene.stage_victory.connect(AbilityDraftScene.generateDraft)
 	AbilityDraftScene.draftFinished.connect(draftFinished)
 	MapScene.nodeSelected.connect(onMapNodeSelected)
+	EventScene.eventFinished.connect(eventFinished)
 	if DEV_MODE:
 		_buildDevPanel()
 
@@ -51,17 +53,25 @@ func _buildDevPanel():
 	vbox.position = Vector2(12, 12)
 	layer.add_child(vbox)
 
-	var header = Label.new()
+	# Clicking the header collapses/expands the buttons below it.
+	var header = Button.new()
 	header.text = "— DEV —"
+	header.flat = true
+	header.focus_mode = Control.FOCUS_NONE
 	vbox.add_child(header)
 
-	_addDevButton(vbox, "Open Ability Draft", _devOpenDraft)
-	_addDevButton(vbox, "Show Map", _devShowMap)
-	_addDevButton(vbox, "Win Battle", _devWinBattle)
-	_addDevButton(vbox, "Fill Magic", _devFillMagic)
-	_addDevButton(vbox, "Full Heal", _devFullHeal)
-	_addDevButton(vbox, "+100 Coins", _devAddCoins)
-	_addDevButton(vbox, "Add Garbage Row", _devAddGarbage)
+	var buttons = VBoxContainer.new()
+	vbox.add_child(buttons)
+	header.pressed.connect(func(): buttons.visible = not buttons.visible)
+
+	_addDevButton(buttons, "Open Ability Draft", _devOpenDraft)
+	_addDevButton(buttons, "Show Map", _devShowMap)
+	_addDevButton(buttons, "Show Event", _devShowEvent)
+	_addDevButton(buttons, "Win Battle", _devWinBattle)
+	_addDevButton(buttons, "Fill Magic", _devFillMagic)
+	_addDevButton(buttons, "Full Heal", _devFullHeal)
+	_addDevButton(buttons, "+100 Coins", _devAddCoins)
+	_addDevButton(buttons, "Add Garbage Row", _devAddGarbage)
 
 func _addDevButton(parent: Node, text: String, callback: Callable):
 	var btn = Button.new()
@@ -81,6 +91,11 @@ func _devShowMap():
 	MapScene.reopen()
 	MapScene.visible = true
 	MapScene.position.y = 0
+
+func _devShowEvent():
+	EventScene.showEvent()
+	EventScene.visible = true
+	EventScene.position.y = 0
 
 func _devWinBattle():
 	MainScene.devKillEnemy()
@@ -199,11 +214,19 @@ func disableOthers():
 	for child in enemyOptionContainer.get_children():
 		child.gui_input.disconnect(onPressed)
 
-# A reachable map node was clicked: start the battle against its enemy.
-func onMapNodeSelected(enemy):
-	PlayerManager.currentEnemy = enemy
-	MainScene.setStage(enemy)
-	grid.setStage(enemy)
+# A reachable map node was clicked: start its encounter.
+func onMapNodeSelected(node):
+	if node.type == "event":
+		EventScene.showEvent(Events.pool.pick_random())
+		await Utilities.slideOut(MapScene)
+		Utilities.slideIn(EventScene)
+		return
+	# Battles may be skipped by event nodes, so sync the level to the map
+	# column here instead of relying on the per-victory increment alone.
+	PlayerManager.currentLevel = node.col
+	PlayerManager.currentEnemy = node.enemy
+	MainScene.setStage(node.enemy)
+	grid.setStage(node.enemy)
 	await Utilities.slideOut(MapScene)
 	Utilities.slideIn(MainScene, func():
 		MainScene.stageReady()
@@ -237,6 +260,12 @@ func victory():
 
 func draftFinished():
 	await Utilities.slideOut(AbilityDraftScene)
+	MapScene.reopen()
+	Utilities.slideIn(MapScene)
+
+# An event was resolved: return to the map (events will later be map nodes).
+func eventFinished():
+	await Utilities.slideOut(EventScene)
 	MapScene.reopen()
 	Utilities.slideIn(MapScene)
 
