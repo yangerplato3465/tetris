@@ -6,24 +6,39 @@ extends Control
 # onto another slot to move (empty target) or swap (filled target) abilities.
 
 signal draftFinished
+signal equipFinished
 
 @onready var optionContainer = $OptionContainer
 @onready var slotContainer = $SlotContainer
 @onready var continueButton = $Continue
+@onready var title = $Title
 
 const ABILITY_CARD = preload("res://Scene/Component/Equipment.tscn")
 const CARD_SIZE = Vector2(138, 186)
 
 var _chosen = false
+var _mode = "draft" # "draft" (post-battle, 3 options) | "equip" (shop purchase)
 
 func _ready():
 	continueButton.pressed.connect(_onContinue)
 
 # Called on stage_victory (see GameplayScene).
 func generateDraft():
+	_mode = "draft"
+	title.text = "Choose an ability  —  drag 1 of 3 into a slot"
 	_chosen = false
 	_buildSlots()
 	_buildOptions()
+
+# Called after a shop spell purchase: same UI, but the only option is the
+# bought spell and Continue returns to the shop (via equipFinished).
+func generateEquip(abilityId: String):
+	_mode = "equip"
+	title.text = "Equip your new spell  —  drag it into a slot"
+	_chosen = false
+	_buildSlots()
+	_clearOptions()
+	_addOptionCard(PlayerManager.getAbility(abilityId))
 
 # --- Slots (drop targets; filled slots are also drag sources) ---
 
@@ -101,10 +116,12 @@ func _buildOptions():
 	_clearOptions()
 	var pool = PlayerManager.getCharacter(PlayerManager.characterClass).abilityPool
 	for index in Utilities.chooseRandom(pool.size(), 3):
-		var ability = PlayerManager.getAbility(pool[index])
-		var card = _makeAbilityCard(ability)
-		card.set_drag_forwarding(_optionDragData.bind(card, ability.id), Callable(), Callable())
-		optionContainer.add_child(card)
+		_addOptionCard(PlayerManager.getAbility(pool[index]))
+
+func _addOptionCard(ability: Dictionary):
+	var card = _makeAbilityCard(ability)
+	card.set_drag_forwarding(_optionDragData.bind(card, ability.id), Callable(), Callable())
+	optionContainer.add_child(card)
 
 func _clearOptions():
 	for child in optionContainer.get_children():
@@ -145,4 +162,7 @@ func _makeDragPreview(card: Control) -> TextureRect:
 
 func _onContinue():
 	AudioManager.kaching.play()
-	draftFinished.emit()
+	if _mode == "equip":
+		equipFinished.emit()
+	else:
+		draftFinished.emit()

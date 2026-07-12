@@ -31,6 +31,8 @@ func _ready():
 	MainScene.stage_gameover.connect(showGameoverPanel)
 	MainScene.stage_victory.connect(victory)
 	ShopPanel.shopFinished.connect(shopFinished)
+	ShopPanel.spellPurchased.connect(onSpellPurchased)
+	AbilityDraftScene.equipFinished.connect(equipFinished)
 	MainScene.stage_victory.connect(AbilityDraftScene.generateDraft)
 	AbilityDraftScene.draftFinished.connect(draftFinished)
 	MapScene.nodeSelected.connect(onMapNodeSelected)
@@ -225,6 +227,11 @@ func onMapNodeSelected(node):
 		await Utilities.slideOut(MapScene)
 		Utilities.slideIn(EventScene)
 		return
+	if node.type == "shop":
+		ShopPanel.generateItems()
+		await Utilities.slideOut(MapScene)
+		Utilities.slideIn(ShopPanel)
+		return
 	# Battles may be skipped by event nodes, so sync the level to the map
 	# column here instead of relying on the per-victory increment alone.
 	PlayerManager.currentLevel = node.col
@@ -273,7 +280,21 @@ func eventFinished():
 	MapScene.reopen()
 	Utilities.slideIn(MapScene)
 
-# Shop closed: for now just slide the panel away (the shop is only reachable
-# from the dev panel; map-flow wiring will decide where to go next).
+# A spell was bought: pop up the ability slots so the player places it.
+func onSpellPurchased(ability):
+	AbilityDraftScene.generateEquip(ability.id)
+	await Utilities.slideOut(ShopPanel)
+	Utilities.slideIn(AbilityDraftScene)
+
+# Equip popup closed: return to the shop with its remaining stock intact
+# (no generateItems here — the bought card is already gone).
+func equipFinished():
+	await Utilities.slideOut(AbilityDraftScene)
+	Utilities.slideIn(ShopPanel)
+
+# Shop closed: return to the map (same as events; also fine for the dev
+# panel shortcut since the map slides in over whatever was showing).
 func shopFinished():
 	await Utilities.slideOut(ShopPanel)
+	MapScene.reopen()
+	Utilities.slideIn(MapScene)

@@ -5,9 +5,9 @@ extends Control
 # start marker; columns 1..15 correspond to the 15 run levels, with bosses on
 # their usual levels (3/6/9/12/15) as single mandatory nodes.
 #
-# Node types: enemy encounters, bosses, and "?" event nodes (randomly
-# sprinkled outside the opening column and boss columns). Other types
-# (shop, rest, ...) can later be added the same way in _assignEncounters.
+# Node types: enemy encounters, bosses, "?" event nodes and "$" shop nodes
+# (randomly sprinkled outside the opening columns and boss columns). Other
+# types (rest, ...) can later be added the same way in _assignEncounters.
 
 signal nodeSelected(node)
 
@@ -16,6 +16,8 @@ const MAX_ROWS = 4
 const BOSS_LEVELS = [15]
 const EVENT_CHANCE = 0.25   # roll per eligible node
 const FIRST_EVENT_LEVEL = 2 # level 1 is always a fight
+const SHOP_CHANCE = 0.15    # rolled after events, on nodes still enemies
+const FIRST_SHOP_LEVEL = 3  # let the player earn some coins first
 
 const LEFT_X = 60.0
 const COLUMN_SPACING = 72.0
@@ -31,7 +33,7 @@ const FONT = preload("res://Font/ThaleahFat/ThaleahFat.ttf")
 class MapNode:
 	var col: int
 	var row: int
-	var type: String # "start" | "enemy" | "boss" | "event"
+	var type: String # "start" | "enemy" | "boss" | "event" | "shop"
 	var enemy: Dictionary
 	var next: Array = [] # MapNodes in the following column
 	var visited := false
@@ -124,11 +126,12 @@ func _assignEncounters():
 		if level in BOSS_LEVELS:
 			colArr[0].enemy = Consts.BossEnemy[BOSS_LEVELS.find(level)]
 			continue
-		# Sprinkle "?" event nodes among the regular encounters.
-		if level >= FIRST_EVENT_LEVEL:
-			for node in colArr:
-				if randf() < EVENT_CHANCE:
-					node.type = "event"
+		# Sprinkle "?" event and "$" shop nodes among the regular encounters.
+		for node in colArr:
+			if level >= FIRST_EVENT_LEVEL and randf() < EVENT_CHANCE:
+				node.type = "event"
+			elif level >= FIRST_SHOP_LEVEL and randf() < SHOP_CHANCE:
+				node.type = "shop"
 		# Distinct picks so one column never offers the same enemy twice.
 		var pool = _tierPool(level)
 		var picks = Utilities.chooseRandom(pool.size(), colArr.size())
@@ -164,6 +167,11 @@ func _buildNodeButton(node: MapNode):
 		btn.add_theme_font_override("font", FONT)
 		btn.add_theme_font_size_override("font_size", 34)
 		btn.tooltip_text = "Something awaits..."
+	elif node.type == "shop":
+		btn.text = "$"
+		btn.add_theme_font_override("font", FONT)
+		btn.add_theme_font_size_override("font_size", 34)
+		btn.tooltip_text = "Spend your coins"
 	else:
 		btn.tooltip_text = "%s\nHP: %d  ATK: %d\n%s" % [
 			node.enemy.name, node.enemy.health, node.enemy.attackDamage, node.enemy.description

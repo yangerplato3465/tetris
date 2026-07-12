@@ -1,6 +1,7 @@
 extends Control
 
 signal shopFinished
+signal spellPurchased(ability)
 
 const SPELL_COUNT = 3
 const KEEPSAKE_COUNT = 5
@@ -59,8 +60,8 @@ func generateItems():
 	for index in Utilities.chooseRandom(available.size(), KEEPSAKE_COUNT):
 		setKeepsakeCard(Keepsakes.keepsakes[available[index]])
 
-# Buying a spell swaps it into the first skill slot (slot swapping/drafting
-# handles rearranging afterwards).
+# Buying a spell pops up the equip screen (see GameplayScene.onSpellPurchased)
+# so the player picks which slot it goes into.
 func setSpellCard(abilityData):
 	var card = setupCard(spellCard, spellRow, abilityData, Color.REBECCA_PURPLE)
 	card.gui_input.connect(onSpellPressed.bind(abilityData, card))
@@ -93,8 +94,8 @@ func onSpellPressed(event: InputEvent, abilityData, node):
 		if PlayerManager.coin < abilityData.price:
 			return
 		PlayerManager.coin -= abilityData.price
-		PlayerManager.setEquippedAbility(0, abilityData.id) # swap into skill_1 slot
 		completePurchase(abilityData, node, onSpellPressed)
+		spellPurchased.emit(abilityData)
 
 func onHealPressed(event: InputEvent, node):
 	if event.is_pressed():
