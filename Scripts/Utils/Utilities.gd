@@ -36,24 +36,7 @@ func hidePanel(node):
 	tween.tween_property(node, "scale", Vector2(0.5, 0.5), 0.3)
 	tween.finished.connect(func(): node.visible = false)
 
-func slideOut(outNode):
-	var tween = create_tween()
-	tween.set_trans(Tween.TRANS_BACK)
-	tween.set_ease(Tween.EASE_IN)
-	tween.tween_property(outNode, "position:y", outNode.position.y + 500, 0.5)
-	await tween.finished
-	outNode.visible = false
-	outNode.position.y = 0
-
-func slideIn(node, callback: Callable = Callable()):
-	node.visible = true
-	node.position.y = 900
-	var tween = create_tween()
-	tween.set_trans(Tween.TRANS_QUINT)
-	tween.set_ease(Tween.EASE_OUT)
-	tween.tween_property(node, "position:y", 0, 1).set_delay(1)
-	if callback.is_valid():
-		tween.finished.connect(callback)
+# Panel slide transitions live in Scripts/Scenes/FlowController.gd.
 
 # --- Board generation ---
 

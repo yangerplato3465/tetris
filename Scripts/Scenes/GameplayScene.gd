@@ -3,6 +3,8 @@ extends Control
 # Set false to hide the dev tools overlay (see _buildDevPanel).
 const DEV_MODE := true
 
+const FLOW_CONTROLLER = preload("res://Scripts/Scenes/FlowController.gd")
+
 @onready var CharacterSelectScene = $CharacterSelectScene
 @onready var characterOptionPrefab = preload("res://Scene/Component/characterOption.tscn")
 @onready var characterOptionContainer = $CharacterSelectScene/CharacterOptionContainer
@@ -22,23 +24,73 @@ const DEV_MODE := true
 
 @onready var gameoverClose = $GameoverPanel/NinePatchRect/Close
 
+var flow # FlowController: owns panel transitions and the current-panel state
+
 func _ready():
 	PlayerManager.reset() # Reset all upgrades and stats
 	grid.stopGrid()
 	generateCharacterOptions()
 	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
 	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
-	MainScene.stage_gameover.connect(showGameoverPanel)
-	MainScene.stage_victory.connect(victory)
-	ShopPanel.shopFinished.connect(shopFinished)
-	ShopPanel.spellPurchased.connect(onSpellPurchased)
-	AbilityDraftScene.equipFinished.connect(equipFinished)
-	MainScene.stage_victory.connect(AbilityDraftScene.generateDraft)
-	AbilityDraftScene.draftFinished.connect(draftFinished)
-	MapScene.nodeSelected.connect(onMapNodeSelected)
-	EventScene.eventFinished.connect(eventFinished)
+	flow = FLOW_CONTROLLER.new()
+	flow.name = "FlowController"
+	add_child(flow)
+	flow.current = CharacterSelectScene
+	_connectFlow()
 	if DEV_MODE:
 		_buildDevPanel()
+
+# --- Flow routes -----------------------------------------------------------
+# Every "this panel is done" signal is wired here, so the run's whole flow
+# reads top-to-bottom in one place. Routes that branch get a named handler.
+func _connectFlow():
+	MainScene.stage_victory.connect(victory)
+	MainScene.stage_gameover.connect(showGameoverPanel)
+	MapScene.nodeSelected.connect(onMapNodeSelected)
+	AbilityDraftScene.draftFinished.connect(func(): flow.goto(MapScene, MapScene.reopen))
+	EventScene.eventFinished.connect(func(): flow.goto(MapScene, MapScene.reopen))
+	ShopPanel.shopFinished.connect(func(): flow.goto(MapScene, MapScene.reopen))
+	# A bought spell pops up the equip screen; Continue returns to the shop
+	# without regenerating, so the remaining stock is kept.
+	ShopPanel.spellPurchased.connect(func(ability):
+		flow.goto(AbilityDraftScene, AbilityDraftScene.generateEquip.bind(ability.id)))
+	AbilityDraftScene.equipFinished.connect(func(): flow.goto(ShopPanel))
+
+# A reachable map node was clicked: start its encounter.
+func onMapNodeSelected(node):
+	if node.type == "event":
+		flow.goto(EventScene, EventScene.showEvent.bind(Events.pool.pick_random()))
+		return
+	if node.type == "shop":
+		flow.goto(ShopPanel, ShopPanel.generateItems)
+		return
+	# Battles may be skipped by event/shop nodes, so sync the level to the map
+	# column here instead of relying on the per-victory increment alone.
+	PlayerManager.currentLevel = node.col
+	PlayerManager.currentEnemy = node.enemy
+	flow.goto(MainScene, _prepBattle.bind(node.enemy), _startBattle)
+
+# Battle prep runs while Main is still offscreen; stageReady only fires once
+# the panel has landed so gameplay never starts mid-transition.
+func _prepBattle(enemy):
+	MainScene.setStage(enemy)
+	grid.setStage(enemy)
+	grid.resetGrid()
+
+func _startBattle():
+	MainScene.stageReady()
+	grid.stageReady()
+
+func victory():
+	if PlayerManager.currentLevel > 15:
+		GameoverPanel.setStats(true)
+		flow.overlay(GameoverPanel)
+	else:
+		flow.goto(AbilityDraftScene, AbilityDraftScene.generateDraft)
+
+func showGameoverPanel():
+	GameoverPanel.setStats()
+	flow.overlay(GameoverPanel)
 
 # --- Dev tools -------------------------------------------------------------
 # A code-built overlay (CanvasLayer so it sits above every panel) with buttons
@@ -82,26 +134,18 @@ func _addDevButton(parent: Node, text: String, callback: Callable):
 	parent.add_child(btn)
 
 func _devOpenDraft():
-	AbilityDraftScene.generateDraft()
-	AbilityDraftScene.visible = true
-	AbilityDraftScene.position.y = 0
+	flow.jump(AbilityDraftScene, AbilityDraftScene.generateDraft)
 
 func _devOpenShop():
-	ShopPanel.generateItems()
-	ShopPanel.visible = true
-	ShopPanel.position.y = 0
+	flow.jump(ShopPanel, ShopPanel.generateItems)
 
 func _devShowMap():
 	if MapScene.columns.is_empty():
 		MapScene.generateMap()
-	MapScene.reopen()
-	MapScene.visible = true
-	MapScene.position.y = 0
+	flow.jump(MapScene, MapScene.reopen)
 
 func _devShowEvent():
-	EventScene.showEvent()
-	EventScene.visible = true
-	EventScene.position.y = 0
+	flow.jump(EventScene, EventScene.showEvent)
 
 func _devWinBattle():
 	MainScene.devKillEnemy()
@@ -121,6 +165,8 @@ func _devAddCoins():
 func _devAddGarbage():
 	if MainScene.battleActive:
 		grid.addGarbageRows(1)
+
+# --- Character select ------------------------------------------------------
 
 func generateCharacterOptions():
 	for child in characterOptionContainer.get_children():
@@ -144,17 +190,13 @@ func onCharacterPressed(event: InputEvent, character, node: Control):
 		disableCharacterOptions()
 		PlayerManager.characterClass = character.id
 		Utilities.onPressed(node)
-		# --- OLD prepare flow (replaced by the run map) ---
-		#generateRandomEnemies()
-		#await Utilities.slideOut(CharacterSelectScene)
-		#Utilities.slideIn(PrepareScene)
-		MapScene.generateMap()
-		await Utilities.slideOut(CharacterSelectScene)
-		Utilities.slideIn(MapScene)
+		flow.goto(MapScene, MapScene.generateMap)
 
 func disableCharacterOptions():
 	for child in characterOptionContainer.get_children():
 		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+# --- Legacy prepare flow (replaced by the run map, kept for reference) ------
 
 func generateRandomEnemies():
 	levelText.text = "level %d" % PlayerManager.currentLevel
@@ -187,7 +229,6 @@ func generateRandomEnemies():
 		15:
 			setOptions(Consts.BossEnemy[4])
 
-
 func setOptions(enemy):
 	var newOption = enemyOptionPrefab.instantiate()
 	newOption.find_child("Name").text = enemy.name
@@ -207,52 +248,18 @@ func onPressed(event: InputEvent, enemy, node: Control):
 		disableOthers()
 		PlayerManager.currentEnemy = enemy
 		Utilities.onPressed(node)
-		MainScene.setStage(enemy)
-		grid.setStage(enemy)
-		await Utilities.slideOut(PrepareScene)
-		Utilities.slideIn(MainScene, func():
-			MainScene.stageReady()
-			grid.stageReady()
-		)
-		grid.resetGrid()
+		flow.goto(MainScene, _prepBattle.bind(enemy), _startBattle)
 
 func disableOthers():
 	for child in enemyOptionContainer.get_children():
 		child.gui_input.disconnect(onPressed)
 
-# A reachable map node was clicked: start its encounter.
-func onMapNodeSelected(node):
-	if node.type == "event":
-		EventScene.showEvent(Events.pool.pick_random())
-		await Utilities.slideOut(MapScene)
-		Utilities.slideIn(EventScene)
-		return
-	if node.type == "shop":
-		ShopPanel.generateItems()
-		await Utilities.slideOut(MapScene)
-		Utilities.slideIn(ShopPanel)
-		return
-	# Battles may be skipped by event nodes, so sync the level to the map
-	# column here instead of relying on the per-victory increment alone.
-	PlayerManager.currentLevel = node.col
-	PlayerManager.currentEnemy = node.enemy
-	MainScene.setStage(node.enemy)
-	grid.setStage(node.enemy)
-	await Utilities.slideOut(MapScene)
-	Utilities.slideIn(MainScene, func():
-		MainScene.stageReady()
-		grid.stageReady()
-	)
-	grid.resetGrid()
+# --- Game over / exit ------------------------------------------------------
 
 func _on_close_pressed():
 	$AnimationPlayer.play("FadeOut")
 	gameoverClose.disabled = true
 	Utilities.onPressed(gameoverClose)
-
-func showGameoverPanel():
-	GameoverPanel.setStats()
-	Utilities.slideIn(GameoverPanel)
 
 func _on_animation_player_animation_finished(anim_name):
 	if(anim_name == "FadeOut"):
@@ -260,41 +267,3 @@ func _on_animation_player_animation_finished(anim_name):
 
 func backToMenu():
 	get_tree().change_scene_to_file("res://Scene/Menu.tscn")
-
-func victory():
-	if PlayerManager.currentLevel > 15:
-		GameoverPanel.setStats(true)
-		Utilities.slideIn(GameoverPanel)
-	else:
-		await Utilities.slideOut(MainScene)
-		Utilities.slideIn(AbilityDraftScene)
-
-func draftFinished():
-	await Utilities.slideOut(AbilityDraftScene)
-	MapScene.reopen()
-	Utilities.slideIn(MapScene)
-
-# An event was resolved: return to the map (events will later be map nodes).
-func eventFinished():
-	await Utilities.slideOut(EventScene)
-	MapScene.reopen()
-	Utilities.slideIn(MapScene)
-
-# A spell was bought: pop up the ability slots so the player places it.
-func onSpellPurchased(ability):
-	AbilityDraftScene.generateEquip(ability.id)
-	await Utilities.slideOut(ShopPanel)
-	Utilities.slideIn(AbilityDraftScene)
-
-# Equip popup closed: return to the shop with its remaining stock intact
-# (no generateItems here — the bought card is already gone).
-func equipFinished():
-	await Utilities.slideOut(AbilityDraftScene)
-	Utilities.slideIn(ShopPanel)
-
-# Shop closed: return to the map (same as events; also fine for the dev
-# panel shortcut since the map slides in over whatever was showing).
-func shopFinished():
-	await Utilities.slideOut(ShopPanel)
-	MapScene.reopen()
-	Utilities.slideIn(MapScene)
