@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/EnemyData.gd" id="1_enemydata"]
+
+[resource]
+script = ExtResource("1_enemydata")
+id = 20
+name = "Shadow Lord"
+health = 10000
+reward = 0
+frame = 30
+description = "Final boss, Start with a very messy board, all damage halfed"
+attackSteps = 3
+attackDamage = 60
+attackAddsGarbage = true
+damageReductionFlat = 0
+damageReduction = 0.5
+disablesHold = false

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/EnemyData.gd" id="1_enemydata"]
+
+[resource]
+script = ExtResource("1_enemydata")
+id = 5
+name = "Bat"
+health = 600
+reward = 60
+frame = 48
+description = "-5 on all damage"
+attackSteps = 8
+attackDamage = 10
+attackAddsGarbage = false
+damageReductionFlat = 5
+damageReduction = 1.0
+disablesHold = false

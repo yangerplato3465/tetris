@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/EnemyData.gd" id="1_enemydata"]
+
+[resource]
+script = ExtResource("1_enemydata")
+id = 2
+name = "Goblin"
+health = 600
+reward = 40
+frame = 2
+description = ""
+attackSteps = 8
+attackDamage = 12
+attackAddsGarbage = false
+damageReductionFlat = 0
+damageReduction = 1.0
+disablesHold = false

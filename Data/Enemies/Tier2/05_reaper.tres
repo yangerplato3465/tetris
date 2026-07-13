@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/EnemyData.gd" id="1_enemydata"]
+
+[resource]
+script = ExtResource("1_enemydata")
+id = 10
+name = "Reaper"
+health = 2500
+reward = 200
+frame = 36
+description = "Start with a messy board, -10 on all damage"
+attackSteps = 5
+attackDamage = 32
+attackAddsGarbage = true
+damageReductionFlat = 10
+damageReduction = 1.0
+disablesHold = false

@@ -96,34 +96,17 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	enemyAttackAddsGarbage = enemyInfo.attackAddsGarbage
 	dropsSinceAttack = 0
 	updateAttackStepsUI()
-	match enemyInfo.id:
-		5:
-			damageReductionFlat = 5
-		9:
-			damageReductionFlat = 15
-		10:
-			damageReductionFlat = 10
-		14:
-			PlayerManager.holdPieceDebuff = true
-			unlockHold(true)
-		15:
-			damageReductionFlat = 20
-		17:
-			damageReductionFlat = 10
-		18:
-			damageReductionFlat = 15
-		19:
-			PlayerManager.holdPieceDebuff = true
-			damageReductionFlat = 10
-			unlockHold(true)
-		20:
-			damageReduction = 0.5
-		_:
-			damageReductionFlat = 0
-			damageReduction = 1
-			PlayerManager.holdPieceDebuff = false
-			if(PlayerManager.canHoldPiece):
-				unlockHold(false)
+	# Debuffs now travel with the enemy (see EnemyData). Every stage sets all
+	# three from the enemy's own data, so nothing leaks from the previous fight.
+	damageReductionFlat = enemyInfo.damageReductionFlat
+	damageReduction = enemyInfo.damageReduction
+	if enemyInfo.disablesHold:
+		PlayerManager.holdPieceDebuff = true
+		unlockHold(true)
+	else:
+		PlayerManager.holdPieceDebuff = false
+		if PlayerManager.canHoldPiece:
+			unlockHold(false)
 
 
 # --- Dev helpers (called from the GameplayScene dev panel) ---

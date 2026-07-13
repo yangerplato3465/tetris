@@ -1,236 +1,37 @@
 extends Node
 
-var tier1Enemy = [
-	{
-		"id": 1,
-		"name": "Orc",
-		"health": 1000,
-		"reward": 80,
-		"frame": 0,
-		"description": "",
-		"attackSteps": 7,
-		"attackDamage": 15,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 2,
-		"name": "Goblin",
-		"health": 600,
-		"reward": 40,
-		"frame": 2,
-		"description": "",
-		"attackSteps": 8,
-		"attackDamage": 12,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 3,
-		"name": "Slime",
-		"health": 600,
-		"reward": 60,
-		"frame": 15,
-		"description": "Start with small messy board",
-		"attackSteps": 7,
-		"attackDamage": 15,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 4,
-		"name": "Centipede",
-		"health": 600,
-		"reward": 60,
-		"frame": 42,
-		"description": "",
-		"attackSteps": 6,
-		"attackDamage": 18,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 5,
-		"name": "Bat",
-		"health": 600,
-		"reward": 60,
-		"frame": 48,
-		"description": "-5 on all damage",
-		"attackSteps": 8,
-		"attackDamage": 10,
-		"attackAddsGarbage": false
-	},
-]
+# Enemy rosters. Each tier is loaded at startup from one .tres per enemy under
+# Data/Enemies/<Tier>/ (typed EnemyData resources). Files are read in sorted
+# filename order, so the numeric prefixes (01_, 02_, ...) on the Boss files
+# preserve the level order that MapScene/GameplayScene index into
+# (BossEnemy[0] = level 3 boss, [1] = level 6, ...).
+# To add or tune an enemy, edit/add a .tres in the Inspector — no code change.
+var tier1Enemy: Array = []
+var tier2Enemy: Array = []
+var tier3Enemy: Array = []
+var BossEnemy: Array = []
 
-var tier2Enemy = [
-	{
-		"id": 6,
-		"name": "Orc Wizard",
-		"health": 2000,
-		"reward": 100,
-		"frame": 1,
-		"description": "Start with a messy board",
-		"attackSteps": 6,
-		"attackDamage": 25,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 7,
-		"name": "Skeleton",
-		"health": 2500,
-		"reward": 100,
-		"frame": 28,
-		"description": "",
-		"attackSteps": 5,
-		"attackDamage": 28,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 8,
-		"name": "Zombie",
-		"health": 2500,
-		"reward": 150,
-		"frame": 32,
-		"description": "Start with a messy board",
-		"attackSteps": 6,
-		"attackDamage": 25,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 9,
-		"name": "Banshee",
-		"health": 2500,
-		"reward": 150,
-		"frame": 35,
-		"description": "Start with a messy board, -15 on all damage",
-		"attackSteps": 5,
-		"attackDamage": 30,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 10,
-		"name": "Reaper",
-		"health": 2500,
-		"reward": 200,
-		"frame": 36,
-		"description": "Start with a messy board, -10 on all damage",
-		"attackSteps": 5,
-		"attackDamage": 32,
-		"attackAddsGarbage": true
-	},
-]
+func _ready():
+	tier1Enemy = _loadEnemyDir("res://Data/Enemies/Tier1")
+	tier2Enemy = _loadEnemyDir("res://Data/Enemies/Tier2")
+	tier3Enemy = _loadEnemyDir("res://Data/Enemies/Tier3")
+	BossEnemy = _loadEnemyDir("res://Data/Enemies/Boss")
 
-var tier3Enemy = [
-	{
-		"id": 11,
-		"name": "Ettin",
-		"health": 5000,
-		"reward": 150,
-		"frame": 7,
-		"description": "Start with a very messy board",
-		"attackSteps": 5,
-		"attackDamage": 38,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 12,
-		"name": "huge worm",
-		"health": 8000,
-		"reward": 200,
-		"frame": 44,
-		"description": "Start with a messy board",
-		"attackSteps": 4,
-		"attackDamage": 35,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 13,
-		"name": "Death",
-		"health": 5000,
-		"reward": 200,
-		"frame": 37,
-		"description": "Start with a messy board",
-		"attackSteps": 4,
-		"attackDamage": 40,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 14,
-		"name": "slime body",
-		"health": 6000,
-		"reward": 200,
-		"frame": 16,
-		"description": "Start with a messy board, You cannot hold pieces",
-		"attackSteps": 5,
-		"attackDamage": 35,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 15,
-		"name": "skeleton archer",
-		"health": 5000,
-		"reward": 200,
-		"frame": 29,
-		"description": "Start with a messy board, -20 on all damage",
-		"attackSteps": 5,
-		"attackDamage": 40,
-		"attackAddsGarbage": false
-	},
-]
-
-var BossEnemy = [
-	{
-		"id": 16,
-		"name": "rock golem",
-		"health": 2000,
-		"reward": 120,
-		"frame": 51,
-		"description": "Start with a small messy board",
-		"attackSteps": 4,
-		"attackDamage": 40,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 17,
-		"name": "wendigo",
-		"health": 4000,
-		"reward": 150,
-		"frame": 50,
-		"description": "Start with a messy board, -15 on all damage",
-		"attackSteps": 4,
-		"attackDamage": 45,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 18,
-		"name": "centaur",
-		"health": 8000,
-		"reward": 200,
-		"frame": 52,
-		"description": "Start with a messy board, -15 on all damage",
-		"attackSteps": 4,
-		"attackDamage": 45,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 19,
-		"name": "death knight",
-		"health": 12000,
-		"reward": 300,
-		"frame": 30,
-		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces",
-		"attackSteps": 3,
-		"attackDamage": 50,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 20,
-		"name": "Shadow Lord",
-		"health": 10000,
-		"reward": 0,
-		"frame": 30,
-		"description": "Final boss, Start with a very messy board, all damage halfed",
-		"attackSteps": 3,
-		"attackDamage": 60,
-		"attackAddsGarbage": true
-	},
-]
+# Load every EnemyData .tres in a directory, sorted by filename. Handles the
+# ".remap" suffix that Godot gives resources in exported builds.
+func _loadEnemyDir(path: String) -> Array:
+	var out: Array = []
+	var dir = DirAccess.open(path)
+	if dir == null:
+		push_error("Consts: could not open enemy directory " + path)
+		return out
+	for file in dir.get_files():
+		var res_name = file
+		if res_name.ends_with(".remap"):
+			res_name = res_name.trim_suffix(".remap")
+		if res_name.ends_with(".tres"):
+			out.append(load(path + "/" + res_name))
+	return out
 
 # --- Ability definitions (initial/static data) ---
 # These are the templates. A run keeps mutable copies in
