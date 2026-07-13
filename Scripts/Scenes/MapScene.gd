@@ -34,7 +34,7 @@ class MapNode:
 	var col: int
 	var row: int
 	var type: String # "start" | "enemy" | "boss" | "event" | "shop"
-	var enemy: Dictionary
+	var enemy: EnemyData
 	var next: Array = [] # MapNodes in the following column
 	var visited := false
 	var button: Button

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "frost_nova"
+name = "Frost Nova"
+type = "attack"
+cost = 2
+costLabel = "2 orbs"
+value = 90
+price = 60
+description = "Deal 90 damage to the enemy"

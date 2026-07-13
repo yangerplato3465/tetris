@@ -25,11 +25,11 @@ Utilities="*res://Scripts/Utils/Utilities.gd"
 Constants="*res://Scripts/Utils/Constants.gd"
 MatrixOperations="*res://Scripts/Utils/MatrixOperations.gd"
 Textures="*res://Scripts/Utils/Textures.gd"
+Consts="*res://Scripts/Utils/Consts.gd"
+Keepsakes="*res://Scripts/Utils/Keepsakes.gd"
 PlayerManager="*res://Scripts/Managers/PlayerManager.gd"
 PopupNumbers="*res://Scripts/Managers/PopupNumbers.gd"
-Consts="*res://Scripts/Utils/Consts.gd"
 Events="*res://Scripts/Utils/Events.gd"
-Keepsakes="*res://Scripts/Utils/Keepsakes.gd"
 AudioManager="*res://Scene/AudioManager.tscn"
 
 [display]

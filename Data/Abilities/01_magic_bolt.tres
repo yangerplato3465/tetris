@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "magic_bolt"
+name = "Magic Bolt"
+type = "attack"
+cost = 1
+costLabel = "1 orb"
+value = 50
+price = 40
+description = "Deal 50 damage to the enemy"

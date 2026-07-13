@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "flame_wave"
+name = "Flame Wave"
+type = "attack"
+cost = 2
+costLabel = "2 orbs"
+value = 100
+price = 65
+description = "Deal 100 damage to the enemy"

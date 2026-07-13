@@ -97,9 +97,11 @@ func reset():
 # --- Abilities ---
 
 func _initAbilities():
-	# Mutable copies of the static definitions so a run can retext/upgrade
-	# abilities without mutating Consts.abilities.
-	abilityState = Consts.abilities.duplicate(true)
+	# Mutable dictionary copies of the static AbilityData definitions so a run can
+	# retext/upgrade abilities (see updateAbility) without touching Consts.abilities.
+	abilityState = {}
+	for id in Consts.abilities:
+		abilityState[id] = Consts.abilities[id].to_dict()
 	# Fixed-size slot array: "" marks an empty slot. The first slots are filled
 	# with the class's starting abilities; the rest start empty for drafting.
 	equippedAbilities = []
@@ -111,11 +113,11 @@ func _initAbilities():
 		for i in mini(starting.size(), ABILITY_SLOTS):
 			equippedAbilities[i] = starting[i]
 
-func getCharacter(id: String) -> Dictionary:
+func getCharacter(id: String) -> CharacterData:
 	for character in Consts.characters:
 		if character.id == id:
 			return character
-	return {}
+	return null
 
 func getAbility(id: String) -> Dictionary:
 	return abilityState.get(id, {})
@@ -163,7 +165,7 @@ func updateAbility(id: String, fields: Dictionary):
 func getCharacterDescription(charId: String) -> String:
 	# Built from current ability state so it reflects switches/upgrades.
 	var character = getCharacter(charId)
-	if character.is_empty():
+	if character == null:
 		return ""
 	var lines = [character.tagline, ""]
 	var slot = 1
@@ -177,15 +179,13 @@ func getCharacterDescription(charId: String) -> String:
 
 # --- Keepsakes ---
 
-func addKeepsake(keepsake: Dictionary):
-	# Pay for a keepsake and apply its data-driven effects (see Keepsakes.gd
+func addKeepsake(keepsake: KeepsakeData):
+	# Pay for a keepsake and apply its data-driven effects (see KeepsakeData
 	# for the schema). Owned keepsakes are excluded from future shop rolls.
 	coin -= keepsake.price
 	ownedKeepsakes.append(keepsake.id)
-	for desc in keepsake.get("effects", []):
+	for desc in keepsake.effects:
 		applyKeepsakeEffect(desc)
-	if keepsake.has("effect"):
-		keepsake.effect.call()
 
 func applyKeepsakeEffect(desc: Dictionary):
 	match desc.type:
