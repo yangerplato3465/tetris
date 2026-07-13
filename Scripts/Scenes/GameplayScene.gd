@@ -30,8 +30,7 @@ func _ready():
 	PlayerManager.reset() # Reset all upgrades and stats
 	grid.stopGrid()
 	generateCharacterOptions()
-	gameoverClose.connect("mouse_entered", Utilities.scaleUp.bind(gameoverClose))
-	gameoverClose.connect("mouse_exited", Utilities.scaleDown.bind(gameoverClose))
+	Utilities.makeJuicy(gameoverClose)
 	flow = FLOW_CONTROLLER.new()
 	flow.name = "FlowController"
 	add_child(flow)
@@ -180,8 +179,7 @@ func setCharacterOption(character):
 	newOption.find_child("Icon").frame = character.frame
 	newOption.find_child("Description").text = PlayerManager.getCharacterDescription(character.id)
 	newOption.pivot_offset = Vector2(110, 155)
-	newOption.mouse_entered.connect(Utilities.scaleUp.bind(newOption))
-	newOption.mouse_exited.connect(Utilities.scaleDown.bind(newOption))
+	Utilities.makeJuicy(newOption)
 	newOption.gui_input.connect(onCharacterPressed.bind(character, newOption))
 	characterOptionContainer.add_child(newOption)
 
@@ -237,8 +235,7 @@ func setOptions(enemy):
 	newOption.find_child("Description").text = descriptionText
 
 	newOption.pivot_offset = Vector2(184, 300)
-	newOption.mouse_entered.connect(Utilities.scaleUp.bind(newOption))
-	newOption.mouse_exited.connect(Utilities.scaleDown.bind(newOption))
+	Utilities.makeJuicy(newOption)
 	newOption.gui_input.connect(onPressed.bind(enemy, newOption))
 
 	enemyOptionContainer.add_child(newOption)

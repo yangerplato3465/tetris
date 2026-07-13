@@ -29,8 +29,7 @@ const UPGRADE_OPTION = {
 var currentCards = []   # [{"data": Dictionary, "node": Control}] for price refresh
 
 func _ready():
-	skipButton.connect("mouse_entered", Utilities.scaleUp.bind(skipButton))
-	skipButton.connect("mouse_exited", Utilities.scaleDown.bind(skipButton))
+	Utilities.makeJuicy(skipButton)
 
 func generateItems():
 	currentCards = []
@@ -83,8 +82,7 @@ func setupCard(scene, row, data, nameColor):
 	cardName.label_settings.font_color = nameColor
 	price.label_settings.font_color = Color.RED if data.price > PlayerManager.coin else Color.BLACK
 	card.tooltip_text = data.description
-	card.connect("mouse_entered", Utilities.scaleUp.bind(card))
-	card.connect("mouse_exited", Utilities.scaleDown.bind(card))
+	Utilities.makeJuicy(card)
 	row.add_child(card)
 	currentCards.append({"data": data, "node": card})
 	return card

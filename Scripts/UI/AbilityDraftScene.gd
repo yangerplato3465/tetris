@@ -146,8 +146,7 @@ func _makeAbilityCard(ability: Dictionary) -> Control:
 	nameLabel.label_settings.font_color = Color.REBECCA_PURPLE
 	valueLabel.label_settings.font_color = Color.BLACK
 	card.tooltip_text = ability.description
-	card.mouse_entered.connect(Utilities.scaleUp.bind(card))
-	card.mouse_exited.connect(Utilities.scaleDown.bind(card))
+	Utilities.makeJuicy(card)
 	return card
 
 func _makeDragPreview(card: Control) -> TextureRect:

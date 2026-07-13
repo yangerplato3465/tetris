@@ -48,18 +48,8 @@ func _ready():
 	settings.pivot_offset = Vector2(112, 56)
 	
 	# 連接滑鼠事件與縮放動畫（製作 hover 效果）
-	# bind() 將按鈕本身作為參數傳遞給 Utilities 的縮放函式
-	start.connect("mouse_entered", Utilities.scaleUp.bind(start))      # 滑鼠進入 → 放大
-	start.connect("mouse_exited", Utilities.scaleDown.bind(start))     # 滑鼠離開 → 縮小
-	rules.connect("mouse_entered", Utilities.scaleUp.bind(rules))
-	rules.connect("mouse_exited", Utilities.scaleDown.bind(rules))
-	settings.connect("mouse_entered", Utilities.scaleUp.bind(settings))
-	settings.connect("mouse_exited", Utilities.scaleDown.bind(settings))
-	rulesClose.connect("mouse_entered", Utilities.scaleUp.bind(rulesClose))
-	rulesClose.connect("mouse_exited", Utilities.scaleDown.bind(rulesClose))
-	settingsClose.connect("mouse_entered", Utilities.scaleUp.bind(settingsClose))
-	settingsClose.connect("mouse_exited", Utilities.scaleDown.bind(settingsClose))
-	pass
+	for button in [start, rules, settings, rulesClose, settingsClose]:
+		Utilities.makeJuicy(button)
 
 # ===== 動態建立按鍵設定列表 =====
 func createActionList():
