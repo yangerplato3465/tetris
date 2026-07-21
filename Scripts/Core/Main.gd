@@ -147,27 +147,43 @@ func useSkill(slot: int):
 		return
 	if PlayerManager.magicMeter < ability.cost:
 		return
-	# Dispatch by type so any equipped attack/block ability uses its own value.
-	match ability.get("type", ""):
-		"attack":
-			_castAttack(ability)
-		"block":
-			_castBlock(ability)
-
-func _castAttack(ability):
+	# Pay once up front, then run the ability's authored effects in order — so a
+	# multi-effect ability is charged for one cast, not one charge per effect.
 	PlayerManager.magicMeter -= ability.cost
 	updateMagicMeterUI()
-	var damageDealt = roundi((ability.value - damageReductionFlat) * damageReduction)
-	attackAnim()
-	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
-	updateEnemyHealth(damageDealt)
+	for effect in ability.get("effects", []):
+		_applyAbilityEffect(effect)
 
-func _castBlock(ability):
-	PlayerManager.magicMeter -= ability.cost
-	updateMagicMeterUI()
-	PlayerManager.shieldNum += ability.value
-	updateShieldUI()
-	PopupNumbers.displayText("+%d SHIELD" % ability.value, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
+# The single place that knows what an ability effect type means. Adding a type
+# here is what makes it available to every .tres under Data/Abilities — see the
+# vocabulary listed in Scripts/Data/AbilityData.gd.
+func _applyAbilityEffect(effect: Dictionary):
+	var amount = effect.get("amount", 0)
+	match effect.get("type", ""):
+		"damage_enemy":
+			var damageDealt = roundi((amount - damageReductionFlat) * damageReduction)
+			attackAnim()
+			PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
+			updateEnemyHealth(damageDealt)
+		"shield":
+			PlayerManager.shieldNum += amount
+			updateShieldUI()
+			PopupNumbers.displayText("+%d SHIELD" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
+		"heal":
+			PlayerManager.playerHealth = mini(PlayerManager.playerHealth + amount, PlayerManager.maxPlayerHealth)
+			updatePlayerHealthUI()
+			PopupNumbers.displayText("+%d HP" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.9, 0.4))
+		"magic":
+			PlayerManager.magicMeter = mini(PlayerManager.magicMeter + amount, PlayerManager.maxMagicMeter)
+			updateMagicMeterUI()
+			PopupNumbers.displayText("+%d ORB" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.8, 0.5, 1.0))
+		"clear_rows":
+			# Grid.clearBottomRows emits clearLines, which is wired to attack()
+			# — so this also deals normal line-clear damage and extends the
+			# combo. Price these abilities with that in mind.
+			$Grid.clearBottomRows(amount)
+		_:
+			push_warning("Main: unknown ability effect type '%s'" % effect.get("type", ""))
 
 func _process(_delta):
 	if not battleActive:

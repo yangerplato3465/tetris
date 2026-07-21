@@ -49,7 +49,7 @@ Defined in `project.godot` and available everywhere without `$`:
 
 **`Scripts/Core/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `hardDrop`, `pieceDropped`, `magicMeterChanged`, `grid_gameover`.
 
-**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attacks triggered every `attackSteps` piece drops, the two player abilities (Magic Bolt: 50 damage, Barrier: +20 shield), win/loss detection. Connects to Grid signals to respond to player actions.
+**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attacks triggered every `attackSteps` piece drops, ability casting (`useSkill` → `_applyAbilityEffect`), win/loss detection. Connects to Grid signals to respond to player actions.
 
 **`Scripts/Core/Piece.gd`** — A single tetromino. Stores its shape matrix and rotation state. Contains elemental block assignment logic (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
 
@@ -92,6 +92,24 @@ damage = (clearedLines * 100 * comboMult^(combo-1) - damageReductionFlat) * dama
 Taking *any* card spends the floor, so a shop or event replaces a fight rather than being extra. Tuning knobs live at the top of `PrepareScene.gd` (`EVENT_CHANCE`, `SHOP_CHANCE`, `MAX_EVENTS`, `FIRST_EVENT_FLOOR`, `FIRST_SHOP_FLOOR`). Two invariants are enforced after the roll: at most `MAX_EVENTS` events per floor, and always at least one fight.
 
 `PlayerManager.currentLevel` persists across battles; `PlayerManager.reset()` resets it to 1. `Main.victory()` steps it after a win, `GameplayScene.advanceFloor()` after an event or shop.
+
+### Adding an Ability
+
+Abilities are data. One `.tres` per ability under `Data/Abilities/`, loaded into `Consts.abilities` at startup by filename order (the `NN_` prefix is load order only — `id` is identity and must be unique).
+
+What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` dictionaries applied in order by `Main._applyAbilityEffect`. Current vocabulary:
+
+| type | effect |
+|---|---|
+| `damage_enemy` | damage the enemy, after its damage reduction |
+| `shield` | gain shield |
+| `heal` | restore HP, capped at `maxPlayerHealth` |
+| `magic` | refund orbs, capped at `maxMagicMeter` |
+| `clear_rows` | wipe `amount` rows off the bottom of the board |
+
+To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres` — both the draft (`AbilityDraftScene._buildOptions`) and the shop (`ShopPanell.generateItems`) roll from that pool, so an ability missing from it can never be obtained. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.
+
+Two gotchas. `clear_rows` calls `Grid.clearBottomRows`, which emits `clearLines` — wired to `Main.attack()` — so it *also* deals normal line-clear damage and extends the combo; price accordingly. And `type` (`attack`/`block`) is descriptive metadata for card visuals only — casting dispatches on `effects`, not on it.
 
 ### Magic Orbs
 

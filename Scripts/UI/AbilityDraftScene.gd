@@ -142,7 +142,10 @@ func _makeAbilityCard(ability: Dictionary) -> Control:
 	nameLabel.label_settings = LabelSettings.new()
 	valueLabel.label_settings = LabelSettings.new()
 	nameLabel.text = ability.name
-	valueLabel.text = str(ability.value)
+	# Abilities no longer carry a single `value`; show the first numeric effect,
+	# and nothing at all for an ability whose effects are all non-numeric.
+	var headline = AbilityData.headlineAmount(ability)
+	valueLabel.text = str(headline) if headline >= 0 else ""
 	nameLabel.label_settings.font_color = Color.REBECCA_PURPLE
 	valueLabel.label_settings.font_color = Color.BLACK
 	card.tooltip_text = ability.description
