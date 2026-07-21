@@ -1,7 +1,7 @@
 [gd_scene load_steps=26 format=3 uid="uid://beaknpi8orob3"]
 
 [ext_resource type="Script" path="res://Scripts/Scenes/GameplayScene.gd" id="1_xfrsu"]
-[ext_resource type="Script" path="res://Scripts/Scenes/MapScene.gd" id="17_mapsc"]
+[ext_resource type="Script" path="res://Scripts/Scenes/PrepareScene.gd" id="17_prep"]
 [ext_resource type="Script" path="res://Scripts/Scenes/EventScene.gd" id="18_event"]
 [ext_resource type="PackedScene" path="res://Scene/AbilityDraftScene.tscn" id="16_draft"]
 [ext_resource type="Shader" path="res://Shader/Background.gdshader" id="2_ga022"]
@@ -195,6 +195,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("17_prep")
 
 [node name="Title" type="Label" parent="PrepareScene"]
 material = SubResource("ShaderMaterial_ubuj6")
@@ -243,16 +244,6 @@ offset_bottom = 318.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
-
-[node name="MapScene" type="Control" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("17_mapsc")
 
 [node name="EventScene" type="Control" parent="."]
 visible = false

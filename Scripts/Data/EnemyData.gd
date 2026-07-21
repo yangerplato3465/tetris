@@ -5,7 +5,7 @@ extends Resource
 # Data/Enemies/{Tier1,Tier2,Tier3,Boss}/ and is loaded by Consts at startup.
 # See Consts._loadEnemyDir for how the tiers are assembled.
 #
-# Consumers (Main.setStage, MapScene, GameplayScene.setOptions, GameoverPanel)
+# Consumers (Main.setStage, PrepareScene, GameoverPanel)
 # read these as plain properties (enemy.health, enemy.name, ...), so this stays
 # a drop-in replacement for the old dictionaries in Consts.gd.
 

@@ -11,7 +11,7 @@ extends Node
 
 # Enemy rosters. Files are read in sorted filename order, so the numeric
 # prefixes (01_, 02_, ...) on the Boss files preserve the level order that
-# MapScene/GameplayScene index into (BossEnemy[0] = level 3 boss, [1] = level 6).
+# PrepareScene indexes into (BossEnemy[0] = level 3 boss, [1] = level 6).
 var tier1Enemy: Array = []
 var tier2Enemy: Array = []
 var tier3Enemy: Array = []

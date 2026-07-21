@@ -10,17 +10,12 @@ const FLOW_CONTROLLER = preload("res://Scripts/Scenes/FlowController.gd")
 @onready var characterOptionContainer = $CharacterSelectScene/CharacterOptionContainer
 
 @onready var PrepareScene = $PrepareScene
-@onready var MapScene = $MapScene
 @onready var EventScene = $EventScene
 @onready var MainScene = $Main
 @onready var GameoverPanel = $GameoverPanel
 @onready var ShopPanel = $ShopPanel
 @onready var AbilityDraftScene = $AbilityDraftScene
 @onready var grid = $Main/Grid
-
-@onready var enemyOptionPrefab = preload("res://Scene/Component/enemyOption.tscn")
-@onready var enemyOptionContainer = $PrepareScene/EnemyOptionContainer
-@onready var levelText = $PrepareScene/LevelNumber
 
 @onready var gameoverClose = $GameoverPanel/NinePatchRect/Close
 
@@ -45,29 +40,40 @@ func _ready():
 func _connectFlow():
 	MainScene.stage_victory.connect(victory)
 	MainScene.stage_gameover.connect(showGameoverPanel)
-	MapScene.nodeSelected.connect(onMapNodeSelected)
-	AbilityDraftScene.draftFinished.connect(func(): flow.goto(MapScene, MapScene.reopen))
-	EventScene.eventFinished.connect(func(): flow.goto(MapScene, MapScene.reopen))
-	ShopPanel.shopFinished.connect(func(): flow.goto(MapScene, MapScene.reopen))
+	PrepareScene.optionSelected.connect(onFloorOptionSelected)
+	# Main.victory() already stepped the level, so the post-reward draft goes
+	# straight to the next floor; event/shop spend the floor themselves.
+	AbilityDraftScene.draftFinished.connect(showFloorOptions)
+	EventScene.eventFinished.connect(advanceFloor)
+	ShopPanel.shopFinished.connect(advanceFloor)
 	# A bought spell pops up the equip screen; Continue returns to the shop
 	# without regenerating, so the remaining stock is kept.
 	ShopPanel.spellPurchased.connect(func(ability):
 		flow.goto(AbilityDraftScene, AbilityDraftScene.generateEquip.bind(ability.id)))
 	AbilityDraftScene.equipFinished.connect(func(): flow.goto(ShopPanel))
 
-# A reachable map node was clicked: start its encounter.
-func onMapNodeSelected(node):
-	if node.type == "event":
-		flow.goto(EventScene, EventScene.showEvent.bind(Events.pool.pick_random()))
-		return
-	if node.type == "shop":
-		flow.goto(ShopPanel, ShopPanel.generateItems)
-		return
-	# Battles may be skipped by event/shop nodes, so sync the level to the map
-	# column here instead of relying on the per-victory increment alone.
-	PlayerManager.currentLevel = node.col
-	PlayerManager.currentEnemy = node.enemy
-	flow.goto(MainScene, _prepBattle.bind(node.enemy), _startBattle)
+# A card on the floor choice screen was taken: run its encounter.
+func onFloorOptionSelected(option):
+	match option.type:
+		"event":
+			flow.goto(EventScene, EventScene.showEvent.bind(Events.pool.pick_random()))
+		"shop":
+			flow.goto(ShopPanel, ShopPanel.generateItems)
+		_:
+			PlayerManager.currentEnemy = option.enemy
+			flow.goto(MainScene, _prepBattle.bind(option.enemy), _startBattle)
+
+func showFloorOptions():
+	flow.goto(PrepareScene, PrepareScene.generateFloor)
+
+# Taking a shop or event costs the floor just like winning a fight does.
+func advanceFloor():
+	PlayerManager.currentLevel += 1
+	if PlayerManager.currentLevel > PrepareScene.FLOOR_COUNT:
+		GameoverPanel.setStats(true)
+		flow.overlay(GameoverPanel)
+	else:
+		showFloorOptions()
 
 # Battle prep runs while Main is still offscreen; stageReady only fires once
 # the panel has landed so gameplay never starts mid-transition.
@@ -117,7 +123,7 @@ func _buildDevPanel():
 
 	_addDevButton(buttons, "Open Ability Draft", _devOpenDraft)
 	_addDevButton(buttons, "Open Shop", _devOpenShop)
-	_addDevButton(buttons, "Show Map", _devShowMap)
+	_addDevButton(buttons, "Show Floor Options", _devShowFloor)
 	_addDevButton(buttons, "Show Event", _devShowEvent)
 	_addDevButton(buttons, "Win Battle", _devWinBattle)
 	_addDevButton(buttons, "Fill Magic", _devFillMagic)
@@ -138,10 +144,8 @@ func _devOpenDraft():
 func _devOpenShop():
 	flow.jump(ShopPanel, ShopPanel.generateItems)
 
-func _devShowMap():
-	if MapScene.columns.is_empty():
-		MapScene.generateMap()
-	flow.jump(MapScene, MapScene.reopen)
+func _devShowFloor():
+	flow.jump(PrepareScene, PrepareScene.generateFloor)
 
 func _devShowEvent():
 	flow.jump(EventScene, EventScene.showEvent)
@@ -188,68 +192,11 @@ func onCharacterPressed(event: InputEvent, character, node: Control):
 		disableCharacterOptions()
 		PlayerManager.characterClass = character.id
 		Utilities.onPressed(node)
-		flow.goto(MapScene, MapScene.generateMap)
+		showFloorOptions()
 
 func disableCharacterOptions():
 	for child in characterOptionContainer.get_children():
 		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-# --- Legacy prepare flow (replaced by the run map, kept for reference) ------
-
-func generateRandomEnemies():
-	levelText.text = "level %d" % PlayerManager.currentLevel
-	for option in enemyOptionContainer.get_children():
-		option.queue_free()
-	match PlayerManager.currentLevel:
-		1, 2:
-			for index in Utilities.chooseRandom(Consts.tier1Enemy.size(), 3):
-				setOptions(Consts.tier1Enemy[index])
-		3:
-			setOptions(Consts.BossEnemy[0])
-		4, 5:
-			for index in Utilities.chooseRandom(Consts.tier2Enemy.size(), 3):
-				setOptions(Consts.tier2Enemy[index])
-		6:
-			setOptions(Consts.BossEnemy[1])
-		7, 8:
-			for index in Utilities.chooseRandom(Consts.tier2Enemy.size(), 3):
-				setOptions(Consts.tier3Enemy[index])
-		9:
-			setOptions(Consts.BossEnemy[2])
-		10, 11:
-			for index in Utilities.chooseRandom(Consts.tier3Enemy.size(), 3):
-				setOptions(Consts.tier3Enemy[index])
-		12:
-			setOptions(Consts.BossEnemy[3])
-		13, 14:
-			for index in Utilities.chooseRandom(Consts.tier3Enemy.size(), 3):
-				setOptions(Consts.tier3Enemy[index])
-		15:
-			setOptions(Consts.BossEnemy[4])
-
-func setOptions(enemy):
-	var newOption = enemyOptionPrefab.instantiate()
-	newOption.find_child("Name").text = enemy.name
-	newOption.find_child("Icon").frame = enemy.frame
-	var descriptionText = "health: %s\nreward: %s\n%s" % [str(enemy.health), str(enemy.reward), enemy.description]
-	newOption.find_child("Description").text = descriptionText
-
-	newOption.pivot_offset = Vector2(184, 300)
-	Utilities.makeJuicy(newOption)
-	newOption.gui_input.connect(onPressed.bind(enemy, newOption))
-
-	enemyOptionContainer.add_child(newOption)
-
-func onPressed(event: InputEvent, enemy, node: Control):
-	if(event.is_pressed()):
-		disableOthers()
-		PlayerManager.currentEnemy = enemy
-		Utilities.onPressed(node)
-		flow.goto(MainScene, _prepBattle.bind(enemy), _startBattle)
-
-func disableOthers():
-	for child in enemyOptionContainer.get_children():
-		child.gui_input.disconnect(onPressed)
 
 # --- Game over / exit ------------------------------------------------------
 
