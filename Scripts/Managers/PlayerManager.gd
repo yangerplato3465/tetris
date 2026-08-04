@@ -72,15 +72,15 @@ func _setDefaults():
 	goldBlocks = false
 	pendingElementalBonus = 0
 	pendingGoldCoins = 0
-	magicMeter = 5
-	maxMagicMeter = 10
+	magicMeter = 0
+	maxMagicMeter = 5
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
 	ownedKeepsakes = []
 	holdPieceDebuff = false
 	shieldNum = 0
 	playerHealth = 100
 	maxPlayerHealth = 100
-	characterClass = "wizard"
+	characterClass = "weaver"
 	nextPiecePoison = false
 	_initAbilities()
 	currentEnemy = null
@@ -112,6 +112,18 @@ func _initAbilities():
 		var starting = character.startingAbilities
 		for i in mini(starting.size(), ABILITY_SLOTS):
 			equippedAbilities[i] = starting[i]
+
+# Lock in the chosen class at character select. Sets the energy cap from the
+# character (maxEnergy) and re-equips that class's starting abilities — the
+# defaults set in _setDefaults are for the placeholder class, so without this
+# every class would start with the default class's kit and energy cap.
+func selectCharacter(id: String):
+	characterClass = id
+	_initAbilities()
+	var character = getCharacter(id)
+	if character:
+		maxMagicMeter = character.maxEnergy
+	magicMeter = 0
 
 func getCharacter(id: String) -> CharacterData:
 	for character in Consts.characters:

@@ -23,7 +23,7 @@ Splash.tscn → Menu.tscn → GameplayScene.tscn
 ```
 
 `GameplayScene.tscn` is the top-level scene for a run. It hosts four sub-scenes that are swapped in/out:
-- `CharacterSelectScene` — pick a class (Wizard, Knight, Rogue, Cleric)
+- `CharacterSelectScene` — pick a class (defined by the `.tres` files in `Data/Characters/`; currently Weaver and Monk)
 - `PrepareScene` — the floor choice screen: pick one of 2–3 cards (enemy, event or shop)
 - `MainScene` (the `Main.tscn` node) — active battle
 - `ShopPanel` — item shop after each victory
@@ -113,9 +113,13 @@ Two gotchas. `clear_rows` calls `Grid.clearBottomRows`, which emits `clearLines`
 
 ### Magic Orbs
 
-`PlayerManager.magicMeter` fuels skills. It increases when:
+`PlayerManager.magicMeter` fuels skills, starting a run at 0. It increases when:
 1. Orb blocks are cleared from the grid (`orb` elemental type)
 2. Every 3rd piece spawned automatically has one block converted to an orb (`Grid.spawnFromBag` checks `pieceCount % 3`)
+
+Energy is capped at `maxMagicMeter`, set from the chosen class's `CharacterData.maxEnergy` (default 5) in `PlayerManager.selectCharacter`, and raised mid-run by `max_magic` upgrades. Orbs collected past the cap are wasted **and burn HP**: `Grid.printClearedBlockTypes` emits `energyOverflow(count)`, and `Main.onEnergyOverflow` deals `count * ENERGY_OVERFLOW_DAMAGE` (5) straight to HP, bypassing shield. Only board orbs overflow — the `magic` ability effect just caps silently.
+
+`selectCharacter` is also where a class's starting abilities get equipped, so it must be called on character pick (`GameplayScene.onCharacterPressed`); setting `characterClass` alone leaves the previous class's kit.
 
 ### Input Actions (defined in project.godot)
 

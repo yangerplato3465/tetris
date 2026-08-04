@@ -190,7 +190,7 @@ func setCharacterOption(character):
 func onCharacterPressed(event: InputEvent, character, node: Control):
 	if event.is_pressed():
 		disableCharacterOptions()
-		PlayerManager.characterClass = character.id
+		PlayerManager.selectCharacter(character.id)
 		Utilities.onPressed(node)
 		showFloorOptions()
 

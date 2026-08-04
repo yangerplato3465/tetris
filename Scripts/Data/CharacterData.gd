@@ -12,5 +12,6 @@ extends Resource
 @export var name: String = ""
 @export var frame: int = 0           # icon frame in the character spritesheet
 @export var tagline: String = ""
+@export var maxEnergy: int = 5       # energy (magic orb) cap; overflow burns HP
 @export var abilityPool: Array[String] = []
 @export var startingAbilities: Array[String] = []

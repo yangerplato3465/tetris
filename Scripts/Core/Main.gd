@@ -37,6 +37,7 @@ var _enemyFlashing = false
 var _playerFlashing = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
+const ENERGY_OVERFLOW_DAMAGE = 5 # HP burned per orb collected past the energy cap
 
 var _skill_rows: Array = []
 
@@ -62,6 +63,7 @@ func connectSignals():
 	$Grid.clearLines.connect(attack)
 	$Grid.hardDrop.connect(hardDrop)
 	$Grid.magicMeterChanged.connect(updateMagicMeterUI)
+	$Grid.energyOverflow.connect(onEnergyOverflow)
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
 	$Grid.pieceDropped.connect(onPieceDropped)
@@ -339,6 +341,19 @@ func enemyAttack():
 		return
 	dropsSinceAttack = 0
 	updateAttackStepsUI()
+
+# Collecting energy orbs while already at the cap overloads the player: each
+# wasted orb burns HP directly (shield does not absorb it). Grid reports how
+# many orbs overflowed; see Grid.printClearedBlockTypes.
+func onEnergyOverflow(count):
+	var damage = count * ENERGY_OVERFLOW_DAMAGE
+	PlayerManager.playerHealth -= damage
+	PopupNumbers.displayText("-%d OVERLOAD" % damage, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.4, 0.3))
+	flashPlayer()
+	screenShake()
+	updatePlayerHealthUI()
+	if PlayerManager.playerHealth <= 0:
+		gameover()
 
 func victory():
 	battleActive = false

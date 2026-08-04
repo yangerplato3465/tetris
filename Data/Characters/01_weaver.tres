@@ -4,9 +4,10 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "wizard"
-name = "Wizard"
+id = "weaver"
+name = "Weaver"
 frame = 0
 tagline = "Amplification & Burst"
+maxEnergy = 5
 abilityPool = Array[String](["magic_bolt", "barrier", "earthquake", "mana_burst", "frost_nova", "flame_wave", "lightning_strike", "time_warp", "heal"])
 startingAbilities = Array[String](["magic_bolt", "barrier"])
