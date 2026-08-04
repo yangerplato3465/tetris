@@ -63,6 +63,7 @@ func generateItems():
 # so the player picks which slot it goes into.
 func setSpellCard(abilityData):
 	var card = setupCard(spellCard, spellRow, abilityData, Color.REBECCA_PURPLE)
+	card.tooltip_text += AbilityData.cooldownLabel(abilityData)
 	card.gui_input.connect(onSpellPressed.bind(abilityData, card))
 
 func setKeepsakeCard(keepsakeData):

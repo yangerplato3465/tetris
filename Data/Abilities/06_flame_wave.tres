@@ -10,6 +10,7 @@ type = "attack"
 rarity = "uncommon"
 cost = 2
 costLabel = "2 orbs"
+cooldown = 5
 effects = Array[Dictionary]([{ "type": "damage_enemy", "amount": 100 }])
 price = 65
 description = "Deal 100 damage to the enemy"

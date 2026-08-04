@@ -10,6 +10,7 @@ type = "block"
 rarity = "common"
 cost = 1
 costLabel = "1 orb"
+cooldown = 0
 effects = Array[Dictionary]([{ "type": "shield", "amount": 20 }])
 price = 40
 description = "Gain +20 shield"

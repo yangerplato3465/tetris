@@ -40,9 +40,16 @@ const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 const ENERGY_OVERFLOW_DAMAGE = 5 # HP burned per orb collected past the energy cap
 
 var _skill_rows: Array = []
+# Remaining cooldown per ability slot, counted down in pieces dropped. 0 = ready.
+# Reset at the start of each battle; set to the ability's cooldown when cast.
+var _slotCooldown: Array[int] = []
+# Skill presses recorded this frame, resolved at end-of-frame by _resolvePendingCasts
+# so a coincident piece drop has already ticked cooldowns before the cast is decided.
+var _pendingCasts: Array[int] = []
 
 func _ready():
 	_buildSkillRows()
+	_resetCooldowns()
 	populateSkillPanel()
 	updateUI()
 	randomize()
@@ -120,12 +127,37 @@ func devKillEnemy():
 func _input(event):
 	if not battleActive:
 		return
+	# Record the press and resolve it at end-of-frame (see _resolvePendingCasts),
+	# rather than casting straight from this event callback — that keeps the cast
+	# ordered after any piece dropped on the same frame. Duplicate deferred calls
+	# are harmless: the resolver drains and clears the queue.
 	for slot in PlayerManager.ABILITY_SLOTS:
 		if event.is_action_pressed("skill_%d" % (slot + 1)):
-			useSkill(slot)
+			_pendingCasts.append(slot)
+			call_deferred("_resolvePendingCasts")
+
+# End-of-frame cast resolution. By now every piece dropped this frame has run
+# _tickCooldowns, so the cast reads the post-tick cooldown. This makes the
+# cooldown==1 boundary deterministic and player-favorable: an unlocking drop on
+# the same frame as the press lets the cast go through.
+func _resolvePendingCasts():
+	if not battleActive:
+		_pendingCasts.clear()
+		return
+	for slot in _pendingCasts:
+		useSkill(slot)
+	_pendingCasts.clear()
+
+func _resetCooldowns():
+	_slotCooldown = []
+	for _i in PlayerManager.ABILITY_SLOTS:
+		_slotCooldown.append(0)
+	_pendingCasts.clear() # drop any press left unresolved across a battle boundary
 
 # Mirror the equipped ability slots into the skill panel rows. Slot order maps
 # skill_1 -> Skill1, skill_2 -> Skill2, ... Empty slots show a placeholder.
+# `costLabel` is stashed as row meta so _updateSkillAvailability can restore it
+# after the Cost label is temporarily repurposed to show a cooldown countdown.
 func populateSkillPanel():
 	for i in _skill_rows.size():
 		var row = _skill_rows[i]
@@ -133,10 +165,12 @@ func populateSkillPanel():
 		row.visible = true
 		if ability.is_empty():
 			row.set_meta("cost", 9999) # unaffordable -> dimmed by _updateSkillAvailability
+			row.set_meta("costLabel", "")
 			row.get_node("Name").text = "—"
 			row.get_node("Cost").text = ""
 		else:
 			row.set_meta("cost", ability.cost)
+			row.set_meta("costLabel", ability.costLabel)
 			row.get_node("Name").text = ability.name
 			row.get_node("Cost").text = ability.costLabel
 	_updateSkillAvailability()
@@ -147,6 +181,8 @@ func useSkill(slot: int):
 	var ability = PlayerManager.getEquippedAbilityAt(slot)
 	if ability.is_empty():
 		return
+	if _slotCooldown[slot] > 0:
+		return
 	if PlayerManager.magicMeter < ability.cost:
 		return
 	# Pay once up front, then run the ability's authored effects in order — so a
@@ -155,6 +191,9 @@ func useSkill(slot: int):
 	updateMagicMeterUI()
 	for effect in ability.get("effects", []):
 		_applyAbilityEffect(effect)
+	# Start the cooldown; onPieceDropped counts it down one per dropped piece.
+	_slotCooldown[slot] = ability.get("cooldown", 0)
+	_updateSkillAvailability()
 
 # The single place that knows what an ability effect type means. Adding a type
 # here is what makes it available to every .tres under Data/Abilities — see the
@@ -208,6 +247,7 @@ func gameover():
 
 func stageReady():
 	dropsSinceAttack = 0
+	_resetCooldowns()
 	updateAttackStepsUI()
 	enemyAttackLabel.modulate = Color.WHITE
 	enemy.self_modulate = Color.WHITE
@@ -223,8 +263,19 @@ func onPieceDropped():
 		return
 	dropsSinceAttack += 1
 	updateAttackStepsUI()
+	_tickCooldowns()
 	if dropsSinceAttack >= enemyAttackSteps:
 		enemyAttack()
+
+# One dropped piece = one tick off every active cooldown.
+func _tickCooldowns():
+	var changed = false
+	for i in _slotCooldown.size():
+		if _slotCooldown[i] > 0:
+			_slotCooldown[i] -= 1
+			changed = true
+	if changed:
+		_updateSkillAvailability()
 
 func updateUI():
 	comboMultText.text = str(PlayerManager.comboMult)
@@ -243,10 +294,21 @@ func updateMagicMeterUI():
 	_updateSkillAvailability()
 
 func _updateSkillAvailability():
-	for row in _skill_rows:
+	for i in _skill_rows.size():
+		var row = _skill_rows[i]
 		var cost = row.get_meta("cost")
-		var can_cast = battleActive and (cost == -1 or PlayerManager.magicMeter >= cost)
+		var cd = _slotCooldown[i] if i < _slotCooldown.size() else 0
+		var can_cast = battleActive and cd == 0 and (cost == -1 or PlayerManager.magicMeter >= cost)
 		row.modulate = Color.WHITE if can_cast else Color(0.35, 0.35, 0.35, 0.7)
+		# While on cooldown the Cost label shows the drops remaining instead of the
+		# orb cost (which is moot until the spell is ready again).
+		var costNode = row.get_node("Cost")
+		if cd > 0:
+			costNode.text = "CD %d" % cd
+			costNode.add_theme_color_override("font_color", Color(1.0, 0.55, 0.2))
+		else:
+			costNode.text = row.get_meta("costLabel", "")
+			costNode.remove_theme_color_override("font_color")
 
 func attack(clearedLines, combo):
 	attackAnim()

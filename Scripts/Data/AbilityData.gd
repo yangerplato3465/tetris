@@ -33,6 +33,7 @@ extends Resource
 @export_enum("common", "uncommon", "rare") var rarity: String = "common"
 @export var cost: int = 1            # magic orbs spent to cast
 @export var costLabel: String = ""   # e.g. "1 orb"
+@export var cooldown: int = 0        # pieces that must drop before recasting (0 = none)
 @export var effects: Array[Dictionary] = []
 @export var price: int = 0           # shop cost in coins
 @export_multiline var description: String = ""
@@ -45,6 +46,7 @@ func to_dict() -> Dictionary:
 		"rarity": rarity,
 		"cost": cost,
 		"costLabel": costLabel,
+		"cooldown": cooldown,
 		# Deep copy: the runtime dictionary exists so a run can upgrade an
 		# ability, and a shallow copy would let that edit reach back into the
 		# shared .tres and leak across runs.
@@ -52,6 +54,11 @@ func to_dict() -> Dictionary:
 		"price": price,
 		"description": description,
 	}
+
+# Tooltip suffix describing the cooldown, or "" when the ability has none.
+static func cooldownLabel(ability: Dictionary) -> String:
+	var cd = ability.get("cooldown", 0)
+	return "\nCooldown: %d drops" % cd if cd > 0 else ""
 
 # Headline number for card UI: the first effect that carries an amount.
 # Returns -1 when an ability has no numeric effect (e.g. a pure board clear).

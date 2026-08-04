@@ -10,6 +10,7 @@ type = "block"
 rarity = "uncommon"
 cost = 2
 costLabel = "2 orbs"
+cooldown = 6
 effects = Array[Dictionary]([{ "type": "heal", "amount": 40 }])
 price = 60
 description = "Restore 40 HP"
