@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/EnemyData.gd" id="1_enemydata"]
+
+[resource]
+script = ExtResource("1_enemydata")
+id = 1
+name = "Orc"
+health = 1000
+reward = 80
+frame = 0
+description = ""
+attackSteps = 7
+attackDamage = 15
+attackAddsGarbage = false
+damageReductionFlat = 0
+damageReduction = 1.0
+disablesHold = false

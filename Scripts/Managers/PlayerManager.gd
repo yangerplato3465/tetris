@@ -22,8 +22,7 @@ var pendingGoldCoins
 var magicMeter
 var maxMagicMeter
 var spawnBag
-var alchemyArray
-var equipmentArray
+var ownedKeepsakes   # Array of keepsake ids bought this run
 var holdPieceDebuff
 var shieldNum
 var playerHealth
@@ -57,11 +56,8 @@ var linesCleared
 var highestCombo
 var totalDamageDealt
 
-var _upgrade_effects: Dictionary = {}
-
 func _ready():
 	_setDefaults()
-	_initUpgradeEffects()
 
 func _setDefaults():
 	visibleNextPiece = 1
@@ -76,16 +72,15 @@ func _setDefaults():
 	goldBlocks = false
 	pendingElementalBonus = 0
 	pendingGoldCoins = 0
-	magicMeter = 5
-	maxMagicMeter = 10
+	magicMeter = 0
+	maxMagicMeter = 5
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
-	alchemyArray = Consts.alchemyCommonItems
-	equipmentArray = Consts.equipmentCommonItems
+	ownedKeepsakes = []
 	holdPieceDebuff = false
 	shieldNum = 0
 	playerHealth = 100
 	maxPlayerHealth = 100
-	characterClass = "wizard"
+	characterClass = "weaver"
 	nextPiecePoison = false
 	_initAbilities()
 	currentEnemy = null
@@ -102,9 +97,11 @@ func reset():
 # --- Abilities ---
 
 func _initAbilities():
-	# Mutable copies of the static definitions so a run can retext/upgrade
-	# abilities without mutating Consts.abilities.
-	abilityState = Consts.abilities.duplicate(true)
+	# Mutable dictionary copies of the static AbilityData definitions so a run can
+	# retext/upgrade abilities (see updateAbility) without touching Consts.abilities.
+	abilityState = {}
+	for id in Consts.abilities:
+		abilityState[id] = Consts.abilities[id].to_dict()
 	# Fixed-size slot array: "" marks an empty slot. The first slots are filled
 	# with the class's starting abilities; the rest start empty for drafting.
 	equippedAbilities = []
@@ -116,11 +113,23 @@ func _initAbilities():
 		for i in mini(starting.size(), ABILITY_SLOTS):
 			equippedAbilities[i] = starting[i]
 
-func getCharacter(id: String) -> Dictionary:
+# Lock in the chosen class at character select. Sets the energy cap from the
+# character (maxEnergy) and re-equips that class's starting abilities — the
+# defaults set in _setDefaults are for the placeholder class, so without this
+# every class would start with the default class's kit and energy cap.
+func selectCharacter(id: String):
+	characterClass = id
+	_initAbilities()
+	var character = getCharacter(id)
+	if character:
+		maxMagicMeter = character.maxEnergy
+	magicMeter = 0
+
+func getCharacter(id: String) -> CharacterData:
 	for character in Consts.characters:
 		if character.id == id:
 			return character
-	return {}
+	return null
 
 func getAbility(id: String) -> Dictionary:
 	return abilityState.get(id, {})
@@ -168,7 +177,7 @@ func updateAbility(id: String, fields: Dictionary):
 func getCharacterDescription(charId: String) -> String:
 	# Built from current ability state so it reflects switches/upgrades.
 	var character = getCharacter(charId)
-	if character.is_empty():
+	if character == null:
 		return ""
 	var lines = [character.tagline, ""]
 	var slot = 1
@@ -180,55 +189,42 @@ func getCharacterDescription(charId: String) -> String:
 		slot += 1
 	return "\n".join(lines)
 
-func _initUpgradeEffects():
-	_upgrade_effects = {
-		4:  func(): comboMult += 0.1,
-		11: func(): spawnBag.append_array([0, 0]),
-		12: func(): comboMult += 0.2,
-		18: func(): comboMult += 0.5,
-		19: func(): _applyUnlockHold(),
-		20: func(): _applyUnlockNext(20),
-		21: func(): _applyUnlockNext(21),
-		22: func(): _applyUnlockNext(22),
-		23: func(): _applyTierUnlock(1, 23),
-		24: func(): hardDropDamage = true; removeEquipment(24),
-		25: func(): treasureBox = true; removeEquipment(25),
-		26: func(): _applyTierUnlock(2, 26),
-		28: func(): fireBlocks = true,
-		29: func(): poisonBlocks = true,
-		30: func(): goldBlocks = true,
-	}
+# --- Keepsakes ---
 
-func applyUpgrades(id: int, price: int):
-	coin -= price
-	if _upgrade_effects.has(id):
-		_upgrade_effects[id].call()
+func addKeepsake(keepsake: KeepsakeData):
+	# Pay for a keepsake and apply its data-driven effects (see KeepsakeData
+	# for the schema). Owned keepsakes are excluded from future shop rolls.
+	coin -= keepsake.price
+	ownedKeepsakes.append(keepsake.id)
+	for desc in keepsake.effects:
+		applyKeepsakeEffect(desc)
 
-func _applyUnlockHold():
-	canHoldPiece = true
-	unlockHold.emit(false)
-	removeEquipment(19)
-
-func _applyUnlockNext(equipment_id: int):
-	visibleNextPiece += 1
-	unlockNextPiece.emit()
-	removeEquipment(equipment_id)
-
-func _applyTierUnlock(tier: int, equipment_id: int):
-	_updateItemArrays(tier)
-	removeEquipment(equipment_id)
-
-func _updateItemArrays(tier: int):
-	match tier:
-		1:
-			alchemyArray.append_array(Consts.alchemyRareItems)
-			equipmentArray.append_array(Consts.equipmentRareItems)
-		2:
-			alchemyArray.append_array(Consts.alchemyLegendaryItems)
-			equipmentArray.append_array(Consts.equipmentLegendaryItems)
-
-func removeEquipment(id: int):
-	for index in range(equipmentArray.size()):
-		if equipmentArray[index]["id"] == id:
-			equipmentArray.remove_at(index)
-			return
+func applyKeepsakeEffect(desc: Dictionary):
+	match desc.type:
+		"combo_mult":
+			comboMult += desc.amount
+		"max_hp":
+			maxPlayerHealth += desc.amount
+			playerHealth += desc.amount
+		"heal":
+			playerHealth = mini(playerHealth + desc.amount, maxPlayerHealth)
+		"max_magic":
+			maxMagicMeter += desc.amount
+		"unlock_hold":
+			canHoldPiece = true
+			unlockHold.emit(false)
+		"next_piece":
+			visibleNextPiece += desc.get("amount", 1)
+			unlockNextPiece.emit()
+		"hard_drop_damage":
+			hardDropDamage = true
+		"treasure_box":
+			treasureBox = true
+		"fire_blocks":
+			fireBlocks = true
+		"poison_blocks":
+			poisonBlocks = true
+		"gold_blocks":
+			goldBlocks = true
+		_:
+			push_warning("PlayerManager: unknown keepsake effect '%s'" % desc.type)

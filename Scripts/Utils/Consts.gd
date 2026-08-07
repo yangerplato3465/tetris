@@ -1,495 +1,55 @@
 extends Node
 
-var tier1Enemy = [
-	{
-		"id": 1,
-		"name": "Orc",
-		"health": 1000,
-		"reward": 80,
-		"frame": 0,
-		"description": "",
-		"attackSteps": 7,
-		"attackDamage": 15,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 2,
-		"name": "Goblin",
-		"health": 600,
-		"reward": 40,
-		"frame": 2,
-		"description": "",
-		"attackSteps": 8,
-		"attackDamage": 12,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 3,
-		"name": "Slime",
-		"health": 600,
-		"reward": 60,
-		"frame": 15,
-		"description": "Start with small messy board",
-		"attackSteps": 7,
-		"attackDamage": 15,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 4,
-		"name": "Centipede",
-		"health": 600,
-		"reward": 60,
-		"frame": 42,
-		"description": "",
-		"attackSteps": 6,
-		"attackDamage": 18,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 5,
-		"name": "Bat",
-		"health": 600,
-		"reward": 60,
-		"frame": 48,
-		"description": "-5 on all damage",
-		"attackSteps": 8,
-		"attackDamage": 10,
-		"attackAddsGarbage": false
-	},
-]
+# All static game data is authored as typed Resource .tres files under Data/ and
+# loaded here at startup. To add/tune content, edit or add a .tres in the Godot
+# Inspector — no code change. See EnemyData / AbilityData / CharacterData.
+#
+# Loading happens in _init() (not _ready) because PlayerManager reads
+# Consts.abilities/characters from its own _ready, and _init runs at
+# instantiation — before any autoload's _ready — so the data is guaranteed
+# populated regardless of autoload ordering.
 
-var tier2Enemy = [
-	{
-		"id": 6,
-		"name": "Orc Wizard",
-		"health": 2000,
-		"reward": 100,
-		"frame": 1,
-		"description": "Start with a messy board",
-		"attackSteps": 6,
-		"attackDamage": 25,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 7,
-		"name": "Skeleton",
-		"health": 2500,
-		"reward": 100,
-		"frame": 28,
-		"description": "",
-		"attackSteps": 5,
-		"attackDamage": 28,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 8,
-		"name": "Zombie",
-		"health": 2500,
-		"reward": 150,
-		"frame": 32,
-		"description": "Start with a messy board",
-		"attackSteps": 6,
-		"attackDamage": 25,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 9,
-		"name": "Banshee",
-		"health": 2500,
-		"reward": 150,
-		"frame": 35,
-		"description": "Start with a messy board, -15 on all damage",
-		"attackSteps": 5,
-		"attackDamage": 30,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 10,
-		"name": "Reaper",
-		"health": 2500,
-		"reward": 200,
-		"frame": 36,
-		"description": "Start with a messy board, -10 on all damage",
-		"attackSteps": 5,
-		"attackDamage": 32,
-		"attackAddsGarbage": true
-	},
-]
+# Enemy rosters. Files are read in sorted filename order, so the numeric
+# prefixes (01_, 02_, ...) on the Boss files preserve the level order that
+# PrepareScene indexes into (BossEnemy[0] = level 3 boss, [1] = level 6).
+var tier1Enemy: Array = []
+var tier2Enemy: Array = []
+var tier3Enemy: Array = []
+var BossEnemy: Array = []
 
-var tier3Enemy = [
-	{
-		"id": 11,
-		"name": "Ettin",
-		"health": 5000,
-		"reward": 150,
-		"frame": 7,
-		"description": "Start with a very messy board",
-		"attackSteps": 5,
-		"attackDamage": 38,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 12,
-		"name": "huge worm",
-		"health": 8000,
-		"reward": 200,
-		"frame": 44,
-		"description": "Start with a messy board",
-		"attackSteps": 4,
-		"attackDamage": 35,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 13,
-		"name": "Death",
-		"health": 5000,
-		"reward": 200,
-		"frame": 37,
-		"description": "Start with a messy board",
-		"attackSteps": 4,
-		"attackDamage": 40,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 14,
-		"name": "slime body",
-		"health": 6000,
-		"reward": 200,
-		"frame": 16,
-		"description": "Start with a messy board, You cannot hold pieces",
-		"attackSteps": 5,
-		"attackDamage": 35,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 15,
-		"name": "skeleton archer",
-		"health": 5000,
-		"reward": 200,
-		"frame": 29,
-		"description": "Start with a messy board, -20 on all damage",
-		"attackSteps": 5,
-		"attackDamage": 40,
-		"attackAddsGarbage": false
-	},
-]
+# Ability templates keyed by id (Dictionary[String] -> AbilityData). PlayerManager
+# keeps mutable per-run dictionary copies (abilityState) so upgrades/swaps don't
+# touch these; see PlayerManager._initAbilities.
+var abilities: Dictionary = {}
 
-var BossEnemy = [
-	{
-		"id": 16,
-		"name": "rock golem",
-		"health": 2000,
-		"reward": 120,
-		"frame": 51,
-		"description": "Start with a small messy board",
-		"attackSteps": 4,
-		"attackDamage": 40,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 17,
-		"name": "wendigo",
-		"health": 4000,
-		"reward": 150,
-		"frame": 50,
-		"description": "Start with a messy board, -15 on all damage",
-		"attackSteps": 4,
-		"attackDamage": 45,
-		"attackAddsGarbage": false
-	},
-	{
-		"id": 18,
-		"name": "centaur",
-		"health": 8000,
-		"reward": 200,
-		"frame": 52,
-		"description": "Start with a messy board, -15 on all damage",
-		"attackSteps": 4,
-		"attackDamage": 45,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 19,
-		"name": "death knight",
-		"health": 12000,
-		"reward": 300,
-		"frame": 30,
-		"description": "Start with a very messy board, -10 on all damage, you cannot hold pieces",
-		"attackSteps": 3,
-		"attackDamage": 50,
-		"attackAddsGarbage": true
-	},
-	{
-		"id": 20,
-		"name": "Shadow Lord",
-		"health": 10000,
-		"reward": 0,
-		"frame": 30,
-		"description": "Final boss, Start with a very messy board, all damage halfed",
-		"attackSteps": 3,
-		"attackDamage": 60,
-		"attackAddsGarbage": true
-	},
-]
+# Playable classes (Array[CharacterData]). abilityPool/startingAbilities on each
+# reference ids in `abilities`.
+var characters: Array = []
 
-# --- Ability definitions (initial/static data) ---
-# These are the templates. A run keeps mutable copies in
-# PlayerManager.abilityState, so switching/upgrading abilities can change
-# their text, cost or effect "value" without touching these defaults.
-# "type" drives the battle effect: "attack" deals "value" damage,
-# "block" grants "value" shield. Swapping an ability changes the value the
-# slot uses, since Main.useSkill reads the equipped ability at cast time.
-var abilities = {
-	"magic_bolt": {
-		"id": "magic_bolt",
-		"name": "Magic Bolt",
-		"type": "attack",
-		"cost": 1,
-		"costLabel": "1 orb",
-		"value": 50,
-		"price": 40,
-		"description": "Deal 50 damage to the enemy"
-	},
-	"barrier": {
-		"id": "barrier",
-		"name": "Barrier",
-		"type": "block",
-		"cost": 1,
-		"costLabel": "1 orb",
-		"value": 20,
-		"price": 40,
-		"description": "Gain +20 shield"
-	},
-	# --- Placeholder abilities (generic attack/block for swap testing) ---
-	"earthquake": {
-		"id": "earthquake",
-		"name": "Earthquake",
-		"type": "attack",
-		"cost": 1,
-		"costLabel": "1 orb",
-		"value": 80,
-		"price": 55,
-		"description": "Deal 80 damage to the enemy"
-	},
-	"mana_burst": {
-		"id": "mana_burst",
-		"name": "Mana Burst",
-		"type": "attack",
-		"cost": 1,
-		"costLabel": "1 orb",
-		"value": 120,
-		"price": 80,
-		"description": "Deal 120 damage to the enemy"
-	},
-	"frost_nova": {
-		"id": "frost_nova",
-		"name": "Frost Nova",
-		"type": "attack",
-		"cost": 2,
-		"costLabel": "2 orbs",
-		"value": 90,
-		"price": 60,
-		"description": "Deal 90 damage to the enemy"
-	},
-	"flame_wave": {
-		"id": "flame_wave",
-		"name": "Flame Wave",
-		"type": "attack",
-		"cost": 2,
-		"costLabel": "2 orbs",
-		"value": 100,
-		"price": 65,
-		"description": "Deal 100 damage to the enemy"
-	},
-	"lightning_strike": {
-		"id": "lightning_strike",
-		"name": "Lightning Strike",
-		"type": "attack",
-		"cost": 3,
-		"costLabel": "3 orbs",
-		"value": 150,
-		"price": 95,
-		"description": "Deal 150 damage to the enemy"
-	},
-	"time_warp": {
-		"id": "time_warp",
-		"name": "Time Warp",
-		"type": "block",
-		"cost": 1,
-		"costLabel": "1 orb",
-		"value": 40,
-		"price": 50,
-		"description": "Gain +40 shield"
-	},
-	"heal": {
-		"id": "heal",
-		"name": "Aegis",
-		"type": "block",
-		"cost": 2,
-		"costLabel": "2 orbs",
-		"value": 70,
-		"price": 70,
-		"description": "Gain +70 shield"
-	},
-}
+func _init():
+	tier1Enemy = _loadResourceDir("res://Data/Enemies/Tier1")
+	tier2Enemy = _loadResourceDir("res://Data/Enemies/Tier2")
+	tier3Enemy = _loadResourceDir("res://Data/Enemies/Tier3")
+	BossEnemy = _loadResourceDir("res://Data/Enemies/Boss")
+	characters = _loadResourceDir("res://Data/Characters")
+	for ability in _loadResourceDir("res://Data/Abilities"):
+		abilities[ability.id] = ability
 
-# --- Character definitions ---
-# "abilityPool" is every ability the class may equip; "startingAbilities" are
-# the slots the player begins a run with (mapped to skill_1, skill_2, ...).
-var characters = [
-	{
-		"id": "wizard",
-		"name": "Wizard",
-		"frame": 0,
-		"tagline": "Amplification & Burst",
-		"abilityPool": ["magic_bolt", "barrier", "earthquake", "mana_burst", "frost_nova", "flame_wave", "lightning_strike", "time_warp", "heal"],
-		"startingAbilities": ["magic_bolt", "barrier"]
-	}
-]
-
-enum {
-	COMMON,
-	RARE,
-	EPIC,
-	LEGENDARY
-}
-
-var alchemyCommonItems = [
-	{
-		"id": 4,
-		"name": "White Powder",
-		"description": "Increase combo multiplier by 0.1 (Current %1)",
-		"price": 30,
-		"frame": 331,
-		"tier": COMMON
-	},
-	{
-		"id": 28,
-		"name": "Fire Shard",
-		"description": "Fire blocks appear in pieces. Clearing fire blocks deals +15 bonus damage each",
-		"price": 40,
-		"frame": 242,
-		"tier": COMMON
-	},
-	{
-		"id": 29,
-		"name": "Poison Vial",
-		"description": "Poison blocks appear in pieces. Clearing poison blocks deals +8 bonus damage each",
-		"price": 30,
-		"frame": 244,
-		"tier": COMMON
-	},
-	{
-		"id": 30,
-		"name": "Gold Shard",
-		"description": "Gold blocks appear in pieces. Clearing gold blocks gives 1 coin each",
-		"price": 40,
-		"frame": 246,
-		"tier": COMMON
-	},
-]
-
-var alchemyRareItems = [
-	{
-		"id": 11,
-		"name": "Blue Powder",
-		"description": "'I' pieces appear 2X more often",
-		"price": 100,
-		"frame": 326,
-		"tier": EPIC
-	},
-	{
-		"id": 12,
-		"name": "Purple Powder",
-		"description": "Increase combo multiplier by 0.2",
-		"price": 60,
-		"frame": 329,
-		"tier": RARE
-	},
-]
-
-var alchemyLegendaryItems = [
-	{
-		"id": 18,
-		"name": "Purple Glob",
-		"description": "Increase combo multiplier by 0.5 (Current %1)",
-		"price": 250,
-		"frame": 291,
-		"tier": LEGENDARY
-	},
-]
-
-var equipmentCommonItems = [
-	{
-		"id": 19,
-		"name": "Old Key",
-		"description": "Unlock the ability to hold pieces",
-		"price": 30,
-		"frame": 185,
-		"tier": COMMON
-	},
-	{
-		"id": 20,
-		"name": "Magnifying Glass",
-		"description": "See one more up coming piece",
-		"price": 30,
-		"frame": 169,
-		"tier": COMMON
-	},
-	{
-		"id": 21,
-		"name": "Magnifying Glass",
-		"description": "See one more up coming piece",
-		"price": 30,
-		"frame": 169,
-		"tier": COMMON
-	},
-	{
-		"id": 22,
-		"name": "Magnifying Glass",
-		"description": "See one more up coming piece",
-		"price": 30,
-		"frame": 169,
-		"tier": COMMON
-	},
-	{
-		"id": 23,
-		"name": "The lost chapter",
-		"description": "Rare and Epic items will appear in the shop",
-		"price": 30,
-		"frame": 215,
-		"tier": COMMON
-	},
-]
-
-var equipmentRareItems = [
-	{
-		"id": 24,
-		"name": "Double Edge Sword",
-		"description": "Every time you hard drop, deal 20 damage to the enemy",
-		"price": 150,
-		"frame": 82,
-		"tier": RARE
-	},
-	{
-		"id": 25,
-		"name": "Treasure Box",
-		"description": "Every time you score a Tetris, gain 50 coins",
-		"price": 100,
-		"frame": 187,
-		"tier": RARE
-	},
-	{
-		"id": 26,
-		"name": "The legendary chapter",
-		"description": "Legendary items will appear in the shop",
-		"price": 100,
-		"frame": 215,
-		"tier": RARE
-	},
-]
-
-var equipmentLegendaryItems = []
+# Load every .tres in a directory, sorted by filename. Handles the ".remap"
+# suffix that Godot gives resources in exported builds.
+func _loadResourceDir(path: String) -> Array:
+	var out: Array = []
+	var dir = DirAccess.open(path)
+	if dir == null:
+		push_error("Consts: could not open data directory " + path)
+		return out
+	for file in dir.get_files():
+		var res_name = file
+		if res_name.ends_with(".remap"):
+			res_name = res_name.trim_suffix(".remap")
+		if res_name.ends_with(".tres"):
+			out.append(load(path + "/" + res_name))
+	return out
 
 var howToPlay = "-Deal damage by clearing lines on a tetris board
 -consecutively clearing lines deals more damage

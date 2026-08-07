@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/EnemyData.gd" id="1_enemydata"]
+
+[resource]
+script = ExtResource("1_enemydata")
+id = 16
+name = "rock golem"
+health = 2000
+reward = 120
+frame = 51
+description = "Start with a small messy board"
+attackSteps = 4
+attackDamage = 40
+attackAddsGarbage = true
+damageReductionFlat = 0
+damageReduction = 1.0
+disablesHold = false

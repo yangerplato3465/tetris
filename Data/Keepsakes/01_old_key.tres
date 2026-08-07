@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="KeepsakeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/KeepsakeData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "old_key"
+name = "Old Key"
+description = "Unlock the ability to hold pieces"
+price = 30
+frame = 185
+effects = [{"type": "unlock_hold"}]

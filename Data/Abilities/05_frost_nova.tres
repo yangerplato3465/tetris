@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "frost_nova"
+name = "Frost Nova"
+type = "attack"
+rarity = "uncommon"
+cost = 2
+costLabel = "2 orbs"
+cooldown = 5
+effects = Array[Dictionary]([{ "type": "damage_enemy", "amount": 90 }])
+price = 60
+description = "Deal 90 damage to the enemy"

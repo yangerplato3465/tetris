@@ -4,6 +4,7 @@ signal clearLines(cleared, combo)
 signal hardDrop
 signal pieceDropped
 signal magicMeterChanged
+signal energyOverflow(count) # orbs collected past the energy cap
 signal grid_gameover
 
 var grid = []
@@ -399,8 +400,14 @@ func printClearedBlockTypes(y):
 	if gold > 0:
 		PlayerManager.pendingGoldCoins += gold
 	if orb > 0:
-		PlayerManager.magicMeter = mini(PlayerManager.magicMeter + orb, PlayerManager.maxMagicMeter)
+		var before = PlayerManager.magicMeter
+		PlayerManager.magicMeter = mini(before + orb, PlayerManager.maxMagicMeter)
 		magicMeterChanged.emit()
+		# Orbs collected past the cap are wasted and burn the player instead of
+		# being stored. Main turns the count into HP damage (see energyOverflow).
+		var overflow = before + orb - PlayerManager.maxMagicMeter
+		if overflow > 0:
+			energyOverflow.emit(overflow)
 
 func checkAndClearFullLines(tSpinType = null):
 	var cleared = 0

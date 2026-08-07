@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/CharacterData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "monk"
+name = "Monk"
+frame = 10
+tagline = "Discipline & Endurance"
+maxEnergy = 5
+abilityPool = Array[String](["magic_bolt", "barrier", "mend", "earthquake", "frost_nova", "time_warp", "heal"])
+startingAbilities = Array[String](["magic_bolt", "mend"])

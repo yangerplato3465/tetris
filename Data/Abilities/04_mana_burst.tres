@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "mana_burst"
+name = "Mana Burst"
+type = "attack"
+rarity = "rare"
+cost = 1
+costLabel = "1 orb"
+cooldown = 8
+effects = Array[Dictionary]([{ "type": "damage_enemy", "amount": 120 }])
+price = 80
+description = "Deal 120 damage to the enemy"

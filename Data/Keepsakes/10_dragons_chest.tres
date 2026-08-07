@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="KeepsakeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/KeepsakeData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "dragons_chest"
+name = "Dragon's Chest"
+description = "Every time you score a Tetris, gain 50 coins"
+price = 60
+frame = 187
+effects = [{"type": "treasure_box"}]

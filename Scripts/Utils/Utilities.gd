@@ -7,8 +7,25 @@ func delete_children(node):
 
 # --- Tween helpers ---
 
+# One juice tween per node/channel: kills the previous one (no stacking)
+# and is bound to the node so it dies when the node is freed.
+func _juiceTween(node: Node, channel := "juice_tween") -> Tween:
+	if node.has_meta(channel):
+		var old = node.get_meta(channel)
+		if old is Tween and old.is_valid():
+			old.kill()
+	var tween = node.create_tween()
+	node.set_meta(channel, tween)
+	return tween
+
+# Wire the standard hover grow/shrink pair. Pivot is NOT touched here —
+# call sites / scenes already set pivot_offset for centered scaling.
+func makeJuicy(node: Control):
+	node.mouse_entered.connect(scaleUp.bind(node))
+	node.mouse_exited.connect(scaleDown.bind(node))
+
 func _tween_scale(node, target: Vector2, duration: float = 0.5):
-	var tween = create_tween()
+	var tween = _juiceTween(node)
 	tween.set_trans(Tween.TRANS_ELASTIC)
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(node, "scale", target, duration)
@@ -30,30 +47,13 @@ func showPanel(node):
 	_tween_scale(node, Vector2(1, 1), 0.7)
 
 func hidePanel(node):
-	var tween = create_tween()
+	var tween = _juiceTween(node)
 	tween.set_trans(Tween.TRANS_BACK)
 	tween.set_ease(Tween.EASE_IN)
 	tween.tween_property(node, "scale", Vector2(0.5, 0.5), 0.3)
 	tween.finished.connect(func(): node.visible = false)
 
-func slideOut(outNode):
-	var tween = create_tween()
-	tween.set_trans(Tween.TRANS_BACK)
-	tween.set_ease(Tween.EASE_IN)
-	tween.tween_property(outNode, "position:y", outNode.position.y + 500, 0.5)
-	await tween.finished
-	outNode.visible = false
-	outNode.position.y = 0
-
-func slideIn(node, callback: Callable = Callable()):
-	node.visible = true
-	node.position.y = 900
-	var tween = create_tween()
-	tween.set_trans(Tween.TRANS_QUINT)
-	tween.set_ease(Tween.EASE_OUT)
-	tween.tween_property(node, "position:y", 0, 1).set_delay(1)
-	if callback.is_valid():
-		tween.finished.connect(callback)
+# Panel slide transitions live in Scripts/Scenes/FlowController.gd.
 
 # --- Board generation ---
 
@@ -88,7 +88,8 @@ func chooseRandom(arraySize: int, size: int) -> Array:
 	return indices.slice(0, size)
 
 func shakeNode(node, originalPos):
-	var tween = create_tween()
+	# Own channel so a shake never kills a scale tween on the same node.
+	var tween = _juiceTween(node, "shake_tween")
 	var shake = 5
 	var shake_duration = 0.05
 	var shake_count = 20

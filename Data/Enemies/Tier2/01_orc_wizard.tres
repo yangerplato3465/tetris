@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/EnemyData.gd" id="1_enemydata"]
+
+[resource]
+script = ExtResource("1_enemydata")
+id = 6
+name = "Orc Wizard"
+health = 2000
+reward = 100
+frame = 1
+description = "Start with a messy board"
+attackSteps = 6
+attackDamage = 25
+attackAddsGarbage = false
+damageReductionFlat = 0
+damageReduction = 1.0
+disablesHold = false

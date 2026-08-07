@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/EnemyData.gd" id="1_enemydata"]
+
+[resource]
+script = ExtResource("1_enemydata")
+id = 13
+name = "Death"
+health = 5000
+reward = 200
+frame = 37
+description = "Start with a messy board"
+attackSteps = 4
+attackDamage = 40
+attackAddsGarbage = true
+damageReductionFlat = 0
+damageReduction = 1.0
+disablesHold = false
