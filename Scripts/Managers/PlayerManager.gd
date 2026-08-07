@@ -3,6 +3,11 @@ extends Node
 signal unlockHold(unlock)
 signal unlockNextPiece
 
+# Combo damage scaling. The base is flat — a combo adds nothing on its own — and
+# only the "combo_mastery" passive or combo_mult keepsakes raise it.
+const BASE_COMBO_MULT = 1.0
+const COMBO_MASTERY_MULT = 1.1
+
 # Level vars============
 var currentLevel = 1
 
@@ -62,7 +67,7 @@ func _ready():
 func _setDefaults():
 	visibleNextPiece = 1
 	canHoldPiece = false
-	comboMult = 1.1
+	comboMult = BASE_COMBO_MULT
 	numberStoreItem = 6
 	coin = 50
 	hardDropDamage = false
@@ -124,6 +129,16 @@ func selectCharacter(id: String):
 	if character:
 		maxMagicMeter = character.maxEnergy
 	magicMeter = 0
+	# Class passives that change base stats are applied here, once, before any
+	# keepsake has had a chance to add to them.
+	comboMult = COMBO_MASTERY_MULT if hasPassive("combo_mastery") else BASE_COMBO_MULT
+
+# True when the current class's passive trait is `id`. Systems that implement a
+# passive gate on this rather than on characterClass, so a trait can be moved to
+# another class by editing its .tres alone (see CharacterData.passive).
+func hasPassive(id: String) -> bool:
+	var character = getCharacter(characterClass)
+	return character != null and character.passive == id
 
 func getCharacter(id: String) -> CharacterData:
 	for character in Consts.characters:
@@ -180,6 +195,9 @@ func getCharacterDescription(charId: String) -> String:
 	if character == null:
 		return ""
 	var lines = [character.tagline, ""]
+	if character.passive != "":
+		lines.append("%s: %s" % [character.passiveName, character.passiveDescription])
+		lines.append("")
 	var slot = 1
 	for abilityId in character.startingAbilities:
 		var ability = abilityState.get(abilityId, {})

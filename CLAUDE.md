@@ -77,7 +77,7 @@ Line-clear damage in `Main.gd`:
 damage = (clearedLines * 100 * comboMult^(combo-1) - damageReductionFlat) * damageReduction + elementalBonus
 ```
 
-- `comboMult` starts at 1.1, increased by alchemy items
+- `comboMult` starts flat at 1.0 — a combo adds nothing by itself. The Monk's `combo_mastery` passive sets it to 1.1 at character select, and alchemy items raise it from there
 - `damageReductionFlat` set per-enemy (e.g. Banshee = 15)
 - `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5)
 - `elementalBonus` accumulates from fire/poison blocks cleared this drop, consumed on the next line clear
@@ -119,7 +119,18 @@ Two gotchas. `clear_rows` calls `Grid.clearBottomRows`, which emits `clearLines`
 1. Orb blocks are cleared from the grid (`orb` elemental type)
 2. Every 3rd piece spawned automatically has one block converted to an orb (`Grid.spawnFromBag` checks `pieceCount % 3`)
 
-Energy is capped at `maxMagicMeter`, set from the chosen class's `CharacterData.maxEnergy` (default 5) in `PlayerManager.selectCharacter`, and raised mid-run by `max_magic` upgrades. Orbs collected past the cap are wasted **and burn HP**: `Grid.printClearedBlockTypes` emits `energyOverflow(count)`, and `Main.onEnergyOverflow` deals `count * ENERGY_OVERFLOW_DAMAGE` (5) straight to HP, bypassing shield. Only board orbs overflow — the `magic` ability effect just caps silently.
+Energy is capped at `maxMagicMeter`, set from the chosen class's `CharacterData.maxEnergy` (default 5) in `PlayerManager.selectCharacter`, and raised mid-run by `max_magic` upgrades. Orbs collected past the cap are wasted: `Grid.printClearedBlockTypes` emits `energyOverflow(count)`, and `Main.onEnergyOverflow` **burns HP only for classes with the `overload` passive** — `count * ENERGY_OVERFLOW_DAMAGE` (5) straight to HP, bypassing shield. Everyone else wastes the orbs silently. Only board orbs overflow — the `magic` ability effect just caps silently.
+
+### Class Passives
+
+`CharacterData.passive` is a trait id (plus `passiveName`/`passiveDescription` for the character-select blurb built in `PlayerManager.getCharacterDescription`); `""` means the class has none. The systems that implement a passive gate on `PlayerManager.hasPassive("<id>")` rather than on `characterClass`, so a trait can be moved between classes by editing the `.tres` files alone.
+
+| id | class | effect |
+|---|---|---|
+| `overload` | Weaver | overflowed energy orbs burn HP (`Main.onEnergyOverflow`) |
+| `combo_mastery` | Monk | `comboMult` 1.1 instead of the flat 1.0 base (`PlayerManager.selectCharacter`) |
+
+Passives that change a base stat are applied in `selectCharacter`, once, before any keepsake can add to that stat.
 
 `selectCharacter` is also where a class's starting abilities get equipped, so it must be called on character pick (`GameplayScene.onCharacterPressed`); setting `characterClass` alone leaves the previous class's kit.
 

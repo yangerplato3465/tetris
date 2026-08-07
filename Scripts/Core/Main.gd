@@ -37,7 +37,7 @@ var _enemyFlashing = false
 var _playerFlashing = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
-const ENERGY_OVERFLOW_DAMAGE = 5 # HP burned per orb collected past the energy cap
+const ENERGY_OVERFLOW_DAMAGE = 5 # HP burned per overflowed orb, "overload" passive only
 
 var _skill_rows: Array = []
 # Remaining cooldown per ability slot, counted down in pieces dropped. 0 = ready.
@@ -404,10 +404,13 @@ func enemyAttack():
 	dropsSinceAttack = 0
 	updateAttackStepsUI()
 
-# Collecting energy orbs while already at the cap overloads the player: each
-# wasted orb burns HP directly (shield does not absorb it). Grid reports how
-# many orbs overflowed; see Grid.printClearedBlockTypes.
+# The Weaver's "overload" passive: collecting energy orbs while already at the
+# cap burns HP directly (shield does not absorb it), one hit per wasted orb.
+# Grid always reports the overflow (see Grid.printClearedBlockTypes); classes
+# without the passive just waste the orbs silently.
 func onEnergyOverflow(count):
+	if not PlayerManager.hasPassive("overload"):
+		return
 	var damage = count * ENERGY_OVERFLOW_DAMAGE
 	PlayerManager.playerHealth -= damage
 	PopupNumbers.displayText("-%d OVERLOAD" % damage, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.4, 0.3))
