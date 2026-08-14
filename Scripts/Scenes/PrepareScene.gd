@@ -46,10 +46,15 @@ class FloorOption:
 @onready var title = $Title
 
 var options: Array = [] # FloorOptions currently on screen
-var locked := false     # blocks input once a card has been taken
+# Blocks input until the panel has landed, and again once a card has been taken.
+# Cards are armed by unlockCards(), which GameplayScene passes to
+# FlowController.goto as its onArrive hook — taking a card mid-slide used to
+# lock the cards and then have its own transition refused by the flow's busy
+# guard, stranding the run on a screen where nothing could be clicked again.
+var locked := true
 
 func generateFloor():
-	locked = false
+	locked = true
 	# Detach immediately (not just queue_free) so the cards from the last floor
 	# can never be seen alongside the new ones while the panel slides in.
 	for child in optionContainer.get_children():
@@ -62,6 +67,8 @@ func generateFloor():
 	title.text = "Choose your path" if options.size() > 1 else _soloTitle(options[0])
 	for option in options:
 		_buildCard(option)
+	# Built inert; unlockCards arms them once the panel has finished sliding in.
+	_setCardsInteractive(false)
 
 func _soloTitle(option: FloorOption) -> String:
 	match option.type:
@@ -143,6 +150,10 @@ func _buildCard(option: FloorOption):
 	card.pivot_offset = Vector2(184, 300)
 	Utilities.makeJuicy(card)
 	card.gui_input.connect(_onCardPressed.bind(option, card))
+	# Remember the prefab's own filter rather than assuming a default, so arming
+	# a card restores exactly what it shipped with (the root is a TextureRect,
+	# which defaults to PASS, not the plain Control STOP).
+	card.set_meta("baseMouseFilter", card.mouse_filter)
 	optionContainer.add_child(card)
 
 # The prefab's icon points at the monster sheet; event/shop cards borrow the
@@ -155,11 +166,24 @@ func _setIcon(icon: Sprite2D, sheet: Texture2D, hframes: int, vframes: int, fram
 
 # --- Interaction -----------------------------------------------------------
 
+# Arms the cards. Passed to FlowController.goto as its onArrive hook, so a card
+# can only be taken once the panel has actually landed and the flow is free to
+# act on the choice.
+func unlockCards():
+	locked = false
+	_setCardsInteractive(true)
+
+func _setCardsInteractive(on: bool):
+	for child in optionContainer.get_children():
+		if on:
+			child.mouse_filter = child.get_meta("baseMouseFilter", Control.MOUSE_FILTER_PASS)
+		else:
+			child.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 func _onCardPressed(event: InputEvent, option: FloorOption, card: Control):
 	if locked or not event.is_pressed():
 		return
 	locked = true
-	for child in optionContainer.get_children():
-		child.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_setCardsInteractive(false)
 	Utilities.onPressed(card)
 	optionSelected.emit(option)

@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## GodotPrompter
+
+This project targets **Godot 4.6**. Prefer APIs and advice valid for that version.
+
+Before implementing any Godot system, check for a matching `godot-prompter:*` skill and invoke it first. The skills cover movement and input, architecture (state machines, event buses, resource patterns), gameplay systems (inventory, dialogue, abilities, save/load), UI and HUD, animation and audio, physics, shaders and VFX, testing, debugging, and optimization. `godot-prompter:using-godot-prompter` lists them all.
+
+This applies to subagents writing Godot code too. Knowing the engine class is not the same as knowing the pattern — invoke the skill even for a small change, since small changes still pick node types and set architecture.
+
 ## Running the Game
 
 Open the project in the Godot 4.6 editor and press **F5**, or run from the CLI:

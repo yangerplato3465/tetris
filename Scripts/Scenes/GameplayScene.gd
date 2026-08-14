@@ -64,7 +64,9 @@ func onFloorOptionSelected(option):
 			flow.goto(MainScene, _prepBattle.bind(option.enemy), _startBattle)
 
 func showFloorOptions():
-	flow.goto(PrepareScene, PrepareScene.generateFloor)
+	# unlockCards as onArrive: the cards only become clickable once the panel has
+	# landed, matching how _startBattle waits for Main to land below.
+	flow.goto(PrepareScene, PrepareScene.generateFloor, PrepareScene.unlockCards)
 
 # Taking a shop or event costs the floor just like winning a fight does.
 func advanceFloor():
@@ -145,7 +147,10 @@ func _devOpenShop():
 	flow.jump(ShopPanel, ShopPanel.generateItems)
 
 func _devShowFloor():
-	flow.jump(PrepareScene, PrepareScene.generateFloor)
+	# jump() has no onArrive and lands instantly, so arm the cards here — without
+	# this the dev button would open a floor screen nothing could be clicked on.
+	if flow.jump(PrepareScene, PrepareScene.generateFloor):
+		PrepareScene.unlockCards()
 
 func _devShowEvent():
 	flow.jump(EventScene, EventScene.showEvent)
