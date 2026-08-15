@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "brainstorm": {
+      "source": "Donchitos/Claude-Code-Game-Studios",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/brainstorm/SKILL.md",
+      "computedHash": "0a7125ce7dc68bcf2a9a93ae88e1c02f23427caf0b69fb6c3b8d4ebb61c39212"
+    }
+  }
+}
