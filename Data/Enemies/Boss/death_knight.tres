@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_enemydata")
 id = 19
+bossFloor = 12
 name = "death knight"
 health = 12000
 reward = 300

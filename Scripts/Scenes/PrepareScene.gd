@@ -83,7 +83,7 @@ func _soloTitle(option: FloorOption) -> String:
 
 func _rollOptions(floorNum: int) -> Array:
 	if floorNum in BOSS_FLOORS:
-		return [_makeOption("boss", Consts.BossEnemy[BOSS_FLOORS.find(floorNum)])]
+		return [_makeOption("boss", _bossForFloor(floorNum))]
 	if floorNum in SHOP_FLOORS:
 		return [_makeOption("shop")]
 
@@ -116,6 +116,17 @@ func _makeOption(type: String, enemy = null) -> FloorOption:
 	option.type = type
 	option.enemy = enemy
 	return option
+
+# Which boss owns this floor is authored on the boss itself (EnemyData.bossFloor),
+# not implied by its position in Consts.BossEnemy. An unauthored floor is a loud
+# error instead of a silent off-by-one handing the fight to whichever file
+# happens to sort into that slot.
+func _bossForFloor(floorNum: int) -> EnemyData:
+	for enemy in Consts.BossEnemy:
+		if enemy.bossFloor == floorNum:
+			return enemy
+	push_error("PrepareScene: no boss authored for floor %d" % floorNum)
+	return Consts.BossEnemy[0] if not Consts.BossEnemy.is_empty() else null
 
 func _tierPool(floorNum: int) -> Array:
 	match floorNum:

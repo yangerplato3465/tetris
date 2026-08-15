@@ -10,6 +10,10 @@ extends Resource
 # a drop-in replacement for the old dictionaries in Consts.gd.
 
 @export var id: int = 0
+# The floor this enemy owns as a mandatory boss; 0 for a normal enemy. Boss
+# scheduling lives here rather than in the sort order of Data/Enemies/Boss/, so
+# renaming, renumbering or reordering those files can't reshuffle the run.
+@export var bossFloor: int = 0
 @export var name: String = ""
 @export var health: int = 0
 @export var reward: int = 0

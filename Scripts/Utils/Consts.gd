@@ -9,9 +9,10 @@ extends Node
 # instantiation — before any autoload's _ready — so the data is guaranteed
 # populated regardless of autoload ordering.
 
-# Enemy rosters. Files are read in sorted filename order, so the numeric
-# prefixes (01_, 02_, ...) on the Boss files preserve the level order that
-# PrepareScene indexes into (BossEnemy[0] = level 3 boss, [1] = level 6).
+# Enemy rosters. Files are read in sorted filename order, but nothing depends on
+# that order — PrepareScene finds a boss by its EnemyData.bossFloor, and the tier
+# arrays are rolled from at random. Filenames carry no meaning beyond naming the
+# enemy, so a file can be added, renamed or dropped without touching code.
 var tier1Enemy: Array = []
 var tier2Enemy: Array = []
 var tier3Enemy: Array = []

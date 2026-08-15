@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_enemydata")
 id = 16
+bossFloor = 3
 name = "rock golem"
 health = 2000
 reward = 120

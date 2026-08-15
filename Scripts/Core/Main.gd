@@ -73,7 +73,6 @@ func _buildSkillRows():
 
 func connectSignals():
 	$Grid.clearLines.connect(attack)
-	$Grid.hardDrop.connect(hardDrop)
 	$Grid.magicMeterChanged.connect(updateMagicMeterUI)
 	$Grid.energyOverflow.connect(onEnergyOverflow)
 	PlayerManager.unlockHold.connect(unlockHold)
@@ -404,12 +403,6 @@ func attack(clearedLines, combo):
 	if (combo > PlayerManager.highestCombo):
 		PlayerManager.highestCombo = combo
 	updateEnemyHealth(damageDealt)
-
-func hardDrop():
-	if PlayerManager.hardDropDamage:
-		var damageDealt = roundi(20 * damageReduction)
-		PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
-		updateEnemyHealth(damageDealt)
 
 func flashEnemy():
 	_enemyFlashing = true

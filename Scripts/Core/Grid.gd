@@ -1,7 +1,6 @@
 extends Node2D
 
 signal clearLines(cleared, combo)
-signal hardDrop
 signal pieceDropped
 signal magicMeterChanged
 signal energyOverflow(count) # orbs collected past the energy cap
@@ -354,7 +353,6 @@ func drawDroppingPoint():
 					ghostIdx += 1
 
 func hardDropPiece():
-	hardDrop.emit()
 	while (canPieceMoveDown()):
 		score += 2
 		$UI/Score/ScoreNumber.text = str(score)

@@ -17,7 +17,6 @@ var canHoldPiece
 var comboMult
 var numberStoreItem
 var coin
-var hardDropDamage
 var treasureBox
 var fireBlocks
 var poisonBlocks
@@ -70,7 +69,6 @@ func _setDefaults():
 	comboMult = BASE_COMBO_MULT
 	numberStoreItem = 6
 	coin = 50
-	hardDropDamage = false
 	treasureBox = false
 	fireBlocks = false
 	poisonBlocks = false
@@ -234,8 +232,6 @@ func applyKeepsakeEffect(desc: Dictionary):
 		"next_piece":
 			visibleNextPiece += desc.get("amount", 1)
 			unlockNextPiece.emit()
-		"hard_drop_damage":
-			hardDropDamage = true
 		"treasure_box":
 			treasureBox = true
 		"fire_blocks":
