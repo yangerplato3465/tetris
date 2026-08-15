@@ -82,12 +82,11 @@ Example: `33` = poison (3×10) + L piece (3). `grid[x][y] % 10` gives the piece 
 
 Line-clear damage in `Main.gd`:
 ```
-damage = (clearedLines * 100 * comboMult^(combo-1) - damageReductionFlat) * damageReduction + elementalBonus
+damage = clearedLines * 100 * comboMult^(combo-1) * damageReduction + elementalBonus
 ```
 
 - `comboMult` starts flat at 1.0 — a combo adds nothing by itself. The Monk's `combo_mastery` passive sets it to 1.1 at character select, and alchemy items raise it from there
-- `damageReductionFlat` set per-enemy (e.g. Banshee = 15)
-- `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5)
+- `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5) and is the only damage debuff an enemy carries — it scales, so it never punishes small hits disproportionately
 - `elementalBonus` accumulates from fire/poison blocks cleared this drop, consumed on the next line clear
 
 Incoming damage in `Main.enemyAttack()` runs on a different scale from outgoing damage:

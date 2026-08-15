@@ -20,6 +20,5 @@ extends Resource
 @export var attackAddsGarbage: bool = false
 
 # --- Debuffs applied while this enemy is the active stage (Main.setStage) ---
-@export var damageReductionFlat: int = 0    # flat amount subtracted from the player's damage
 @export var damageReduction: float = 1.0    # multiplier on the player's damage (0.5 = halved)
 @export var disablesHold: bool = false      # locks the player out of holding pieces

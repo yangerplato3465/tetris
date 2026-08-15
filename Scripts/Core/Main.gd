@@ -31,7 +31,6 @@ var battleActive = false
 var currentEnemyHealth = 0
 var currentEnemyMaxHealth = 0
 var reward = 0
-var damageReductionFlat = 0
 var damageReduction = 1
 var _enemyFlashing = false
 var _playerFlashing = false
@@ -111,9 +110,8 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	enemyAttackAddsGarbage = enemyInfo.attackAddsGarbage
 	dropsSinceAttack = 0
 	updateAttackStepsUI()
-	# Debuffs now travel with the enemy (see EnemyData). Every stage sets all
-	# three from the enemy's own data, so nothing leaks from the previous fight.
-	damageReductionFlat = enemyInfo.damageReductionFlat
+	# Debuffs now travel with the enemy (see EnemyData). Every stage sets them
+	# from the enemy's own data, so nothing leaks from the previous fight.
 	damageReduction = enemyInfo.damageReduction
 	if enemyInfo.disablesHold:
 		PlayerManager.holdPieceDebuff = true
@@ -264,10 +262,9 @@ func _applyAbilityEffect(effect: Dictionary):
 		"charge":
 			PlayerManager.pendingElementalBonus += amount
 			PopupNumbers.displayText("+%d CHARGED" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.7, 0.2))
-		# Strips the enemy's damage-reduction debuffs for the rest of the fight.
-		# setStage re-reads them from EnemyData, so this never leaks to the next one.
+		# Strips the enemy's damage reduction for the rest of the fight. setStage
+		# re-reads it from EnemyData, so this never leaks to the next one.
 		"cleanse":
-			damageReductionFlat = 0
 			damageReduction = 1
 			PopupNumbers.displayText("DISPELLED", Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.6, 1.0, 1.0))
 		"delay_attack":
@@ -278,9 +275,9 @@ func _applyAbilityEffect(effect: Dictionary):
 			push_warning("Main: unknown ability effect type '%s'" % effect.get("type", ""))
 
 # Shared tail of every damaging ability effect: apply the enemy's reduction,
-# never below zero (a big flat reduction would otherwise heal it), then animate.
+# never below zero, then animate.
 func _dealAbilityDamage(raw: int):
-	var damageDealt = maxi(roundi((raw - damageReductionFlat) * damageReduction), 0)
+	var damageDealt = maxi(roundi(raw * damageReduction), 0)
 	attackAnim()
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
@@ -393,7 +390,7 @@ func attack(clearedLines, combo):
 	if goldCoins > 0:
 		PlayerManager.coin += goldCoins
 		PopupNumbers.displayText("+$%d" % goldCoins, Vector2(620, 220), Color(1.0, 0.85, 0.0))
-	damageDealt = roundi(((damageDealt * pow(PlayerManager.comboMult, combo - 1))- damageReductionFlat) * damageReduction + elementalBonus)
+	damageDealt = roundi(damageDealt * pow(PlayerManager.comboMult, combo - 1) * damageReduction + elementalBonus)
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	const ANNOUNCE_POS = Vector2(620, 160)
 	match clearedLines:
@@ -410,7 +407,7 @@ func attack(clearedLines, combo):
 
 func hardDrop():
 	if PlayerManager.hardDropDamage:
-		var damageDealt = roundi((20 - damageReductionFlat) * damageReduction)
+		var damageDealt = roundi(20 * damageReduction)
 		PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 		updateEnemyHealth(damageDealt)
 

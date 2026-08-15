@@ -13,6 +13,5 @@ description = ""
 attackSteps = 5
 attackDamage = 28
 attackAddsGarbage = false
-damageReductionFlat = 0
 damageReduction = 1.0
 disablesHold = false
