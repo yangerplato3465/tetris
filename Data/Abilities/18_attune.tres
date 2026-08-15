@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "attune"
+name = "Attune"
+type = "block"
+rarity = "rare"
+cost = 1
+costLabel = "1 orb"
+cooldown = 6
+effects = Array[Dictionary]([{ "type": "enchant_piece", "element": 5 }])
+price = 75
+description = "The falling piece becomes raw energy — every block refunds an orb when cleared. Overflow still burns a Weaver"

@@ -681,6 +681,32 @@ func shuffleBottomRows(count: int):
 	drawGrid()
 	drawDroppingPoint()
 
+# Rows in the playable area holding at least one block. Abilities that scale off
+# board danger (damage_per_row) read this, so the falling piece is lifted out
+# first — a piece in flight is not board state yet.
+func occupiedRowCount() -> int:
+	deletePieceFromGrid()
+	var count = 0
+	for y in range(vanishZone, gridHeight):
+		for x in range(gridWidth):
+			if grid[x][y] != 0:
+				count += 1
+				break
+	addPiece()
+	return count
+
+# Recolour every block of the falling piece to one elemental type (see
+# Constants.Elemental). The piece is already stamped into `grid`, so it has to be
+# lifted out, retyped and re-stamped for the change to show.
+func enchantCurrentPiece(elemental: int):
+	if currentPiece == null:
+		return
+	deletePieceFromGrid()
+	currentPiece.assignAllElemental(elemental)
+	addPiece()
+	drawGrid()
+	drawDroppingPoint()
+
 func holyBeam():
 	deletePieceFromGrid()
 	var bestRow = -1

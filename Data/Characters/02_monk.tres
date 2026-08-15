@@ -12,5 +12,5 @@ maxEnergy = 5
 passive = "combo_mastery"
 passiveName = "Combo Mastery"
 passiveDescription = "Back-to-back line clears multiply damage by 1.1x per combo step. Other classes get no combo scaling."
-abilityPool = Array[String](["magic_bolt", "barrier", "mend", "earthquake", "frost_nova", "time_warp", "heal"])
+abilityPool = Array[String](["magic_bolt", "barrier", "mend", "earthquake", "frost_nova", "time_warp", "heal", "purge", "holy_beam", "stasis", "shatter", "kindle", "chain_lightning", "detonate", "dispel"])
 startingAbilities = Array[String](["magic_bolt", "mend"])

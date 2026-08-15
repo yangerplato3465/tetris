@@ -15,11 +15,25 @@ extends Resource
 # is cast. Main._applyAbilityEffect is the only place that knows what each type
 # means, so a new ability needs no code as long as it uses existing types:
 #
-#   damage_enemy  damage the enemy, after its damage reduction
-#   shield        gain shield
-#   heal          restore HP (capped at maxPlayerHealth)
-#   magic         refund magic orbs (capped at maxMagicMeter)
-#   clear_rows    wipe `amount` rows off the bottom of the board
+#   damage_enemy      damage the enemy, after its damage reduction
+#   damage_per_row    `amount` damage per occupied row on the board
+#   damage_per_combo  `amount` damage per step of the combo held right now
+#   shield            gain shield
+#   heal              restore HP (capped at maxPlayerHealth)
+#   magic             refund magic orbs (capped at maxMagicMeter)
+#   charge            bank flat damage onto the next line clear
+#   clear_rows        wipe `amount` rows off the bottom of the board
+#   holy_beam         clear the fullest row — no damage, no combo
+#   purify_garbage    turn every garbage block back into a normal block
+#   shuffle_rows      scramble the bottom `amount` rows
+#   add_garbage       push `amount` garbage rows onto your *own* board
+#   enchant_piece     retype the falling piece to the elemental in `element`
+#   cleanse           strip the enemy's damage reduction for this battle
+#   delay_attack      wind the enemy attack counter back `amount` drops
+#
+# Most effects carry an int `amount`. enchant_piece is the exception: it carries
+# `element` (a Constants.Elemental value) instead, so headlineAmount doesn't
+# print an enum as a card's headline number.
 #
 # The names match Events.gd / EventScene._applyEffect where the meaning is the
 # same, so the two vocabularies read alike. The exception is damage_enemy:

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "holy_beam"
+name = "Holy Beam"
+type = "block"
+rarity = "rare"
+cost = 2
+costLabel = "2 orbs"
+cooldown = 8
+effects = Array[Dictionary]([{ "type": "holy_beam" }, { "type": "shield", "amount": 20 }])
+price = 85
+description = "Vaporise the most crowded row on the board — no damage, no combo — and gain +20 shield"

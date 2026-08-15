@@ -38,6 +38,12 @@ var _playerFlashing = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 const ENERGY_OVERFLOW_DAMAGE = 5 # HP burned per overflowed orb, "overload" passive only
+# An enemy's attackDamage is a hit against *shield*, not against HP. Only what
+# leaks past the shield touches HP, and it is divided down by this before it
+# does. HP is a single pool spent across all 15 floors (nothing refills it but
+# Rest, Mend and events), while a long fight can eat a dozen-plus attacks — so
+# one leaked hit has to cost single-digit HP for a run to be survivable.
+const ATTACK_DAMAGE_PER_HP = 10.0
 
 var _skill_rows: Array = []
 # Remaining cooldown per ability slot, counted down in pieces dropped. 0 = ready.
@@ -190,6 +196,11 @@ func useSkill(slot: int):
 	PlayerManager.magicMeter -= ability.cost
 	updateMagicMeterUI()
 	for effect in ability.get("effects", []):
+		# Stop if the battle ended part-way through a multi-effect ability: the
+		# enemy died on an earlier effect, or self-inflicted garbage topped the
+		# player out. Running on would fire victory()/gameover() a second time.
+		if not battleActive:
+			break
 		_applyAbilityEffect(effect)
 	# Start the cooldown; onPieceDropped counts it down one per dropped piece.
 	_slotCooldown[slot] = ability.get("cooldown", 0)
@@ -202,10 +213,15 @@ func _applyAbilityEffect(effect: Dictionary):
 	var amount = effect.get("amount", 0)
 	match effect.get("type", ""):
 		"damage_enemy":
-			var damageDealt = roundi((amount - damageReductionFlat) * damageReduction)
-			attackAnim()
-			PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
-			updateEnemyHealth(damageDealt)
+			_dealAbilityDamage(amount)
+		# Board danger as a weapon: the fuller the board, the harder it hits.
+		# Pairs naturally with an effect that clears afterwards.
+		"damage_per_row":
+			_dealAbilityDamage(amount * maxi($Grid.occupiedRowCount(), 1))
+		# Scales with the combo running *right now*, so it wants to be cast
+		# between clears rather than on cooldown.
+		"damage_per_combo":
+			_dealAbilityDamage(amount * maxi($Grid.combo, 1))
 		"shield":
 			PlayerManager.shieldNum += amount
 			updateShieldUI()
@@ -223,8 +239,51 @@ func _applyAbilityEffect(effect: Dictionary):
 			# — so this also deals normal line-clear damage and extends the
 			# combo. Price these abilities with that in mind.
 			$Grid.clearBottomRows(amount)
+		# Unlike clear_rows this one is silent: holyBeam does not emit clearLines,
+		# so it deals no damage and does not extend the combo. Pure board relief.
+		"holy_beam":
+			$Grid.holyBeam()
+			PopupNumbers.displayText("HOLY BEAM", Vector2(620, 160), Color(1.0, 0.95, 0.6))
+		"purify_garbage":
+			$Grid.purifyGarbage()
+			PopupNumbers.displayText("PURIFIED", Vector2(620, 160), Color(0.7, 1.0, 0.9))
+		"shuffle_rows":
+			$Grid.shuffleBottomRows(amount)
+			PopupNumbers.displayText("SHUFFLE", Vector2(620, 160), Color(0.9, 0.6, 1.0))
+		# Self-inflicted garbage — the cost half of a bargain ability. It can top
+		# the player out, which is the risk being paid for.
+		"add_garbage":
+			$Grid.addGarbageRows(amount)
+			PopupNumbers.displayText("+%d GARBAGE" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.6, 0.6, 0.6))
+		# Retypes the falling piece (see Constants.Elemental). Carried in `element`
+		# rather than `amount` so card UI doesn't print the enum as a headline number.
+		"enchant_piece":
+			$Grid.enchantCurrentPiece(effect.get("element", 0))
+		# Banks flat damage onto the next line clear, the same pot fire/poison
+		# blocks fill. Setup now, payoff on the clear.
+		"charge":
+			PlayerManager.pendingElementalBonus += amount
+			PopupNumbers.displayText("+%d CHARGED" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.7, 0.2))
+		# Strips the enemy's damage-reduction debuffs for the rest of the fight.
+		# setStage re-reads them from EnemyData, so this never leaks to the next one.
+		"cleanse":
+			damageReductionFlat = 0
+			damageReduction = 1
+			PopupNumbers.displayText("DISPELLED", Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.6, 1.0, 1.0))
+		"delay_attack":
+			dropsSinceAttack = maxi(dropsSinceAttack - amount, 0)
+			updateAttackStepsUI()
+			PopupNumbers.displayText("STASIS", Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.5, 0.8, 1.0))
 		_:
 			push_warning("Main: unknown ability effect type '%s'" % effect.get("type", ""))
+
+# Shared tail of every damaging ability effect: apply the enemy's reduction,
+# never below zero (a big flat reduction would otherwise heal it), then animate.
+func _dealAbilityDamage(raw: int):
+	var damageDealt = maxi(roundi((raw - damageReductionFlat) * damageReduction), 0)
+	attackAnim()
+	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
+	updateEnemyHealth(damageDealt)
 
 func _process(_delta):
 	if not battleActive:
@@ -391,7 +450,13 @@ func enemyAttack():
 	var overflow = enemyAttackDamage - PlayerManager.shieldNum
 	PlayerManager.shieldNum = maxi(PlayerManager.shieldNum - enemyAttackDamage, 0)
 	if overflow > 0:
-		PlayerManager.playerHealth -= 1
+		# Rounded up, so a hit that gets through always costs at least 1 HP —
+		# shaving an attack down to a 1-point leak is a win, not a free pass.
+		var hpLost = ceili(overflow / ATTACK_DAMAGE_PER_HP)
+		PlayerManager.playerHealth -= hpLost
+		PopupNumbers.displayText("-%d HP" % hpLost, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.3, 0.3))
+	else:
+		PopupNumbers.displayText("BLOCKED", Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
 	flashPlayer()
 	screenShake()
 	updateShieldUI()
