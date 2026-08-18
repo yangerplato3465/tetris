@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "lightning_strike"
-name = "Lightning Strike"
-type = "attack"
+id = "collapse"
+name = "Collapse"
+type = "block"
 rarity = "rare"
 cost = 3
 costLabel = "3 orbs"
-cooldown = 10
-effects = Array[Dictionary]([{ "type": "damage_enemy", "amount": 150 }])
-price = 95
-description = "Deal 150 damage to the enemy"
+cooldown = 15
+effects = Array[Dictionary]([{ "type": "compact_board" }])
+price = 180
+description = "Every block falls straight down, closing all gaps. Rows completed on the way clear as normal"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "immolate"
+name = "Immolate"
+type = "attack"
+rarity = "rare"
+cost = 2
+costLabel = "2 orbs"
+cooldown = 10
+effects = Array[Dictionary]([{ "type": "damage_per_garbage", "amount": 150 }, { "type": "purify_garbage" }])
+price = 160
+description = "Deal 150 damage per garbage block on your board, then purify them all"

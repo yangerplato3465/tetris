@@ -18,6 +18,7 @@ extends Resource
 #   damage_enemy      damage the enemy, after its damage reduction
 #   damage_per_row    `amount` damage per occupied row on the board
 #   damage_per_combo  `amount` damage per step of the combo held right now
+#   damage_per_garbage `amount` damage per garbage block on the board
 #   shield            gain shield
 #   heal              restore HP (capped at maxPlayerHealth)
 #   magic             refund magic orbs (capped at maxMagicMeter)
@@ -26,14 +27,18 @@ extends Resource
 #   holy_beam         clear the fullest row — no damage, no combo
 #   purify_garbage    turn every garbage block back into a normal block
 #   shuffle_rows      scramble the bottom `amount` rows
+#   compact_board     every block falls straight down, closing all gaps; rows
+#                     completed on the way clear normally (damage and combo)
 #   add_garbage       push `amount` garbage rows onto your *own* board
 #   enchant_piece     retype the falling piece to the elemental in `element`
+#   queue_piece       put the tetromino in `shape` at the front of the queue
 #   cleanse           strip the enemy's damage reduction for this battle
 #   delay_attack      wind the enemy attack counter back `amount` drops
 #
-# Most effects carry an int `amount`. enchant_piece is the exception: it carries
-# `element` (a Constants.Elemental value) instead, so headlineAmount doesn't
-# print an enum as a card's headline number.
+# Most effects carry an int `amount`. enchant_piece and queue_piece are the
+# exceptions: they carry `element` (a Constants.Elemental value) and `shape` (an
+# index into Constants.SHAPES) instead, so headlineAmount doesn't print an id as
+# a card's headline number.
 #
 # The names match Events.gd / EventScene._applyEffect where the meaning is the
 # same, so the two vocabularies read alike. The exception is damage_enemy:

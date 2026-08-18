@@ -736,3 +736,97 @@ func holyBeam():
 	addPiece()
 	drawGrid()
 	drawDroppingPoint()
+
+# Global gravity: every block falls straight down until it rests on the stack,
+# closing every hole. Unlike a line clear this moves blocks *within* a column, so
+# a swiss-cheese board becomes a dense one, and any row completed on the way down
+# clears through checkAndClearFullLines — normal damage, combo and elementals.
+#
+# One pass is always enough. Afterwards no column holds a hole, so clearing rows
+# only shifts solid mass down and can never expose a new gap or complete a new
+# row: there is no cascade to loop over.
+func compactBoard():
+	# The falling piece is not board state yet, so it must neither plug a column
+	# nor help complete a row. Lifted out here, stamped back at the end.
+	deletePieceFromGrid()
+	for x in range(gridWidth):
+		var stack = []
+		for y in range(gridHeight):
+			if grid[x][y] != 0:
+				stack.append(grid[x][y])
+		var writeY = gridHeight - 1
+		for i in range(stack.size() - 1, -1, -1):
+			grid[x][writeY] = stack[i]
+			writeY -= 1
+		while writeY >= 0:
+			grid[x][writeY] = 0
+			writeY -= 1
+	# Only clear when a row actually completed: checkAndClearFullLines zeroes
+	# `combo` when it clears nothing, and casting this must not silently break a
+	# combo the player is holding.
+	if _hasFullRow():
+		checkAndClearFullLines()
+	_liftPieceClearOfStack()
+	addPiece()
+	drawGrid()
+	drawDroppingPoint()
+
+func _hasFullRow() -> bool:
+	for y in range(gridHeight):
+		var full = true
+		for x in range(gridWidth):
+			if grid[x][y] == 0:
+				full = false
+				break
+		if full:
+			return true
+	return false
+
+# Compaction drops settled blocks downward, which can land them on cells the
+# falling piece occupies (a piece sitting under an overhang). Stamping the piece
+# back over them would silently eat those blocks, so walk it up to clear air
+# first. Bounded by the top of the grid.
+func _liftPieceClearOfStack():
+	if currentPiece == null:
+		return
+	while currentPiece.positionInGrid.y > 0 and _pieceOverlapsStack():
+		currentPiece.positionInGrid.y -= 1
+
+func _pieceOverlapsStack() -> bool:
+	for x in range(currentPiece.shape.size()):
+		for y in range(currentPiece.shape[0].size()):
+			if currentPiece.shape[x][y] == 0:
+				continue
+			var gx = int(currentPiece.positionInGrid.x) + x
+			var gy = int(currentPiece.positionInGrid.y) + y
+			if gx < 0 or gx >= gridWidth or gy < 0 or gy >= gridHeight:
+				continue
+			if grid[gx][gy] != 0:
+				return true
+	return false
+
+# Garbage blocks sitting on the board. Abilities that turn the enemy's own
+# pressure into damage (damage_per_garbage) price themselves off this. No need to
+# lift the falling piece out the way occupiedRowCount does — a piece is never
+# made of garbage, so it cannot inflate the count.
+func garbageBlockCount() -> int:
+	var count = 0
+	for x in range(gridWidth):
+		for y in range(gridHeight):
+			if grid[x][y] == Constants.GARBAGE:
+				count += 1
+	return count
+
+# Push a specific tetromino (an index into Constants.SHAPES) to the front of the
+# queue, so it is the very next piece to spawn. Elementals are rolled the usual
+# way, so once it lands a queued piece is no different from a bag piece.
+func queuePiece(shapeIndex: int):
+	if shapeIndex < 0 or shapeIndex >= Constants.SHAPES.size():
+		return
+	var piece = Piece.new()
+	piece.shape = Constants.SHAPES[shapeIndex].duplicate(true)
+	piece.assignRandomElemental()
+	if currentBag == null:
+		currentBag = []
+	currentBag.push_front(piece)
+	$UI/NextPieces.drawPieces(currentBag, nextBag)

@@ -219,6 +219,12 @@ func _applyAbilityEffect(effect: Dictionary):
 		# between clears rather than on cooldown.
 		"damage_per_combo":
 			_dealAbilityDamage(amount * maxi($Grid.combo, 1))
+		# Turns the enemy's own pressure into damage. Deliberately *not* floored
+		# at 1 like damage_per_row: whiffing on a clean board is the cost of a
+		# comeback effect, and it is what stops this being a strict upgrade over
+		# a flat damage_enemy.
+		"damage_per_garbage":
+			_dealAbilityDamage(amount * $Grid.garbageBlockCount())
 		"shield":
 			PlayerManager.shieldNum += amount
 			updateShieldUI()
@@ -247,6 +253,19 @@ func _applyAbilityEffect(effect: Dictionary):
 		"shuffle_rows":
 			$Grid.shuffleBottomRows(amount)
 			PopupNumbers.displayText("SHUFFLE", Vector2(620, 160), Color(0.9, 0.6, 1.0))
+		# Board-wide gravity. Like clear_rows this can complete rows on the way
+		# down, and those clears go through checkAndClearFullLines — so they emit
+		# clearLines and pay normal damage and combo. Its damage is therefore
+		# earned by how holey the board was, and needs no `amount` of its own.
+		"compact_board":
+			$Grid.compactBoard()
+			PopupNumbers.displayText("COLLAPSE", Vector2(620, 160), Color(0.6, 0.9, 1.0))
+		# Puts a chosen tetromino at the front of the queue. Carried in `shape`
+		# (an index into Constants.SHAPES) rather than `amount` for the same
+		# reason as enchant_piece — it is an id, not a headline number.
+		"queue_piece":
+			$Grid.queuePiece(effect.get("shape", 0))
+			PopupNumbers.displayText("QUEUED", Vector2(620, 160), Color(0.7, 0.9, 1.0))
 		# Self-inflicted garbage — the cost half of a bargain ability. It can top
 		# the player out, which is the risk being paid for.
 		"add_garbage":
