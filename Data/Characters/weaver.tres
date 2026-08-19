@@ -12,5 +12,5 @@ maxEnergy = 5
 passive = "overload"
 passiveName = "Overload"
 passiveDescription = "Orbs collected at full energy burn 5 HP each, ignoring shield."
-abilityPool = Array[String](["magic_bolt", "barrier", "collapse", "immolate", "ore_vein"])
+abilityPool = Array[String](["magic_bolt", "barrier", "cinder", "collapse", "immolate", "ore_vein"])
 startingAbilities = Array[String](["magic_bolt", "barrier"])
