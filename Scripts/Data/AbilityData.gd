@@ -19,6 +19,7 @@ extends Resource
 #   damage_per_row    `amount` damage per occupied row on the board
 #   damage_per_combo  `amount` damage per step of the combo held right now
 #   damage_per_garbage `amount` damage per garbage block on the board
+#   damage_per_shield `amount` damage per point of current shield (shield is not spent)
 #   shield            gain shield
 #   heal              restore HP (capped at maxPlayerHealth)
 #   magic             refund magic orbs (capped at maxMagicMeter)

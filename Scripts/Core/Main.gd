@@ -225,6 +225,12 @@ func _applyAbilityEffect(effect: Dictionary):
 		# a flat damage_enemy.
 		"damage_per_garbage":
 			_dealAbilityDamage(amount * $Grid.garbageBlockCount())
+		# Turns banked defense into offense. Deliberately does *not* spend the
+		# shield: the enemy already spends it for you on every attack, so the real
+		# cost is having chosen to bank shield instead of casting something else.
+		# Whiffs at 0 shield like damage_per_garbage whiffs on a clean board.
+		"damage_per_shield":
+			_dealAbilityDamage(amount * PlayerManager.shieldNum)
 		"shield":
 			PlayerManager.shieldNum += amount
 			updateShieldUI()
