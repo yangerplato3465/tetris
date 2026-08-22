@@ -1,0 +1,10 @@
+{
+  "userIgnoreFilters": [
+    "Scripts/",
+    "Scene/",
+    "Sprite/",
+    "Data/",
+    "audio/",
+    ".godot"
+  ]
+}

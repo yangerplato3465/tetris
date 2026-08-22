@@ -10,6 +10,19 @@ Before implementing any Godot system, check for a matching `godot-prompter:*` sk
 
 This applies to subagents writing Godot code too. Knowing the engine class is not the same as knowing the pattern — invoke the skill even for a small change, since small changes still pick node types and set architecture.
 
+## Design Docs (Obsidian vault)
+
+`design/` is an Obsidian vault. The repo root is the vault folder, so `CLAUDE.md` and `README.md` are visible in it too.
+
+When writing or editing anything under `design/`:
+
+- **One concept per note.** A risk, a pillar, a scope tier, an open question each get their own file. Do not append a new section to an existing note when it is really a new concept.
+- **Link with `[[wikilinks]]`, never "see §N".** Section numbers break the moment a note is split. Obsidian resolves a link by filename alone, so `[[R3-main-attack-god-function]]` works from any folder. A link to a note that doesn't exist yet is fine — it marks work to do.
+- **YAML frontmatter on every note.** Risks carry `status` / `severity` / `blocks`; pillars carry `status`; questions carry `status` / `resolve_by`. Keep the keys stable — they are what Dataview queries read.
+- **Every code-level claim names the symbol** (`Main.attack()`, `Grid.clearBottomRows`) and must be verified against the repo before being written down, not recalled.
+- `design/gdd/game-concept.md` is the index note. Anything new under `design/` gets linked from it or from a note it already links to, or it will be orphaned.
+- Playtest logs go in `design/playtests/YYYY-MM-DD-<class>.md` with `class` / `floor_reached` / `result` frontmatter.
+
 ## Running the Game
 
 Open the project in the Godot 4.6 editor and press **F5**, or run from the CLI:
