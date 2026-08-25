@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "aegis"
+name = "Aegis"
+type = "block"
+rarity = "common"
+cost = 0
+costLabel = "free"
+cooldown = 6
+effects = Array[Dictionary]([{ "type": "shield", "amount": 10 }])
+price = 60
+description = "Gain +10 shield. Costs no orbs"

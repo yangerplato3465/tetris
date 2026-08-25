@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "bulwark"
+name = "Bulwark"
+type = "block"
+rarity = "rare"
+cost = 2
+costLabel = "2 orbs"
+cooldown = 3
+effects = Array[Dictionary]([{ "type": "shield_per_row", "amount": 8 }])
+price = 150
+description = "Gain 8 shield per occupied row on your board"

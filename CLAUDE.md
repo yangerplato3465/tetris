@@ -134,6 +134,8 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `damage_per_garbage` | `amount` damage per garbage block on the board (0 on a clean board — not floored at 1) |
 | `damage_per_shield` | `amount` damage per point of current shield; the shield is **not** consumed |
 | `shield` | gain shield |
+| `shield_per_row` | `amount` shield per occupied row on the board (floored at 1 row, like `damage_per_row`) |
+| `shield_per_garbage` | `amount` shield per garbage block on the board (0 on a clean board — not floored, like `damage_per_garbage`) |
 | `heal` | restore HP, capped at `maxPlayerHealth` |
 | `magic` | refund orbs, capped at `maxMagicMeter` |
 | `charge` | bank flat damage onto the next line clear (`pendingElementalBonus`) |

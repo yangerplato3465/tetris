@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "crucible"
+name = "Crucible"
+type = "block"
+rarity = "rare"
+cost = 3
+costLabel = "3 orbs"
+cooldown = 0
+burn = true
+effects = Array[Dictionary]([{ "type": "shield", "amount": 90 }])
+price = 170
+description = "Gain +90 shield"

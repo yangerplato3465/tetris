@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "slag"
+name = "Slag"
+type = "block"
+rarity = "rare"
+cost = 2
+costLabel = "2 orbs"
+cooldown = 0
+burn = true
+effects = Array[Dictionary]([{ "type": "shield_per_garbage", "amount": 5 }, { "type": "purify_garbage" }])
+price = 150
+description = "Gain 5 shield per garbage block on your board, then purify them all"

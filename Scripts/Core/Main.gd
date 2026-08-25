@@ -249,9 +249,19 @@ func _applyAbilityEffect(effect: Dictionary):
 		"damage_per_shield":
 			_dealAbilityDamage(amount * PlayerManager.shieldNum)
 		"shield":
-			PlayerManager.shieldNum += amount
-			updateShieldUI()
-			PopupNumbers.displayText("+%d SHIELD" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
+			_gainShield(amount)
+		# The defensive twin of damage_per_row. A choked board is exactly when
+		# clearing lines can no longer defend you, so the danger itself pays the
+		# armour. Floored at 1 row like its damage twin, so it is never a total
+		# whiff — and it goes quiet again once you have dug yourself out.
+		"shield_per_row":
+			_gainShield(amount * maxi($Grid.occupiedRowCount(), 1))
+		# The defensive twin of damage_per_garbage, and deliberately *not*
+		# floored for the same reason that one is not: turning the enemy's own
+		# pressure into armour is a comeback effect, and whiffing on a clean
+		# board is the cost of that.
+		"shield_per_garbage":
+			_gainShield(amount * $Grid.garbageBlockCount())
 		"heal":
 			PlayerManager.playerHealth = mini(PlayerManager.playerHealth + amount, PlayerManager.maxPlayerHealth)
 			updatePlayerHealthUI()
@@ -314,6 +324,14 @@ func _applyAbilityEffect(effect: Dictionary):
 			PopupNumbers.displayText("STASIS", Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.5, 0.8, 1.0))
 		_:
 			push_warning("Main: unknown ability effect type '%s'" % effect.get("type", ""))
+
+# Shared tail of every shield-granting effect: bank it, refresh the UI, pop the
+# number. The defensive mirror of _dealAbilityDamage — no reduction applies,
+# since damageReduction is the enemy's and only touches outgoing damage.
+func _gainShield(amount: int):
+	PlayerManager.shieldNum += amount
+	updateShieldUI()
+	PopupNumbers.displayText("+%d SHIELD" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
 
 # Shared tail of every damaging ability effect: apply the enemy's reduction,
 # never below zero, then animate.

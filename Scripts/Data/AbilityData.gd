@@ -21,6 +21,8 @@ extends Resource
 #   damage_per_garbage `amount` damage per garbage block on the board
 #   damage_per_shield `amount` damage per point of current shield (shield is not spent)
 #   shield            gain shield
+#   shield_per_row    `amount` shield per occupied row on the board
+#   shield_per_garbage `amount` shield per garbage block on the board
 #   heal              restore HP (capped at maxPlayerHealth)
 #   magic             refund magic orbs (capped at maxMagicMeter)
 #   charge            bank flat damage onto the next line clear
