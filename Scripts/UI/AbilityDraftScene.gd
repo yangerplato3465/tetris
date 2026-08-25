@@ -148,7 +148,7 @@ func _makeAbilityCard(ability: Dictionary) -> Control:
 	valueLabel.text = str(headline) if headline >= 0 else ""
 	nameLabel.label_settings.font_color = Color.REBECCA_PURPLE
 	valueLabel.label_settings.font_color = Color.BLACK
-	card.tooltip_text = ability.description + AbilityData.cooldownLabel(ability)
+	card.tooltip_text = ability.description + AbilityData.cooldownLabel(ability) + AbilityData.burnLabel(ability)
 	Utilities.makeJuicy(card)
 	return card
 

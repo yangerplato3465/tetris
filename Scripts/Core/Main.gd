@@ -48,13 +48,17 @@ var _skill_rows: Array = []
 # Remaining cooldown per ability slot, counted down in pieces dropped. 0 = ready.
 # Reset at the start of each battle; set to the ability's cooldown when cast.
 var _slotCooldown: Array[int] = []
+# Slots whose ability has "burn" and has already been cast this battle. A burned
+# slot is dead for the rest of the fight regardless of orbs or cooldown, and is
+# cleared only by _resetSlotState at the start of the next battle.
+var _slotBurned: Array[bool] = []
 # Skill presses recorded this frame, resolved at end-of-frame by _resolvePendingCasts
 # so a coincident piece drop has already ticked cooldowns before the cast is decided.
 var _pendingCasts: Array[int] = []
 
 func _ready():
 	_buildSkillRows()
-	_resetCooldowns()
+	_resetSlotState()
 	populateSkillPanel()
 	updateUI()
 	randomize()
@@ -151,10 +155,15 @@ func _resolvePendingCasts():
 		useSkill(slot)
 	_pendingCasts.clear()
 
-func _resetCooldowns():
+# Wipes every per-battle slot limiter: cooldowns, burns, and any press that was
+# recorded but never resolved. Called once at _ready and again from stageReady,
+# so nothing a previous fight left behind can leak into the next one.
+func _resetSlotState():
 	_slotCooldown = []
+	_slotBurned = []
 	for _i in PlayerManager.ABILITY_SLOTS:
 		_slotCooldown.append(0)
+		_slotBurned.append(false)
 	_pendingCasts.clear() # drop any press left unresolved across a battle boundary
 
 # Mirror the equipped ability slots into the skill panel rows. Slot order maps
@@ -184,6 +193,10 @@ func useSkill(slot: int):
 	var ability = PlayerManager.getEquippedAbilityAt(slot)
 	if ability.is_empty():
 		return
+	# Burn is checked before cooldown because it outranks it: a burned slot never
+	# comes back this battle, so there is nothing left to count down.
+	if _slotBurned[slot]:
+		return
 	if _slotCooldown[slot] > 0:
 		return
 	if PlayerManager.magicMeter < ability.cost:
@@ -201,6 +214,10 @@ func useSkill(slot: int):
 		_applyAbilityEffect(effect)
 	# Start the cooldown; onPieceDropped counts it down one per dropped piece.
 	_slotCooldown[slot] = ability.get("cooldown", 0)
+	# Burn last, and unconditionally: a spell that ended the battle part-way
+	# through its effects has still been spent, and stageReady clears this anyway.
+	if ability.get("burn", false):
+		_slotBurned[slot] = true
 	_updateSkillAvailability()
 
 # The single place that knows what an ability effect type means. Adding a type
@@ -327,7 +344,7 @@ func gameover():
 
 func stageReady():
 	dropsSinceAttack = 0
-	_resetCooldowns()
+	_resetSlotState()
 	updateAttackStepsUI()
 	enemyAttackLabel.modulate = Color.WHITE
 	enemy.self_modulate = Color.WHITE
@@ -378,12 +395,16 @@ func _updateSkillAvailability():
 		var row = _skill_rows[i]
 		var cost = row.get_meta("cost")
 		var cd = _slotCooldown[i] if i < _slotCooldown.size() else 0
-		var can_cast = battleActive and cd == 0 and (cost == -1 or PlayerManager.magicMeter >= cost)
+		var burned = _slotBurned[i] if i < _slotBurned.size() else false
+		var can_cast = battleActive and not burned and cd == 0 and (cost == -1 or PlayerManager.magicMeter >= cost)
 		row.modulate = Color.WHITE if can_cast else Color(0.35, 0.35, 0.35, 0.7)
 		# While on cooldown the Cost label shows the drops remaining instead of the
 		# orb cost (which is moot until the spell is ready again).
 		var costNode = row.get_node("Cost")
-		if cd > 0:
+		if burned:
+			costNode.text = "BURNED"
+			costNode.add_theme_color_override("font_color", Color(0.85, 0.3, 0.3))
+		elif cd > 0:
 			costNode.text = "CD %d" % cd
 			costNode.add_theme_color_override("font_color", Color(1.0, 0.55, 0.2))
 		else:

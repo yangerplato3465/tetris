@@ -54,6 +54,11 @@ extends Resource
 @export var cost: int = 1            # magic orbs spent to cast
 @export var costLabel: String = ""   # e.g. "1 orb"
 @export var cooldown: int = 0        # pieces that must drop before recasting (0 = none)
+# Slay-the-Spire "exhaust": casting the ability disables its slot for the rest of
+# the battle. Outranks `cooldown` — a burned slot never comes back this fight —
+# so a burn ability should leave `cooldown` at 0 rather than carry both. Main
+# tracks it per slot in _slotBurned and clears it in _resetSlotState.
+@export var burn: bool = false
 @export var effects: Array[Dictionary] = []
 @export var price: int = 0           # shop cost in coins
 @export_multiline var description: String = ""
@@ -67,6 +72,7 @@ func to_dict() -> Dictionary:
 		"cost": cost,
 		"costLabel": costLabel,
 		"cooldown": cooldown,
+		"burn": burn,
 		# Deep copy: the runtime dictionary exists so a run can upgrade an
 		# ability, and a shallow copy would let that edit reach back into the
 		# shared .tres and leak across runs.
@@ -79,6 +85,12 @@ func to_dict() -> Dictionary:
 static func cooldownLabel(ability: Dictionary) -> String:
 	var cd = ability.get("cooldown", 0)
 	return "\nCooldown: %d drops" % cd if cd > 0 else ""
+
+# Tooltip suffix flagging a burn ability, or "" when it has none. Kept separate
+# from cooldownLabel so a card can show both, though in practice a burn ability
+# carries no cooldown.
+static func burnLabel(ability: Dictionary) -> String:
+	return "\nBurn: one cast per battle" if ability.get("burn", false) else ""
 
 # Headline number for card UI: the first effect that carries an amount.
 # Returns -1 when an ability has no numeric effect (e.g. a pure board clear).

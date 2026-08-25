@@ -155,6 +155,16 @@ card's headline number.
 
 An ability may also set `cooldown` (default 0): the number of pieces that must drop before it can be recast. `Main` tracks remaining cooldown per equipped slot in `_slotCooldown`, decrements it one per `onPieceDropped`, blocks casting while >0, and resets it each battle in `stageReady`. The skill panel shows the countdown (`CD N`) in place of the orb cost while a slot is on cooldown; card tooltips append it via `AbilityData.cooldownLabel`. Skill presses are recorded in `_input` and resolved at end-of-frame by `_resolvePendingCasts` (via `call_deferred`), so a piece dropped on the same frame ticks the cooldown *before* the cast is decided — an unlocking drop always lets that frame's cast through.
 
+An ability may also set `burn` (default `false`) — Slay the Spire's *exhaust*.
+Casting a burn ability kills its slot for the rest of the battle: `Main` records
+it in `_slotBurned`, `useSkill` checks it *before* the cooldown check, and the
+skill panel shows `BURNED` in place of the orb cost. `_resetSlotState` (called
+from `stageReady`) is the only thing that clears it, so a burn is per-battle, not
+per-run. Burn outranks `cooldown` — a burned slot never comes back this fight —
+so a burn ability should leave `cooldown` at 0 rather than carry both.
+`Collapse` and `Immolate` are the two burn abilities; card tooltips append the
+note via `AbilityData.burnLabel`.
+
 To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres` — both the draft (`AbilityDraftScene._buildOptions`) and the shop (`ShopPanell.generateItems`) roll from that pool, so an ability missing from it can never be obtained. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.
 
 Four gotchas. `clear_rows` calls `Grid.clearBottomRows`, which emits `clearLines` — wired to `Main.attack()` — so it *also* deals normal line-clear damage and extends the combo; price accordingly. `compact_board` is the same: it routes completed rows through `checkAndClearFullLines`, so its damage is whatever the collapse happens to clear, which is why it carries no `amount` of its own. `holy_beam` deliberately does *not*: `Grid.holyBeam` emits nothing, so it is pure board relief. And `type` (`attack`/`block`) is descriptive metadata for card visuals only — casting dispatches on `effects`, not on it.
