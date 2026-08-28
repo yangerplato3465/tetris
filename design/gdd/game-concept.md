@@ -440,3 +440,27 @@ document were independently verified against the repository before being recorde
 5. **Run `/design-system enchantments`** — the largest new system, and the one whose identity model (R5) needs
    settling before spells are authored.
 6. **Build the MVP to its exit criterion**: 20 recorded runs where Monk and Weaver diverge and both win.
+
+---
+
+## 15. Ideas
+
+Parking lot for design ideas that are decided-but-unbuilt or deliberately deferred. An entry here is not a
+commitment until it appears in §14.
+
+### I2 — Typed garbage: garbage that heals the enemy or bills the player *(deferred)*
+
+Extension of the shipped no-damage garbage rule, not a replacement. The elemental slot on a garbage cell is
+unused, so `18` / `38` / `48` /
+`58` are free encodings and the elemental would mean **what clearing this cell costs you**, rather than what it
+pays: healing the enemy on clear, billing HP, draining magic, stealing coins. Garbage stays fully clearable
+throughout — the cost is the threat.
+
+**Blocked on R6.** `Textures.getTextureForColorIndex` special-cases `index == GARBAGE` and returns a texture,
+but `18 % 10 == 8` matches no branch, so any *elemental* garbage renders as a null texture today. R6's
+migration to a bitfield or parallel flags array is the prerequisite; authoring typed garbage before it would
+add a fifth consumer to an encoding already marked for replacement.
+
+**Do not build until** the shipped no-damage rule has been playtested. That rule is the cheap version of the
+same idea, and if garbage still does not feel threatening once it pays nothing, the problem is arrival rate and
+hole placement rather than per-block rules.

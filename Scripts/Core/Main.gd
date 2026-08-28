@@ -37,6 +37,14 @@ var _playerFlashing = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 const ENERGY_OVERFLOW_DAMAGE = 5 # HP burned per overflowed orb, "overload" passive only
+# Line-clear damage is billed per cleared block, not per cleared row. A clean
+# row is 10 blocks, so a clean line is still worth the 100 it always was — this
+# is a restatement, not a retune. What changes is that garbage blocks are
+# excluded from the count (Grid.payingBlockCount), so a row dug out of the
+# enemy's rubble pays only for the blocks the player actually placed. The row
+# still counts for the combo, so clearing garbage sets up the next hit rather
+# than wasting the multiplier.
+const DAMAGE_PER_BLOCK = 10
 # An enemy's attackDamage is a hit against *shield*, not against HP. Only what
 # leaks past the shield touches HP, and it is divided down by this before it
 # does. HP is a single pool spent across all 15 floors (nothing refills it but
@@ -429,9 +437,9 @@ func _updateSkillAvailability():
 			costNode.text = row.get_meta("costLabel", "")
 			costNode.remove_theme_color_override("font_color")
 
-func attack(clearedLines, combo):
+func attack(clearedLines, combo, payingBlocks):
 	attackAnim()
-	var damageDealt = clearedLines * 100
+	var damageDealt = payingBlocks * DAMAGE_PER_BLOCK
 	if clearedLines == 4 and PlayerManager.treasureBox:
 		showTreasureboxReward()
 	match combo:

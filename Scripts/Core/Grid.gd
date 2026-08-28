@@ -1,6 +1,9 @@
 extends Node2D
 
-signal clearLines(cleared, combo)
+# `paying` is the number of cleared blocks that actually bill the enemy: every
+# non-empty cell in the cleared rows except garbage. Damage is per-block, so the
+# row count alone no longer determines it — see Main.attack.
+signal clearLines(cleared, combo, paying)
 signal pieceDropped
 signal magicMeterChanged
 signal energyOverflow(count) # orbs collected past the energy cap
@@ -380,6 +383,22 @@ func checkGameOver():
 			return true
 	return false
 
+# Blocks in row `y` that pay damage when the row clears: everything occupied
+# except garbage. Garbage is the enemy's own rubble — clearing it is board
+# upkeep, not an attack — but it still rides the normal clear path, so the row
+# it completes still counts for the combo.
+#
+# Garbage is matched modulo ELEMENTAL_MUL rather than by equality so a typed
+# garbage cell (18, 38, ...) would still read as garbage. No enemy deals one
+# today; this just keeps the test from silently paying out if one ever does.
+func payingBlockCount(y) -> int:
+	var count = 0
+	for x in range(gridWidth):
+		var value = grid[x][y]
+		if value != 0 and value % Constants.ELEMENTAL_MUL != Constants.GARBAGE:
+			count += 1
+	return count
+
 func printClearedBlockTypes(y):
 	var fire = 0
 	var poison = 0
@@ -409,6 +428,7 @@ func printClearedBlockTypes(y):
 
 func checkAndClearFullLines(tSpinType = null):
 	var cleared = 0
+	var paying = 0
 	for y in range(gridHeight):
 		var fullLine = true
 		for x in range(gridWidth):
@@ -417,6 +437,7 @@ func checkAndClearFullLines(tSpinType = null):
 				break;
 		if fullLine:
 			cleared+=1
+			paying += payingBlockCount(y)
 			printClearedBlockTypes(y)
 			#Clear line
 			for x in range(gridWidth):
@@ -459,7 +480,7 @@ func checkAndClearFullLines(tSpinType = null):
 			# level+=1
 			# speed = pow(0.8-(level-1)*0.007,level-1)
 			# $UI/Level/LevelNumber.text = str(level)
-		clearLines.emit(cleared, combo)
+		clearLines.emit(cleared, combo, paying)
 	else:
 		hasCleared = false
 		combo = 0
@@ -620,8 +641,10 @@ func addGarbageRows(count):
 func clearBottomRows(count: int):
 	deletePieceFromGrid()
 	var cleared = 0
+	var paying = 0
 	for i in range(count):
 		var y = gridHeight - 1
+		paying += payingBlockCount(y)
 		printClearedBlockTypes(y)
 		for x in range(gridWidth):
 			grid[x][y] = 0
@@ -639,7 +662,7 @@ func clearBottomRows(count: int):
 		particle.emit()
 	addPiece()
 	combo += 1
-	clearLines.emit(cleared, combo)
+	clearLines.emit(cleared, combo, paying)
 	drawGrid()
 	drawDroppingPoint()
 
