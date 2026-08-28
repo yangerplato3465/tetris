@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "mend"
-name = "Mend"
+id = "aegis"
+name = "Aegis"
 type = "block"
-rarity = "uncommon"
-cost = 2
-costLabel = "2 orbs"
+rarity = "common"
+cost = 0
+costLabel = "free"
 cooldown = 6
-effects = Array[Dictionary]([{ "type": "heal", "amount": 40 }])
+effects = Array[Dictionary]([{ "type": "shield", "amount": 10 }])
 price = 60
-description = "Restore 40 HP"
+description = "Gain +10 shield. Costs no orbs"

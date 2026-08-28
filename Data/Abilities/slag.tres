@@ -4,13 +4,14 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "holy_beam"
-name = "Holy Beam"
+id = "slag"
+name = "Slag"
 type = "block"
 rarity = "rare"
 cost = 2
 costLabel = "2 orbs"
-cooldown = 8
-effects = Array[Dictionary]([{ "type": "holy_beam" }, { "type": "shield", "amount": 20 }])
-price = 85
-description = "Vaporise the most crowded row on the board — no damage, no combo — and gain +20 shield"
+cooldown = 0
+burn = true
+effects = Array[Dictionary]([{ "type": "shield_per_garbage", "amount": 5 }, { "type": "purify_garbage" }])
+price = 150
+description = "Gain 5 shield per garbage block on your board, then purify them all"

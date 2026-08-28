@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "purge"
-name = "Purge"
+id = "barricade"
+name = "Barricade"
 type = "block"
 rarity = "uncommon"
 cost = 1
 costLabel = "1 orb"
-cooldown = 5
-effects = Array[Dictionary]([{ "type": "purify_garbage" }, { "type": "shield", "amount": 15 }])
-price = 60
-description = "Turn every garbage block on the board back into a normal block, and gain +15 shield"
+cooldown = 3
+effects = Array[Dictionary]([{ "type": "shield", "amount": 45 }, { "type": "add_garbage", "amount": 1 }])
+price = 110
+description = "Gain +45 shield, but a garbage row is pushed onto your own board"

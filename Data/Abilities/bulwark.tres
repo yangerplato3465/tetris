@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "flame_wave"
-name = "Flame Wave"
-type = "attack"
-rarity = "uncommon"
+id = "bulwark"
+name = "Bulwark"
+type = "block"
+rarity = "rare"
 cost = 2
 costLabel = "2 orbs"
-cooldown = 5
-effects = Array[Dictionary]([{ "type": "damage_enemy", "amount": 100 }])
-price = 65
-description = "Deal 100 damage to the enemy"
+cooldown = 3
+effects = Array[Dictionary]([{ "type": "shield_per_row", "amount": 8 }])
+price = 150
+description = "Gain 8 shield per occupied row on your board"

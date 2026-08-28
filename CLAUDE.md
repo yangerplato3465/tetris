@@ -95,9 +95,10 @@ Example: `33` = poison (3×10) + L piece (3). `grid[x][y] % 10` gives the piece 
 
 Line-clear damage in `Main.gd`:
 ```
-damage = clearedLines * 100 * comboMult^(combo-1) * damageReduction + elementalBonus
+damage = payingBlocks * DAMAGE_PER_BLOCK * comboMult^(combo-1) * damageReduction + elementalBonus
 ```
 
+- `payingBlocks` is billed **per block, not per row**: every cleared cell except garbage, counted by `Grid.payingBlockCount` and carried on the `clearLines(cleared, combo, paying)` signal. A clean row is 10 blocks × `DAMAGE_PER_BLOCK` (10) = the same 100 a line has always been worth, so a clean board is unchanged — what differs is that a row dug out of the enemy's rubble pays only for the blocks the player placed. Garbage still completes and clears rows normally and **still counts for the combo**, so digging out is a setup move rather than a wasted multiplier. This is the only mechanical difference between a garbage block and a plain one; everything else in `Grid.gd` tests `!= 0` and cannot tell them apart
 - `comboMult` starts flat at 1.0 — a combo adds nothing by itself. The Monk's `combo_mastery` passive sets it to 1.1 at character select, and alchemy items raise it from there
 - `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5) and is the only damage debuff an enemy carries — it scales, so it never punishes small hits disproportionately
 - `elementalBonus` accumulates from fire/poison blocks cleared this drop, consumed on the next line clear
@@ -144,7 +145,11 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `damage_enemy` | damage the enemy, after its damage reduction |
 | `damage_per_row` | `amount` damage per occupied row on the board |
 | `damage_per_combo` | `amount` damage per step of the combo held right now |
+| `damage_per_garbage` | `amount` damage per garbage block on the board (0 on a clean board — not floored at 1) |
+| `damage_per_shield` | `amount` damage per point of current shield; the shield is **not** consumed |
 | `shield` | gain shield |
+| `shield_per_row` | `amount` shield per occupied row on the board (floored at 1 row, like `damage_per_row`) |
+| `shield_per_garbage` | `amount` shield per garbage block on the board (0 on a clean board — not floored, like `damage_per_garbage`) |
 | `heal` | restore HP, capped at `maxPlayerHealth` |
 | `magic` | refund orbs, capped at `maxMagicMeter` |
 | `charge` | bank flat damage onto the next line clear (`pendingElementalBonus`) |
@@ -152,20 +157,33 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `holy_beam` | clear the fullest row — no damage, no combo |
 | `purify_garbage` | turn every garbage block back into a normal block |
 | `shuffle_rows` | scramble the bottom `amount` rows |
+| `compact_board` | every block falls straight down, closing all gaps; rows completed on the way clear normally |
 | `add_garbage` | push `amount` garbage rows onto the player's *own* board |
 | `enchant_piece` | retype the falling piece to the elemental in `element` |
+| `queue_piece` | put the tetromino in `shape` (index into `Constants.SHAPES`) at the front of the queue |
 | `cleanse` | strip the enemy's damage reduction for the rest of the battle |
 | `delay_attack` | wind the enemy attack counter back `amount` drops |
 
-Every effect but one carries an int `amount`; `enchant_piece` carries `element`
-(a `Constants.Elemental` value) so `AbilityData.headlineAmount` doesn't print an
-enum as a card's headline number.
+Most effects carry an int `amount`. `enchant_piece` carries `element` (a
+`Constants.Elemental` value) and `queue_piece` carries `shape` (an index into
+`Constants.SHAPES`), so `AbilityData.headlineAmount` doesn't print an id as a
+card's headline number.
 
 An ability may also set `cooldown` (default 0): the number of pieces that must drop before it can be recast. `Main` tracks remaining cooldown per equipped slot in `_slotCooldown`, decrements it one per `onPieceDropped`, blocks casting while >0, and resets it each battle in `stageReady`. The skill panel shows the countdown (`CD N`) in place of the orb cost while a slot is on cooldown; card tooltips append it via `AbilityData.cooldownLabel`. Skill presses are recorded in `_input` and resolved at end-of-frame by `_resolvePendingCasts` (via `call_deferred`), so a piece dropped on the same frame ticks the cooldown *before* the cast is decided — an unlocking drop always lets that frame's cast through.
 
+An ability may also set `burn` (default `false`) — Slay the Spire's *exhaust*.
+Casting a burn ability kills its slot for the rest of the battle: `Main` records
+it in `_slotBurned`, `useSkill` checks it *before* the cooldown check, and the
+skill panel shows `BURNED` in place of the orb cost. `_resetSlotState` (called
+from `stageReady`) is the only thing that clears it, so a burn is per-battle, not
+per-run. Burn outranks `cooldown` — a burned slot never comes back this fight —
+so a burn ability should leave `cooldown` at 0 rather than carry both.
+`Collapse` and `Immolate` are the two burn abilities; card tooltips append the
+note via `AbilityData.burnLabel`.
+
 To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres` — both the draft (`AbilityDraftScene._buildOptions`) and the shop (`ShopPanell.generateItems`) roll from that pool, so an ability missing from it can never be obtained. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.
 
-Three gotchas. `clear_rows` calls `Grid.clearBottomRows`, which emits `clearLines` — wired to `Main.attack()` — so it *also* deals normal line-clear damage and extends the combo; price accordingly. `holy_beam` deliberately does *not*: `Grid.holyBeam` emits nothing, so it is pure board relief. And `type` (`attack`/`block`) is descriptive metadata for card visuals only — casting dispatches on `effects`, not on it.
+Four gotchas. `clear_rows` calls `Grid.clearBottomRows`, which emits `clearLines` — wired to `Main.attack()` — so it *also* deals normal line-clear damage and extends the combo; price accordingly. Since that damage is per-block, wiping rows made mostly of garbage pays close to nothing while still extending the combo — `clear_rows` is board relief first and damage second. `compact_board` is the same: it routes completed rows through `checkAndClearFullLines`, so its damage is whatever the collapse happens to clear, which is why it carries no `amount` of its own. `holy_beam` deliberately does *not*: `Grid.holyBeam` emits nothing, so it is pure board relief. And `type` (`attack`/`block`) is descriptive metadata for card visuals only — casting dispatches on `effects`, not on it.
 
 Effects run in order and `useSkill` stops the loop the moment `battleActive` goes false, so an ability that kills the enemy (or tops the player out via `add_garbage`) never runs its remaining effects — that guard is what keeps `victory()` from firing twice.
 

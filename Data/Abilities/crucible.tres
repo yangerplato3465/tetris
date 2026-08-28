@@ -4,13 +4,14 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "heal"
-name = "Aegis"
+id = "crucible"
+name = "Crucible"
 type = "block"
-rarity = "uncommon"
-cost = 2
-costLabel = "2 orbs"
-cooldown = 6
-effects = Array[Dictionary]([{ "type": "shield", "amount": 70 }])
-price = 70
-description = "Gain +70 shield"
+rarity = "rare"
+cost = 3
+costLabel = "3 orbs"
+cooldown = 0
+burn = true
+effects = Array[Dictionary]([{ "type": "shield", "amount": 90 }])
+price = 170
+description = "Gain +90 shield"

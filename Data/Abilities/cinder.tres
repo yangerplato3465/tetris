@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "time_warp"
-name = "Time Warp"
-type = "block"
+id = "cinder"
+name = "Cinder"
+type = "attack"
 rarity = "common"
-cost = 1
-costLabel = "1 orb"
+cost = 0
+costLabel = "free"
 cooldown = 3
-effects = Array[Dictionary]([{ "type": "shield", "amount": 40 }])
+effects = Array[Dictionary]([{ "type": "damage_enemy", "amount": 30 }])
 price = 50
-description = "Gain +40 shield"
+description = "Deal 30 damage to the enemy"

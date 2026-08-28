@@ -37,6 +37,14 @@ var _playerFlashing = false
 const PLAYER_ORIGINAL_POS = Vector2(729, 230)
 const ENEMY_ORIGINAL_POS = Vector2(1019, 236)
 const ENERGY_OVERFLOW_DAMAGE = 5 # HP burned per overflowed orb, "overload" passive only
+# Line-clear damage is billed per cleared block, not per cleared row. A clean
+# row is 10 blocks, so a clean line is still worth the 100 it always was — this
+# is a restatement, not a retune. What changes is that garbage blocks are
+# excluded from the count (Grid.payingBlockCount), so a row dug out of the
+# enemy's rubble pays only for the blocks the player actually placed. The row
+# still counts for the combo, so clearing garbage sets up the next hit rather
+# than wasting the multiplier.
+const DAMAGE_PER_BLOCK = 10
 # An enemy's attackDamage is a hit against *shield*, not against HP. Only what
 # leaks past the shield touches HP, and it is divided down by this before it
 # does. HP is a single pool spent across all 15 floors (nothing refills it but
@@ -48,13 +56,17 @@ var _skill_rows: Array = []
 # Remaining cooldown per ability slot, counted down in pieces dropped. 0 = ready.
 # Reset at the start of each battle; set to the ability's cooldown when cast.
 var _slotCooldown: Array[int] = []
+# Slots whose ability has "burn" and has already been cast this battle. A burned
+# slot is dead for the rest of the fight regardless of orbs or cooldown, and is
+# cleared only by _resetSlotState at the start of the next battle.
+var _slotBurned: Array[bool] = []
 # Skill presses recorded this frame, resolved at end-of-frame by _resolvePendingCasts
 # so a coincident piece drop has already ticked cooldowns before the cast is decided.
 var _pendingCasts: Array[int] = []
 
 func _ready():
 	_buildSkillRows()
-	_resetCooldowns()
+	_resetSlotState()
 	populateSkillPanel()
 	updateUI()
 	randomize()
@@ -151,10 +163,15 @@ func _resolvePendingCasts():
 		useSkill(slot)
 	_pendingCasts.clear()
 
-func _resetCooldowns():
+# Wipes every per-battle slot limiter: cooldowns, burns, and any press that was
+# recorded but never resolved. Called once at _ready and again from stageReady,
+# so nothing a previous fight left behind can leak into the next one.
+func _resetSlotState():
 	_slotCooldown = []
+	_slotBurned = []
 	for _i in PlayerManager.ABILITY_SLOTS:
 		_slotCooldown.append(0)
+		_slotBurned.append(false)
 	_pendingCasts.clear() # drop any press left unresolved across a battle boundary
 
 # Mirror the equipped ability slots into the skill panel rows. Slot order maps
@@ -184,6 +201,10 @@ func useSkill(slot: int):
 	var ability = PlayerManager.getEquippedAbilityAt(slot)
 	if ability.is_empty():
 		return
+	# Burn is checked before cooldown because it outranks it: a burned slot never
+	# comes back this battle, so there is nothing left to count down.
+	if _slotBurned[slot]:
+		return
 	if _slotCooldown[slot] > 0:
 		return
 	if PlayerManager.magicMeter < ability.cost:
@@ -201,6 +222,10 @@ func useSkill(slot: int):
 		_applyAbilityEffect(effect)
 	# Start the cooldown; onPieceDropped counts it down one per dropped piece.
 	_slotCooldown[slot] = ability.get("cooldown", 0)
+	# Burn last, and unconditionally: a spell that ended the battle part-way
+	# through its effects has still been spent, and stageReady clears this anyway.
+	if ability.get("burn", false):
+		_slotBurned[slot] = true
 	_updateSkillAvailability()
 
 # The single place that knows what an ability effect type means. Adding a type
@@ -219,10 +244,32 @@ func _applyAbilityEffect(effect: Dictionary):
 		# between clears rather than on cooldown.
 		"damage_per_combo":
 			_dealAbilityDamage(amount * maxi($Grid.combo, 1))
+		# Turns the enemy's own pressure into damage. Deliberately *not* floored
+		# at 1 like damage_per_row: whiffing on a clean board is the cost of a
+		# comeback effect, and it is what stops this being a strict upgrade over
+		# a flat damage_enemy.
+		"damage_per_garbage":
+			_dealAbilityDamage(amount * $Grid.garbageBlockCount())
+		# Turns banked defense into offense. Deliberately does *not* spend the
+		# shield: the enemy already spends it for you on every attack, so the real
+		# cost is having chosen to bank shield instead of casting something else.
+		# Whiffs at 0 shield like damage_per_garbage whiffs on a clean board.
+		"damage_per_shield":
+			_dealAbilityDamage(amount * PlayerManager.shieldNum)
 		"shield":
-			PlayerManager.shieldNum += amount
-			updateShieldUI()
-			PopupNumbers.displayText("+%d SHIELD" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
+			_gainShield(amount)
+		# The defensive twin of damage_per_row. A choked board is exactly when
+		# clearing lines can no longer defend you, so the danger itself pays the
+		# armour. Floored at 1 row like its damage twin, so it is never a total
+		# whiff — and it goes quiet again once you have dug yourself out.
+		"shield_per_row":
+			_gainShield(amount * maxi($Grid.occupiedRowCount(), 1))
+		# The defensive twin of damage_per_garbage, and deliberately *not*
+		# floored for the same reason that one is not: turning the enemy's own
+		# pressure into armour is a comeback effect, and whiffing on a clean
+		# board is the cost of that.
+		"shield_per_garbage":
+			_gainShield(amount * $Grid.garbageBlockCount())
 		"heal":
 			PlayerManager.playerHealth = mini(PlayerManager.playerHealth + amount, PlayerManager.maxPlayerHealth)
 			updatePlayerHealthUI()
@@ -247,6 +294,19 @@ func _applyAbilityEffect(effect: Dictionary):
 		"shuffle_rows":
 			$Grid.shuffleBottomRows(amount)
 			PopupNumbers.displayText("SHUFFLE", Vector2(620, 160), Color(0.9, 0.6, 1.0))
+		# Board-wide gravity. Like clear_rows this can complete rows on the way
+		# down, and those clears go through checkAndClearFullLines — so they emit
+		# clearLines and pay normal damage and combo. Its damage is therefore
+		# earned by how holey the board was, and needs no `amount` of its own.
+		"compact_board":
+			$Grid.compactBoard()
+			PopupNumbers.displayText("COLLAPSE", Vector2(620, 160), Color(0.6, 0.9, 1.0))
+		# Puts a chosen tetromino at the front of the queue. Carried in `shape`
+		# (an index into Constants.SHAPES) rather than `amount` for the same
+		# reason as enchant_piece — it is an id, not a headline number.
+		"queue_piece":
+			$Grid.queuePiece(effect.get("shape", 0))
+			PopupNumbers.displayText("QUEUED", Vector2(620, 160), Color(0.7, 0.9, 1.0))
 		# Self-inflicted garbage — the cost half of a bargain ability. It can top
 		# the player out, which is the risk being paid for.
 		"add_garbage":
@@ -272,6 +332,14 @@ func _applyAbilityEffect(effect: Dictionary):
 			PopupNumbers.displayText("STASIS", Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.5, 0.8, 1.0))
 		_:
 			push_warning("Main: unknown ability effect type '%s'" % effect.get("type", ""))
+
+# Shared tail of every shield-granting effect: bank it, refresh the UI, pop the
+# number. The defensive mirror of _dealAbilityDamage — no reduction applies,
+# since damageReduction is the enemy's and only touches outgoing damage.
+func _gainShield(amount: int):
+	PlayerManager.shieldNum += amount
+	updateShieldUI()
+	PopupNumbers.displayText("+%d SHIELD" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
 
 # Shared tail of every damaging ability effect: apply the enemy's reduction,
 # never below zero, then animate.
@@ -302,7 +370,7 @@ func gameover():
 
 func stageReady():
 	dropsSinceAttack = 0
-	_resetCooldowns()
+	_resetSlotState()
 	updateAttackStepsUI()
 	enemyAttackLabel.modulate = Color.WHITE
 	enemy.self_modulate = Color.WHITE
@@ -353,21 +421,25 @@ func _updateSkillAvailability():
 		var row = _skill_rows[i]
 		var cost = row.get_meta("cost")
 		var cd = _slotCooldown[i] if i < _slotCooldown.size() else 0
-		var can_cast = battleActive and cd == 0 and (cost == -1 or PlayerManager.magicMeter >= cost)
+		var burned = _slotBurned[i] if i < _slotBurned.size() else false
+		var can_cast = battleActive and not burned and cd == 0 and (cost == -1 or PlayerManager.magicMeter >= cost)
 		row.modulate = Color.WHITE if can_cast else Color(0.35, 0.35, 0.35, 0.7)
 		# While on cooldown the Cost label shows the drops remaining instead of the
 		# orb cost (which is moot until the spell is ready again).
 		var costNode = row.get_node("Cost")
-		if cd > 0:
+		if burned:
+			costNode.text = "BURNED"
+			costNode.add_theme_color_override("font_color", Color(0.85, 0.3, 0.3))
+		elif cd > 0:
 			costNode.text = "CD %d" % cd
 			costNode.add_theme_color_override("font_color", Color(1.0, 0.55, 0.2))
 		else:
 			costNode.text = row.get_meta("costLabel", "")
 			costNode.remove_theme_color_override("font_color")
 
-func attack(clearedLines, combo):
+func attack(clearedLines, combo, payingBlocks):
 	attackAnim()
-	var damageDealt = clearedLines * 100
+	var damageDealt = payingBlocks * DAMAGE_PER_BLOCK
 	if clearedLines == 4 and PlayerManager.treasureBox:
 		showTreasureboxReward()
 	match combo:
