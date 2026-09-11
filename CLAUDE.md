@@ -197,6 +197,7 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `queue_piece` | put the tetromino in `shape` (index into `Constants.SHAPES`) at the front of the queue |
 | `cleanse` | strip the enemy's damage reduction for the rest of the battle |
 | `delay_attack` | wind the enemy attack counter back `amount` drops |
+| `advance_attack` | wind the enemy attack counter *forward* `amount` drops; if that reaches `attackSteps` the enemy attacks immediately, mid-cast |
 
 Most effects carry an int `amount`. `enchant_piece` carries `element` (a
 `Constants.Elemental` value) and `queue_piece` carries `shape` (an index into

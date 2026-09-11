@@ -37,6 +37,7 @@ extends Resource
 #   queue_piece       put the tetromino in `shape` at the front of the queue
 #   cleanse           strip the enemy's damage reduction for this battle
 #   delay_attack      wind the enemy attack counter back `amount` drops
+#   advance_attack    wind it *forward* `amount` drops; can trigger the attack now
 #
 # Most effects carry an int `amount`. enchant_piece and queue_piece are the
 # exceptions: they carry `element` (a Constants.Elemental value) and `shape` (an

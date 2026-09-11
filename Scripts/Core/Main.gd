@@ -331,6 +331,18 @@ func _applyAbilityEffect(effect: Dictionary):
 			dropsSinceAttack = maxi(dropsSinceAttack - amount, 0)
 			updateAttackStepsUI()
 			PopupNumbers.displayText("STASIS", Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.5, 0.8, 1.0))
+		# The inverse of delay_attack, and the cost half of a bargain spell: it hands
+		# the enemy attack progress and can set the swing off mid-cast. The threshold
+		# check mirrors onPieceDropped's, and enemyAttack() zeroes the counter itself.
+		# Because useSkill breaks its effect loop once battleActive goes false, an
+		# ability that lists damage *before* this never pays the cost on a killing
+		# blow — and a swing that kills the player stops the rest of the cast.
+		"advance_attack":
+			dropsSinceAttack += amount
+			updateAttackStepsUI()
+			PopupNumbers.displayText("HASTENED +%d" % amount, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(1.0, 0.5, 0.3))
+			if dropsSinceAttack >= enemyAttackSteps:
+				enemyAttack()
 		_:
 			push_warning("Main: unknown ability effect type '%s'" % effect.get("type", ""))
 

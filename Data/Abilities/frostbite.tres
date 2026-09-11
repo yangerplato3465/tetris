@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "frostbite"
+name = "Frostbite"
+type = "attack"
+rarity = "uncommon"
+cost = 1
+costLabel = "1 orb"
+cooldown = 5
+effects = Array[Dictionary]([{ "type": "enchant_piece", "element": 2 }, { "type": "damage_enemy", "amount": 20 }])
+price = 110
+description = "Turn the falling piece to ice, then deal 20 damage. Each ice block cleared delays the enemy attack by 1 drop"

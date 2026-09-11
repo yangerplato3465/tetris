@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "absolute_zero"
+name = "Absolute Zero"
+type = "attack"
+rarity = "rare"
+cost = 3
+costLabel = "3 orbs"
+cooldown = 0
+burn = true
+effects = Array[Dictionary]([{ "type": "damage_enemy", "amount": 250 }, { "type": "advance_attack", "amount": 3 }])
+price = 200
+description = "Deal 250 damage, then hand the enemy 3 drops of attack progress. If that fills their counter, they swing immediately.
+
+Burn: one cast per battle"

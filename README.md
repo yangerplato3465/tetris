@@ -98,10 +98,13 @@ until the next fight.
 | Bulwark | 2 orbs | 3 | Gain 8 shield per occupied row on your board |
 | Barricade | 1 orb | 3 | Gain 45 shield, but push a garbage row onto your own board |
 | Ore Vein | 1 orb | 5 | The next piece is an I-piece |
+| Plumb Line | 2 orbs | 3 | Deal 15 damage per occupied row on your board |
+| Frostbite | 1 orb | 5 | Turn the falling piece to ice, then deal 20 damage |
 | **Collapse** | 3 orbs | burn | Every block falls straight down; rows completed on the way clear normally |
 | **Crucible** | 3 orbs | burn | Gain 90 shield |
 | **Immolate** | 2 orbs | burn | Deal 150 damage per garbage block, then purify them all |
 | **Slag** | 2 orbs | burn | Gain 5 shield per garbage block, then purify them all |
+| **Absolute Zero** | 3 orbs | burn | Deal 250 damage, then hand the enemy 3 drops of attack progress |
 
 Spells are data — one `.tres` per spell under `Data/Abilities/`, assembled from a
 vocabulary of effect types. Adding one usually needs no code at all.
