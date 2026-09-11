@@ -96,6 +96,14 @@ Every content directory under `Data/` is scanned whole at startup and loaded int
 
 The `id` field is identity; each file is named for its `id` and nothing else. Boss scheduling lives in `EnemyData.bossFloor`, not in file order.
 
+**One exception — enemies are not fully data-driven.** `Grid.setStage()` picks the
+battle's starting board with `match enemyInfo.id:` against a hardcoded list of integer
+ids (`3, 16` → small messy board, `6, 8, 9, ...` → medium, `11, 20` → large). A new
+enemy `.tres` whose `id` is not in that list silently falls through to `_` and gets a
+clean board, and renumbering an existing enemy silently changes its opening board. This
+is the only place enemy behaviour is keyed by id rather than by an exported field;
+replacing it with a `startingGarbageRows: int` export on `EnemyData` would close the gap.
+
 ### Block Value Encoding
 
 Grid cells store integers that encode both piece identity and elemental type:
