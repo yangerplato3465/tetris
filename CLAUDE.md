@@ -20,9 +20,11 @@ godot --path /path/to/tetris
 
 There is no build step, test suite, or linter — this is a pure Godot project.
 
+**Dev panel.** `GameplayScene.gd` has `const DEV_MODE := true`, which builds a collapsible overlay (`_buildDevPanel`) on a `CanvasLayer` above every panel: jump to the ability draft, shop, floor screen or an event; win the battle; fill magic; full heal; +100 coins; add a garbage row. This is how you exercise a system without playing to it — it is the closest thing the project has to a test harness. Add buttons there rather than hacking temporary code into the systems themselves. Set `DEV_MODE` false to hide it.
+
 ## Architecture Overview
 
-**Alchetris** is a roguelike Tetris battle game. The player clears lines to deal damage to enemies, uses character skills fueled by a Magic Meter, and buys upgrades between rounds.
+**Alchetris** is a roguelike Tetris battle game. The player clears lines to deal damage to enemies, casts abilities fueled by magic orbs, and spends coins on spells and keepsakes between fights.
 
 ### Scene Flow
 
@@ -30,13 +32,25 @@ There is no build step, test suite, or linter — this is a pure Godot project.
 Splash.tscn → Menu.tscn → GameplayScene.tscn
 ```
 
-`GameplayScene.tscn` is the top-level scene for a run. It hosts four sub-scenes that are swapped in/out:
-- `CharacterSelectScene` — pick a class (defined by the `.tres` files in `Data/Characters/`; currently Weaver and Monk)
-- `PrepareScene` — the floor choice screen: pick one of 2–3 cards (enemy, event or shop)
-- `MainScene` (the `Main.tscn` node) — active battle
-- `ShopPanel` — item shop after each victory
+`GameplayScene.tscn` is the top-level scene for a run. It hosts sibling panels that are slid in and out:
 
-`GameplayScene.gd` drives all transitions between these panels using `Utilities.slideIn/slideOut`.
+| Panel | Script | Role |
+|---|---|---|
+| `CharacterSelectScene` | (built inline in `GameplayScene.gd`) | pick a class from the `.tres` files in `Data/Characters/` |
+| `PrepareScene` | `Scripts/Scenes/PrepareScene.gd` | the floor choice screen: pick one of 2–3 cards (enemy, event or shop) |
+| `Main` | `Scripts/Core/Main.gd` | active battle |
+| `AbilityDraftScene` | `Scripts/UI/AbilityDraftScene.gd` | post-victory draft / equip screen |
+| `ShopPanel` | `Scripts/UI/ShopPanell.gd` | spells, services and keepsakes |
+| `EventScene` | `Scripts/Scenes/EventScene.gd` | `?` events |
+| `GameoverPanel` | `Scripts/UI/GameoverPanel.gd` | end-of-run stats, slid in as an overlay |
+
+**`Scripts/Scenes/FlowController.gd`** owns which panel is on screen and the transitions between them. `GameplayScene._connectFlow()` wires every "this panel is done" signal in one place, so the whole run reads top to bottom there. Three entry points:
+
+- `goto(to, prep, onArrive)` — the normal animated transition. `prep` runs while the panel is still offscreen (`_prepBattle` sets the enemy up), `onArrive` runs once it has landed (`_startBattle`, `PrepareScene.unlockCards`). Panels that gate input arm it in `onArrive` — a card taken mid-slide would lock itself and then have its own transition refused by the busy guard, stranding the run.
+- `jump(to, prep)` — instant switch, used only by the dev panel; still keeps `current` accurate.
+- `overlay(panel)` — slides a panel in on top without removing `current` (game over).
+
+A transition requested while another is running is held in a single `_pending` slot (last request wins) and dispatched when the running one lands, so a burst of clicks can neither be dropped nor queue up a chain of panels.
 
 ### Autoloaded Singletons
 
@@ -44,50 +58,69 @@ Defined in `project.godot` and available everywhere without `$`:
 
 | Singleton | Script | Purpose |
 |---|---|---|
-| `PlayerManager` | `Scripts/Managers/PlayerManager.gd` | All persistent run state (HP, shield, magic, coins, upgrades, character class) |
-| `Consts` | `Scripts/Utils/Consts.gd` | Static game data: enemy definitions by tier, shop item arrays |
-| `Constants` | `Scripts/Utils/Constants.gd` | Tetromino shapes and SRS wall-kick tables |
+| `Utilities` | `Scripts/Utils/Utilities.gd` | shared helpers: juice tweens, board generators, `chooseRandom` |
+| `Constants` | `Scripts/Utils/Constants.gd` | tetromino shapes, SRS kick tables, the `Elemental` enum |
 | `MatrixOperations` | `Scripts/Utils/MatrixOperations.gd` | 2D matrix helpers used for piece rotation |
-| `Textures` | `Scripts/Utils/Textures.gd` | Block texture and elemental color lookups |
-| `Utilities` | `Scripts/Utils/Utilities.gd` | Shared helpers: animations, board generators, UI utilities |
-| `PopupNumbers` | `Scripts/Managers/PopupNumbers.gd` | Floating damage/text popups |
-| `AudioManager` | `Scene/AudioManager.tscn` | Central audio node with named players |
+| `Textures` | `Scripts/Utils/Textures.gd` | block texture and elemental color lookups |
+| `Consts` | `Scripts/Utils/Consts.gd` | loads `Data/Enemies`, `Data/Abilities`, `Data/Characters` |
+| `Keepsakes` | `Scripts/Utils/Keepsakes.gd` | loads `Data/Keepsakes`; `keepsakes` (id → data) and `pool` |
+| `PlayerManager` | `Scripts/Managers/PlayerManager.gd` | all persistent run state |
+| `PopupNumbers` | `Scripts/Managers/PopupNumbers.gd` | floating damage/text popups |
+| `Events` | `Scripts/Utils/Events.gd` | `?` event definitions and the `pool` of valid starting pages |
+| `AudioManager` | `Scene/AudioManager.tscn` | central audio node with named players |
+
+`Consts` and `Keepsakes` load their `.tres` files in `_init()`, not `_ready()` — `PlayerManager._ready` reads `Consts.abilities` and `_init` runs before any autoload's `_ready`, so the data is populated regardless of autoload order. Preserve that if you add a data singleton.
+
+`Scripts/Utils/Global.gd` exists but is **not** autoloaded and is unused.
 
 ### Core Scripts
 
-**`Scripts/Core/Grid.gd`** — The Tetris engine. Owns the 10×23 grid array, piece movement, SRS rotation with kick tables, line clearing, and all board-mutation methods called by skills (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`). Emits signals: `clearLines(cleared, combo)`, `pieceDropped`, `magicMeterChanged`, `energyOverflow(count)`, `grid_gameover`.
+**`Scripts/Core/Grid.gd`** — The Tetris engine (~850 lines). Owns the 10×23 grid array (3-row vanish zone), piece movement, SRS rotation with kick tables, line clearing, and every board-mutation method skills call (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`, `compactBoard`, `enchantCurrentPiece`, `queuePiece`) plus the board queries they scale off (`occupiedRowCount`, `garbageBlockCount`, `payingBlockCount`). Emits: `clearLines(cleared, combo, paying)`, `pieceDropped`, `magicMeterChanged`, `energyOverflow(count)`, `grid_gameover`.
 
-**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). Handles all combat math: damage from line clears (with combo multiplier, elemental bonuses, damage reduction), enemy attacks triggered every `attackSteps` piece drops, ability casting (`useSkill` → `_applyAbilityEffect`), win/loss detection. Connects to Grid signals to respond to player actions.
+**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). All combat math: line-clear damage, enemy attacks every `attackSteps` drops, ability casting (`useSkill` → `_applyAbilityEffect`), the skill panel, win/loss. Connects to Grid's signals.
 
-**`Scripts/Core/Piece.gd`** — A single tetromino. Stores its shape matrix and rotation state. Contains elemental block assignment logic (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
+**`Scripts/Core/Piece.gd`** — A single tetromino: shape matrix, rotation state, and elemental assignment (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
 
-**`Scripts/Managers/PlayerManager.gd`** — Mutable singleton holding the entire run state. Call `PlayerManager.reset()` at the start of a new run. `applyUpgrades(id, price)` uses a dictionary of lambdas keyed by item ID to apply upgrade effects.
+**`Scripts/Managers/PlayerManager.gd`** — Mutable singleton holding the entire run state. `reset()` (called from `GameplayScene._ready`) restores defaults; `_setDefaults()` is the single list of what a run starts with. Keepsake purchases go through `addKeepsake` → `applyKeepsakeEffect`.
+
+### Content is Data, Not Code
+
+Every content directory under `Data/` is scanned whole at startup and loaded into a typed `Resource`. Nothing depends on load order or filename, so a file can be added, renamed or dropped without touching code:
+
+| Directory | Class | Loaded into |
+|---|---|---|
+| `Data/Enemies/{Tier1,Tier2,Tier3,Boss}/` | `EnemyData` | `Consts.tier1Enemy` … `Consts.BossEnemy` |
+| `Data/Abilities/` | `AbilityData` | `Consts.abilities` (keyed by `id`) |
+| `Data/Characters/` | `CharacterData` | `Consts.characters` |
+| `Data/Keepsakes/` | `KeepsakeData` | `Keepsakes.keepsakes` / `Keepsakes.pool` |
+
+The `id` field is identity; each file is named for its `id` and nothing else. Boss scheduling lives in `EnemyData.bossFloor`, not in file order.
 
 ### Block Value Encoding
 
 Grid cells store integers that encode both piece identity and elemental type:
 
 ```
-value = elemental_type * 10 + piece_color_index
+value = elemental_type * Constants.ELEMENTAL_MUL + piece_color_index
 ```
 
 - `piece_color_index` 1–7 → I, J, L, O, T, Z, S pieces
-- Elemental multipliers: 0=none, 1=fire, 3=poison, 4=gold, 5=orb
-- `8` → garbage block (enemy attack)
+- `Constants.Elemental`: `NONE = 0`, `FIRE = 1`, `POISON = 3`, `GOLD = 4`, `ORB = 5`
+- `Constants.GARBAGE` (`8`) → garbage block from an enemy attack
 - `0` → empty cell
 
-Example: `33` = poison (3×10) + L piece (3). `grid[x][y] % 10` gives the piece type; `grid[x][y] / 10` gives the elemental type.
+Example: `33` = poison (3×10) + L piece (3). `grid[x][y] % 10` gives the piece type; `grid[x][y] / 10` gives the elemental type. The raw `/10` and `%10` arithmetic is still used in several files — prefer `Constants.Elemental` / `Constants.ELEMENTAL_MUL` in new code.
 
 ### Combat & Damage Formula
 
-Line-clear damage in `Main.gd`:
+Line-clear damage in `Main.attack()`:
 ```
 damage = payingBlocks * DAMAGE_PER_BLOCK * comboMult^(combo-1) * damageReduction + elementalBonus
 ```
 
 - `payingBlocks` is billed **per block, not per row**: every cleared cell except garbage, counted by `Grid.payingBlockCount` and carried on the `clearLines(cleared, combo, paying)` signal. A clean row is 10 blocks × `DAMAGE_PER_BLOCK` (10) = the same 100 a line has always been worth, so a clean board is unchanged — what differs is that a row dug out of the enemy's rubble pays only for the blocks the player placed. Garbage still completes and clears rows normally and **still counts for the combo**, so digging out is a setup move rather than a wasted multiplier. This is the only mechanical difference between a garbage block and a plain one; everything else in `Grid.gd` tests `!= 0` and cannot tell them apart
-- `comboMult` starts flat at 1.0 — a combo adds nothing by itself. The Monk's `combo_mastery` passive sets it to 1.1 at character select, and alchemy items raise it from there
-- `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5) and is the only damage debuff an enemy carries — it scales, so it never punishes small hits disproportionately
+- `comboMult` starts flat at `PlayerManager.BASE_COMBO_MULT` (1.0) — a combo adds nothing by itself. The Monk's `combo_mastery` passive sets it to `COMBO_MASTERY_MULT` (1.1) at character select, and `combo_mult` keepsakes raise it from there
+- `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5) and is the only damage debuff an enemy carries — it scales, so it never punishes small hits disproportionately. `EnemyData.disablesHold` is the other debuff
 - `elementalBonus` accumulates from fire/poison blocks cleared this drop, consumed on the next line clear
 
 Incoming damage in `Main.enemyAttack()` runs on a different scale from outgoing damage:
@@ -112,18 +145,24 @@ so banking it before a boss is a real play.
 
 ### Roguelike Progression
 
-15 floors across 5 tiers. Each floor is one choice on `PrepareScene`, generated by `PrepareScene.gd:_rollOptions()`:
-- Boss floors (`BOSS_FLOORS` = 3, 6, 9, 12, 15): a single mandatory boss, found by matching `EnemyData.bossFloor` (`PrepareScene._bossForFloor`). To move a boss to a different floor, edit that field — filenames and file order carry no meaning
-- Floor 7: a single mandatory shop
+15 floors (`PrepareScene.FLOOR_COUNT`) across the enemy tiers. Each floor is one choice on `PrepareScene`, generated by `_rollOptions()`:
+- Boss floors (`BOSS_FLOORS` = 3, 6, 9, 12, 15): a single mandatory boss, found by matching `EnemyData.bossFloor` (`PrepareScene._bossForFloor`). To move a boss to a different floor, edit that field
+- `SHOP_FLOORS` (= 7): a single mandatory shop
 - Every other floor: 2–3 cards, each an enemy, a `?` event or a `$` shop
 
-Taking *any* card spends the floor, so a shop or event replaces a fight rather than being extra. Tuning knobs live at the top of `PrepareScene.gd` (`EVENT_CHANCE`, `SHOP_CHANCE`, `MAX_EVENTS`, `FIRST_EVENT_FLOOR`, `FIRST_SHOP_FLOOR`). Two invariants are enforced after the roll: at most `MAX_EVENTS` events per floor, and always at least one fight.
+Taking *any* card spends the floor, so a shop or event replaces a fight rather than being extra. Tuning knobs live at the top of `PrepareScene.gd` (`EVENT_CHANCE`, `SHOP_CHANCE`, `MAX_EVENTS`, `FIRST_EVENT_FLOOR`, `FIRST_SHOP_FLOOR`, `MIN_OPTIONS`/`MAX_OPTIONS`). Two invariants are enforced after the roll: at most `MAX_EVENTS` events per floor, and always at least one fight.
 
-`PlayerManager.currentLevel` persists across battles; `PlayerManager.reset()` resets it to 1. `Main.victory()` steps it after a win, `GameplayScene.advanceFloor()` after an event or shop.
+`PlayerManager.currentLevel` persists across battles; `reset()` puts it back to 1. `Main.victory()` steps it after a win, `GameplayScene.advanceFloor()` after an event or shop.
 
-### Adding an Ability
+### Abilities
 
-Abilities are data. One `.tres` per ability under `Data/Abilities/`, loaded into `Consts.abilities` at startup. Every data directory is scanned whole and nothing depends on load order, so each file is named for its `id` and nothing else — `id` is identity and must be unique.
+Abilities are data. One `.tres` per ability under `Data/Abilities/`, loaded into `Consts.abilities` at startup. `PlayerManager` keeps a **mutable dictionary copy** of each (`abilityState`, built by `AbilityData.to_dict()`) so a run can retext or upgrade an ability without touching the shared resource — which is why every consumer (`Main.useSkill`, `AbilityDraftScene`, `ShopPanell`) reads a `Dictionary`, not an `AbilityData`.
+
+`PlayerManager.ABILITY_SLOTS` is **5**. `equippedAbilities` is a fixed-size array of ability ids in slot order (`""` = empty), mapped to the `skill_1`–`skill_5` input actions. `selectCharacter` fills the first slots from the class's `startingAbilities`; the rest are drafted into. `Main._buildSkillRows` duplicates the two authored skill rows in `Main.tscn` up to `ABILITY_SLOTS`, so the slot count is changed in one constant.
+
+Two screens grant abilities, both rolling from the class's `CharacterData.abilityPool` — an ability missing from that pool can never be obtained:
+- **`AbilityDraftScene.generateDraft`** — after every victory, 3 free options, drag one into a slot. Filled slots are also drag sources (`PlayerManager.swapAbilitySlots`), so dragging onto an empty slot moves and onto a filled one swaps
+- **`ShopPanell.generateItems`** — 3 spells for coins. Buying one emits `spellPurchased`, which routes through `AbilityDraftScene.generateEquip` for the slot choice and back to the shop with its stock intact
 
 What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` dictionaries applied in order by `Main._applyAbilityEffect`. Current vocabulary:
 
@@ -162,17 +201,31 @@ An ability may also set `burn` (default `false`) — Slay the Spire's *exhaust*.
 Casting a burn ability kills its slot for the rest of the battle: `Main` records
 it in `_slotBurned`, `useSkill` checks it *before* the cooldown check, and the
 skill panel shows `BURNED` in place of the orb cost. `_resetSlotState` (called
-from `stageReady`) is the only thing that clears it, so a burn is per-battle, not
-per-run. Burn outranks `cooldown` — a burned slot never comes back this fight —
-so a burn ability should leave `cooldown` at 0 rather than carry both.
-`Collapse` and `Immolate` are the two burn abilities; card tooltips append the
-note via `AbilityData.burnLabel`.
+from `_ready` and `stageReady`) is the only thing that clears it, so a burn is
+per-battle, not per-run. Burn outranks `cooldown` — a burned slot never comes
+back this fight — so a burn ability should leave `cooldown` at 0 rather than
+carry both. `Collapse` and `Immolate` are the two burn abilities; card tooltips
+append the note via `AbilityData.burnLabel`.
 
-To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres` — both the draft (`AbilityDraftScene._buildOptions`) and the shop (`ShopPanell.generateItems`) roll from that pool, so an ability missing from it can never be obtained. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.
+To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres`. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.
 
 Four gotchas. `clear_rows` calls `Grid.clearBottomRows`, which emits `clearLines` — wired to `Main.attack()` — so it *also* deals normal line-clear damage and extends the combo; price accordingly. Since that damage is per-block, wiping rows made mostly of garbage pays close to nothing while still extending the combo — `clear_rows` is board relief first and damage second. `compact_board` is the same: it routes completed rows through `checkAndClearFullLines`, so its damage is whatever the collapse happens to clear, which is why it carries no `amount` of its own. `holy_beam` deliberately does *not*: `Grid.holyBeam` emits nothing, so it is pure board relief. And `type` (`attack`/`block`) is descriptive metadata for card visuals only — casting dispatches on `effects`, not on it.
 
 Effects run in order and `useSkill` stops the loop the moment `battleActive` goes false, so an ability that kills the enemy (or tops the player out via `add_garbage`) never runs its remaining effects — that guard is what keeps `victory()` from firing twice.
+
+### Keepsakes
+
+Keepsakes are the shop's bottom row: permanent trinkets bought once, applied immediately, kept for the rest of the run. One `KeepsakeData` `.tres` per keepsake under `Data/Keepsakes/`. `ShopPanell` rolls `KEEPSAKE_COUNT` (5) ids from `Keepsakes.pool`, filtering out anything already in `PlayerManager.ownedKeepsakes`, so an owned keepsake never reappears.
+
+Purchase runs `PlayerManager.addKeepsake` → `applyKeepsakeEffect` per descriptor. The vocabulary is separate from the ability one and lives entirely in that `match`: `combo_mult`, `max_hp`, `heal`, `max_magic`, `unlock_hold`, `next_piece`, `treasure_box`, `fire_blocks`, `poison_blocks`, `gold_blocks` (the boolean unlock types ignore `amount`). `unlock_hold` and `next_piece` emit `PlayerManager.unlockHold` / `unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
+
+The shop's other two cards are services defined inline as constants at the top of `ShopPanell.gd`: `HEAL_OPTION` (Rest, 30 coins for 30 HP) and `UPGRADE_OPTION` (not implemented).
+
+### Events
+
+`?` floors run `EventScene.showEvent(id)` with an id picked from `Events.pool`. Every event is one **page** in the `Events.events` dictionary; multi-page events are just more entries reached by an option's `"next"`, and those follow-up pages must **not** be listed in `pool` (it holds valid starting points only). `Events.gd` documents the full schema in its header comment, including the weighted-`outcomes` form and the `cost` array that grays a button out while unaffordable.
+
+Event effect descriptors are interpreted by `EventScene._applyEffect` and are a *different* vocabulary from abilities: `coins`, `heal`, `damage`, `max_hp`, `shield`, `magic`, `max_magic`. The names deliberately match the ability ones where the meaning is the same; `damage` is the exception — in an event it hurts the *player*, which is why the ability version is called `damage_enemy`. `_canAfford` handles `coins`, `magic` and `hp` costs (an HP cost can hurt but never kill).
 
 ### Magic Orbs
 
@@ -180,7 +233,7 @@ Effects run in order and `useSkill` stops the loop the moment `battleActive` goe
 1. Orb blocks are cleared from the grid (`orb` elemental type)
 2. Every 3rd piece spawned automatically has one block converted to an orb (`Grid.spawnFromBag` checks `pieceCount % 3`)
 
-Energy is capped at `maxMagicMeter`, set from the chosen class's `CharacterData.maxEnergy` (default 5) in `PlayerManager.selectCharacter`, and raised mid-run by `max_magic` upgrades. Orbs collected past the cap are wasted: `Grid.printClearedBlockTypes` emits `energyOverflow(count)`, and `Main.onEnergyOverflow` **burns HP only for classes with the `overload` passive** — `count * ENERGY_OVERFLOW_DAMAGE` (5) straight to HP, bypassing shield. Everyone else wastes the orbs silently. Only board orbs overflow — the `magic` ability effect just caps silently.
+Energy is capped at `maxMagicMeter`, set from the chosen class's `CharacterData.maxEnergy` (default 5) in `PlayerManager.selectCharacter`, and raised mid-run by `max_magic` keepsakes. Orbs collected past the cap are wasted: `Grid.printClearedBlockTypes` emits `energyOverflow(count)`, and `Main.onEnergyOverflow` **burns HP only for classes with the `overload` passive** — `count * ENERGY_OVERFLOW_DAMAGE` (5) straight to HP, bypassing shield. Everyone else wastes the orbs silently. Only board orbs overflow — the `magic` ability effect just caps silently.
 
 ### Class Passives
 
@@ -197,4 +250,8 @@ Passives that change a base stat are applied in `selectCharacter`, once, before 
 
 ### Input Actions (defined in project.godot)
 
-`left`, `right`, `soft_drop`, `hard_drop` (Space), `rotate_right` (Up), `rotate_left` (Z), `hold_piece` (Shift), `skill_1`–`skill_4` (keys 1–4).
+`left`, `right`, `soft_drop`, `hard_drop` (Space), `rotate_right` (Up), `rotate_left` (Z), `hold_piece` (Shift), `skill_1`–`skill_5` (keys 1–5). `Menu.gd` lets the player rebind these at runtime via `InputMap`, so never assume a keycode — read the action.
+
+## README
+
+`README.md` carries the credit for the Tetris base (Juan Cerrone), the block-type table (which elemental is unlocked by what, and what it pays on clear), and a live TODO list of balance/content/code debt. Its **ability table is stale** — it describes the two hardcoded spells from before abilities became data, not the current 5-slot draft system. Check `Data/Abilities/` instead.
