@@ -87,6 +87,7 @@ func connectSignals():
 	$Grid.clearLines.connect(attack)
 	$Grid.magicMeterChanged.connect(updateMagicMeterUI)
 	$Grid.energyOverflow.connect(onEnergyOverflow)
+	$Grid.iceCleared.connect(onIceCleared)
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
 	$Grid.pieceDropped.connect(onPieceDropped)
@@ -316,8 +317,8 @@ func _applyAbilityEffect(effect: Dictionary):
 		# rather than `amount` so card UI doesn't print the enum as a headline number.
 		"enchant_piece":
 			$Grid.enchantCurrentPiece(effect.get("element", 0))
-		# Banks flat damage onto the next line clear, the same pot fire/poison
-		# blocks fill. Setup now, payoff on the clear.
+		# Banks flat damage onto the next line clear, the same pot fire blocks
+		# fill. Setup now, payoff on the clear.
 		"charge":
 			PlayerManager.pendingElementalBonus += amount
 			PopupNumbers.displayText("+%d CHARGED" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.7, 0.2))
@@ -530,6 +531,19 @@ func enemyAttack():
 		return
 	dropsSinceAttack = 0
 	updateAttackStepsUI()
+
+# Ice blocks pay in tempo rather than damage: each one cleared winds the enemy
+# attack counter back a drop. Grid emits this from printClearedBlockTypes, which
+# runs inside checkAndClearFullLines — and afterDrop() calls that *before* it
+# emits pieceDropped. So the delay always resolves ahead of onPieceDropped's
+# increment: clearing one ice block on the drop that would have triggered an
+# attack cancels that attack rather than arriving one step too late.
+func onIceCleared(count):
+	if not battleActive:
+		return
+	dropsSinceAttack = maxi(dropsSinceAttack - count, 0)
+	updateAttackStepsUI()
+	PopupNumbers.displayText("FROZEN -%d" % count, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.55, 0.85, 1.0))
 
 # The Weaver's "overload" passive: collecting energy orbs while already at the
 # cap burns HP directly (shield does not absorb it), one hit per wasted orb.

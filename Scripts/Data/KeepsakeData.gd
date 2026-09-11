@@ -8,7 +8,7 @@ extends Resource
 # Dictionary {"type": String, "amount": int/float}. They are interpreted by
 # PlayerManager.applyKeepsakeEffect — add new effect types there. Types in use:
 # combo_mult, max_hp, heal, max_magic, unlock_hold, next_piece, treasure_box,
-# fire_blocks, poison_blocks, gold_blocks (boolean/unlock types ignore "amount").
+# fire_blocks, ice_blocks, gold_blocks (boolean/unlock types ignore "amount").
 
 @export var id: String = ""
 @export var name: String = ""

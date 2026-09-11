@@ -17,8 +17,8 @@ func assignRandomElemental():
 	var available = []
 	if PlayerManager.fireBlocks:
 		available.append(Constants.Elemental.FIRE)
-	if PlayerManager.poisonBlocks:
-		available.append(Constants.Elemental.POISON)
+	if PlayerManager.iceBlocks:
+		available.append(Constants.Elemental.ICE)
 	if PlayerManager.goldBlocks:
 		available.append(Constants.Elemental.GOLD)
 	if available.is_empty():

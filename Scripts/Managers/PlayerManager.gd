@@ -19,7 +19,7 @@ var numberStoreItem
 var coin
 var treasureBox
 var fireBlocks
-var poisonBlocks
+var iceBlocks
 var goldBlocks
 var pendingElementalBonus
 var pendingGoldCoins
@@ -32,7 +32,6 @@ var shieldNum
 var playerHealth
 var maxPlayerHealth
 var characterClass
-var nextPiecePoison
 
 # Ability vars============
 const ABILITY_SLOTS = 5
@@ -71,7 +70,7 @@ func _setDefaults():
 	coin = 50
 	treasureBox = false
 	fireBlocks = false
-	poisonBlocks = false
+	iceBlocks = false
 	goldBlocks = false
 	pendingElementalBonus = 0
 	pendingGoldCoins = 0
@@ -84,7 +83,6 @@ func _setDefaults():
 	playerHealth = 100
 	maxPlayerHealth = 100
 	characterClass = "weaver"
-	nextPiecePoison = false
 	_initAbilities()
 	currentEnemy = null
 	coinsSpent = 0
@@ -236,8 +234,8 @@ func applyKeepsakeEffect(desc: Dictionary):
 			treasureBox = true
 		"fire_blocks":
 			fireBlocks = true
-		"poison_blocks":
-			poisonBlocks = true
+		"ice_blocks":
+			iceBlocks = true
 		"gold_blocks":
 			goldBlocks = true
 		_:

@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "venom_fang"
-name = "Venom Fang"
-description = "Poison blocks appear in pieces. Clearing poison blocks deals +8 bonus damage each"
+id = "rime_shard"
+name = "Rime Shard"
+description = "Ice blocks appear in pieces. Clearing an ice block delays the enemy attack by 1 drop"
 price = 30
 frame = 244
-effects = [{"type": "poison_blocks"}]
+effects = [{"type": "ice_blocks"}]

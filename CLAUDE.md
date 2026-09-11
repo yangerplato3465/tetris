@@ -113,11 +113,11 @@ value = elemental_type * Constants.ELEMENTAL_MUL + piece_color_index
 ```
 
 - `piece_color_index` 1–7 → I, J, L, O, T, Z, S pieces
-- `Constants.Elemental`: `NONE = 0`, `FIRE = 1`, `POISON = 3`, `GOLD = 4`, `ORB = 5`
+- `Constants.Elemental`: `NONE = 0`, `FIRE = 1`, `ICE = 2`, `GOLD = 4`, `ORB = 5` (3 is a gap — poison was removed; values are never renumbered, since they are baked into every grid cell)
 - `Constants.GARBAGE` (`8`) → garbage block from an enemy attack
 - `0` → empty cell
 
-Example: `33` = poison (3×10) + L piece (3). `grid[x][y] % 10` gives the piece type; `grid[x][y] / 10` gives the elemental type. The raw `/10` and `%10` arithmetic is still used in several files — prefer `Constants.Elemental` / `Constants.ELEMENTAL_MUL` in new code.
+Example: `23` = ice (2×10) + L piece (3). `grid[x][y] % 10` gives the piece type; `grid[x][y] / 10` gives the elemental type. The raw `/10` and `%10` arithmetic is still used in several files — prefer `Constants.Elemental` / `Constants.ELEMENTAL_MUL` in new code.
 
 ### Combat & Damage Formula
 
@@ -129,7 +129,7 @@ damage = payingBlocks * DAMAGE_PER_BLOCK * comboMult^(combo-1) * damageReduction
 - `payingBlocks` is billed **per block, not per row**: every cleared cell except garbage, counted by `Grid.payingBlockCount` and carried on the `clearLines(cleared, combo, paying)` signal. A clean row is 10 blocks × `DAMAGE_PER_BLOCK` (10) = the same 100 a line has always been worth, so a clean board is unchanged — what differs is that a row dug out of the enemy's rubble pays only for the blocks the player placed. Garbage still completes and clears rows normally and **still counts for the combo**, so digging out is a setup move rather than a wasted multiplier. This is the only mechanical difference between a garbage block and a plain one; everything else in `Grid.gd` tests `!= 0` and cannot tell them apart
 - `comboMult` starts flat at `PlayerManager.BASE_COMBO_MULT` (1.0) — a combo adds nothing by itself. The Monk's `combo_mastery` passive sets it to `COMBO_MASTERY_MULT` (1.1) at character select, and `combo_mult` keepsakes raise it from there
 - `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5) and is the only damage debuff an enemy carries — it scales, so it never punishes small hits disproportionately. `EnemyData.disablesHold` is the other debuff
-- `elementalBonus` accumulates from fire/poison blocks cleared this drop, consumed on the next line clear
+- `elementalBonus` accumulates from fire blocks cleared this drop, consumed on the next line clear. Ice does **not** feed it — see Elemental Blocks below
 
 Incoming damage in `Main.enemyAttack()` runs on a different scale from outgoing damage:
 
@@ -225,7 +225,7 @@ Effects run in order and `useSkill` stops the loop the moment `battleActive` goe
 
 Keepsakes are the shop's bottom row: permanent trinkets bought once, applied immediately, kept for the rest of the run. One `KeepsakeData` `.tres` per keepsake under `Data/Keepsakes/`. `ShopPanell` rolls `KEEPSAKE_COUNT` (5) ids from `Keepsakes.pool`, filtering out anything already in `PlayerManager.ownedKeepsakes`, so an owned keepsake never reappears.
 
-Purchase runs `PlayerManager.addKeepsake` → `applyKeepsakeEffect` per descriptor. The vocabulary is separate from the ability one and lives entirely in that `match`: `combo_mult`, `max_hp`, `heal`, `max_magic`, `unlock_hold`, `next_piece`, `treasure_box`, `fire_blocks`, `poison_blocks`, `gold_blocks` (the boolean unlock types ignore `amount`). `unlock_hold` and `next_piece` emit `PlayerManager.unlockHold` / `unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
+Purchase runs `PlayerManager.addKeepsake` → `applyKeepsakeEffect` per descriptor. The vocabulary is separate from the ability one and lives entirely in that `match`: `combo_mult`, `max_hp`, `heal`, `max_magic`, `unlock_hold`, `next_piece`, `treasure_box`, `fire_blocks`, `ice_blocks`, `gold_blocks` (the boolean unlock types ignore `amount`). `unlock_hold` and `next_piece` emit `PlayerManager.unlockHold` / `unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
 
 The shop's other two cards are services defined inline as constants at the top of `ShopPanell.gd`: `HEAL_OPTION` (Rest, 30 coins for 30 HP) and `UPGRADE_OPTION` (not implemented).
 
@@ -234,6 +234,32 @@ The shop's other two cards are services defined inline as constants at the top o
 `?` floors run `EventScene.showEvent(id)` with an id picked from `Events.pool`. Every event is one **page** in the `Events.events` dictionary; multi-page events are just more entries reached by an option's `"next"`, and those follow-up pages must **not** be listed in `pool` (it holds valid starting points only). `Events.gd` documents the full schema in its header comment, including the weighted-`outcomes` form and the `cost` array that grays a button out while unaffordable.
 
 Event effect descriptors are interpreted by `EventScene._applyEffect` and are a *different* vocabulary from abilities: `coins`, `heal`, `damage`, `max_hp`, `shield`, `magic`, `max_magic`. The names deliberately match the ability ones where the meaning is the same; `damage` is the exception — in an event it hurts the *player*, which is why the ability version is called `damage_enemy`. `_canAfford` handles `coins`, `magic` and `hp` costs (an HP cost can hurt but never kill).
+
+### Elemental Blocks
+
+Once unlocked by its keepsake, every piece built in `Grid.newBag()` gets one random block
+retyped by `Piece.assignRandomElemental()` (orb is separate — `spawnFromBag` stamps it on
+every 3rd piece, overwriting whatever was there). `Grid.printClearedBlockTypes` is the one
+place that pays them out:
+
+| Element | Value | Payout | Keepsake |
+|---|---|---|---|
+| Fire | 1 | `pendingElementalBonus += n * 15` — banked onto the next clear | Ember Charm |
+| Ice | 2 | emits `iceCleared(n)` — winds the enemy attack counter back `n` drops | Rime Shard |
+| Gold | 4 | `pendingGoldCoins += n` | Gilded Idol |
+| Orb | 5 | `magicMeter += n`, overflow emits `energyOverflow` | (automatic) |
+
+**Ice pays in tempo, not damage, and its ordering is load-bearing.** `Main.onIceCleared`
+subtracts from `dropsSinceAttack`, the same counter `onPieceDropped` increments. The delay
+resolves first *by construction*: `Grid.afterDrop()` calls `checkAndClearFullLines()` —
+which calls `printClearedBlockTypes` and emits `iceCleared` — **before** it emits
+`pieceDropped`. So clearing one ice block on the drop that would have triggered an attack
+cancels that attack instead of arriving a step late. Do not reorder those two calls in
+`afterDrop()`, and do not move the ice payout to a `pieceDropped` handler.
+
+Ice counts wherever `printClearedBlockTypes` runs, so `clear_rows` and `compact_board`
+also collect it. `holy_beam` does **not** — `Grid.holyBeam` emits nothing, consistent with
+it paying no damage and no combo either.
 
 ### Magic Orbs
 

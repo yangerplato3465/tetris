@@ -7,6 +7,7 @@ signal clearLines(cleared, combo, paying)
 signal pieceDropped
 signal magicMeterChanged
 signal energyOverflow(count) # orbs collected past the energy cap
+signal iceCleared(count)     # ice blocks cleared this row — each winds the attack counter back 1
 signal grid_gameover
 
 var grid = []
@@ -401,19 +402,22 @@ func payingBlockCount(y) -> int:
 
 func printClearedBlockTypes(y):
 	var fire = 0
-	var poison = 0
+	var ice = 0
 	var gold = 0
 	var orb = 0
 	for x in range(gridWidth):
 		match (grid[x][y] / Constants.ELEMENTAL_MUL):
 			Constants.Elemental.FIRE: fire += 1
-			Constants.Elemental.POISON: poison += 1
+			Constants.Elemental.ICE: ice += 1
 			Constants.Elemental.GOLD: gold += 1
 			Constants.Elemental.ORB: orb += 1
 	if fire > 0:
 		PlayerManager.pendingElementalBonus += fire * 15
-	if poison > 0:
-		PlayerManager.pendingElementalBonus += poison * 8
+	if ice > 0:
+		# Not a damage bonus like fire — ice pays in tempo. Emitted here, inside
+		# checkAndClearFullLines, which afterDrop() runs *before* pieceDropped: the
+		# delay always lands before Main.onPieceDropped ticks the counter up.
+		iceCleared.emit(ice)
 	if gold > 0:
 		PlayerManager.pendingGoldCoins += gold
 	if orb > 0:
@@ -503,9 +507,6 @@ func spawnFromBag():
 	pieceCount += 1
 	if pieceCount % 3 == 0:
 		currentPiece.assignOrb()
-	elif PlayerManager.nextPiecePoison:
-		currentPiece.assignAllElemental(3)
-		PlayerManager.nextPiecePoison = false
 	spawnPiece()
 	$UI/NextPieces.drawPieces(currentBag, nextBag)
 

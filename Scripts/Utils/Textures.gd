@@ -27,7 +27,7 @@ func getTextureForColorIndex(index):
 #   0     = empty
 #   1–7   = normal block (piece type 1–7)
 #   11–17 = fire block   (red tint,   elemental = value / 10 == 1)
-#   31–37 = poison block (green tint, elemental = value / 10 == 3)
+#   21–27 = ice block    (pale blue,  elemental = value / 10 == 2)
 # piece type  = value % 10
 # elemental   = value / 10
 func getElementalColor(index):
@@ -35,7 +35,7 @@ func getElementalColor(index):
 		return Color(0.7, 0.2, 1.0)  # Garbage - purple
 	match (index / Constants.ELEMENTAL_MUL):
 		Constants.Elemental.FIRE: return Color(1.0, 0.25, 0.25)   # Fire - red
-		Constants.Elemental.POISON: return Color(0.25, 1.0, 0.25) # Poison - green
+		Constants.Elemental.ICE: return Color(0.55, 0.85, 1.0)    # Ice - pale blue
 		Constants.Elemental.GOLD: return Color(1.0, 0.85, 0.0)    # Gold - yellow
 		Constants.Elemental.ORB: return Color(0.0, 0.5, 0.5)      # Orb - teal
 		_: return Color.WHITE

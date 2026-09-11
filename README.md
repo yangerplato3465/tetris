@@ -137,14 +137,14 @@ Overload above.
 ## Block Types
 
 Once an elemental is unlocked by its keepsake, **every piece** gets one random block of an
-unlocked type. Every 3rd piece gets an orb block instead. Elemental bonuses from cleared
-blocks bank onto your *next* line clear.
+unlocked type. Every 3rd piece gets an orb block instead. Fire banks onto your *next* line
+clear; ice pays immediately in tempo instead of damage.
 
 | Block | Colour | How it appears | On clear |
 |---|---|---|---|
 | Normal | White | Always | — |
 | Fire | Red | Ember Charm keepsake | +15 bonus damage per block |
-| Poison | Green | Venom Fang keepsake | +8 bonus damage per block |
+| Ice | Pale blue | Rime Shard keepsake | Delays the enemy attack by 1 drop per block |
 | Gold | Yellow | Gilded Idol keepsake | +1 coin per block |
 | Orb | Teal | Every 3rd piece | +1 magic orb |
 | Garbage | Purple | Enemy attacks | Pays no damage, but still counts for the combo |
@@ -160,7 +160,7 @@ Five of the nine are offered per visit, and anything you already own never reapp
 |---|---|---|
 | Old Key | 30 | Unlocks holding pieces |
 | Magnifying Glass | 30 | See one more upcoming piece |
-| Venom Fang | 30 | Unlocks poison blocks |
+| Rime Shard | 30 | Unlocks ice blocks |
 | Ember Charm | 40 | Unlocks fire blocks |
 | Gilded Idol | 40 | Unlocks gold blocks |
 | Alchemist's Ring | 40 | +0.1 combo multiplier |
