@@ -204,7 +204,7 @@ skill panel shows `BURNED` in place of the orb cost. `_resetSlotState` (called
 from `_ready` and `stageReady`) is the only thing that clears it, so a burn is
 per-battle, not per-run. Burn outranks `cooldown` — a burned slot never comes
 back this fight — so a burn ability should leave `cooldown` at 0 rather than
-carry both. `Collapse` and `Immolate` are the two burn abilities; card tooltips
+carry both. `Collapse`, `Crucible`, `Immolate` and `Slag` are the burn abilities; card tooltips
 append the note via `AbilityData.burnLabel`.
 
 To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres`. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.
