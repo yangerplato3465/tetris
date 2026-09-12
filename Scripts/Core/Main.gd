@@ -257,6 +257,13 @@ func _applyAbilityEffect(effect: Dictionary):
 		# Whiffs at 0 shield like damage_per_garbage whiffs on a clean board.
 		"damage_per_shield":
 			_dealAbilityDamage(amount * PlayerManager.shieldNum)
+		# Scales off the whole fight so far rather than the board right now, so
+		# it is near-worthless on an opening cast and best saved for a long
+		# grind. Grid.linesThisBattle resets in resetGrid(), so this cannot bank
+		# progress from the previous floor. Not floored: casting it on turn one
+		# is the mistake the card is built around.
+		"damage_per_line_cleared":
+			_dealAbilityDamage(amount * $Grid.linesThisBattle)
 		"shield":
 			_gainShield(amount)
 		# The defensive twin of damage_per_row. A choked board is exactly when
@@ -271,6 +278,12 @@ func _applyAbilityEffect(effect: Dictionary):
 		# board is the cost of that.
 		"shield_per_garbage":
 			_gainShield(amount * $Grid.garbageBlockCount())
+		# The defensive twin of damage_per_combo, and floored at 1 the same way:
+		# a combo is already fragile — one drop that clears nothing zeroes it in
+		# Grid — so this pays out for keeping a chain alive rather than punishing
+		# the cast that starts one.
+		"shield_per_combo":
+			_gainShield(amount * maxi($Grid.combo, 1))
 		"heal":
 			PlayerManager.playerHealth = mini(PlayerManager.playerHealth + amount, PlayerManager.maxPlayerHealth)
 			updatePlayerHealthUI()

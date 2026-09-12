@@ -39,6 +39,9 @@ var deltaSum = 0
 var clearedLines = 0
 var dasCounter = 0
 var lines = 0
+# Run-lifetime `lines` above is never reset; this one is cleared by resetGrid()
+# every battle, so abilities can scale off "how long has this fight gone on".
+var linesThisBattle = 0
 var level = 1
 var score = 0
 var actions = 0
@@ -119,6 +122,7 @@ func stopGrid():
 func resetGrid():
 	set_physics_process(true)
 	grid = MatrixOperations.create2DMatrix(gridWidth, gridHeight, 0, startingBoard)
+	linesThisBattle = 0
 	currentBag = newBag()
 	nextBag = newBag()
 	pieceCount = 0
@@ -476,6 +480,7 @@ func checkAndClearFullLines(tSpinType = null):
 			#print("T SPIN!!!" + str(lastPiece.rotationState))
 		score += newScore
 		lines += cleared
+		linesThisBattle += cleared
 		# $UI/Score/ScoreNumber.text = str(score)
 		# $UI/Lines/LinesNumber.text = str(lines)
 		clearedLines += cleared

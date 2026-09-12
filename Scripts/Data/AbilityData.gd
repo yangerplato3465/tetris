@@ -20,9 +20,11 @@ extends Resource
 #   damage_per_combo  `amount` damage per step of the combo held right now
 #   damage_per_garbage `amount` damage per garbage block on the board
 #   damage_per_shield `amount` damage per point of current shield (shield is not spent)
+#   damage_per_line_cleared `amount` damage per line cleared so far this battle
 #   shield            gain shield
 #   shield_per_row    `amount` shield per occupied row on the board
 #   shield_per_garbage `amount` shield per garbage block on the board
+#   shield_per_combo  `amount` shield per step of the combo held right now
 #   heal              restore HP (capped at maxPlayerHealth)
 #   magic             refund magic orbs (capped at maxMagicMeter)
 #   charge            bank flat damage onto the next line clear
@@ -53,6 +55,8 @@ extends Resource
 # Descriptive only — casting dispatches on `effects`, not on this. Kept as a
 # coarse tag for card visuals and for filtering an ability pool.
 @export_enum("attack", "block") var type: String = "attack"
+# Descriptive only, like `type`: nothing rolls or prices off rarity yet — the
+# draft and shop both pick uniformly from the character's abilityPool.
 @export_enum("common", "uncommon", "rare") var rarity: String = "common"
 @export var cost: int = 1            # magic orbs spent to cast
 @export var costLabel: String = ""   # e.g. "1 orb"

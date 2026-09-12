@@ -16,32 +16,44 @@ slots start filled from your class; the rest you fill during the run.
 - Filled slots can be dragged onto each other to swap or move
 
 Some spells have a **cooldown** (counted in piece drops, shown as `CD n` in place of the
-orb cost). Four are **burn** spells — one cast per battle, then the slot reads `BURNED`
+orb cost). Six are **burn** spells — one cast per battle, then the slot reads `BURNED`
 until the next fight.
 
 ## Spell List
 
-| Spell | Rarity | Cost | CD | Effect |
-|---|---|---|---|---|
-| Magic Bolt | Common | 1 orb | — | Deal 50 damage |
-| Cinder | Common | free | 3 | Deal 30 damage |
-| Interrupt | Uncommon | 1 orb | 4 | Deal 40 damage and wind the attack counter back 2 drops |
-| Shield Bash | Uncommon | 1 orb | 4 | Deal damage equal to your shield — the shield is not spent |
-| Barrier | Common | 1 orb | — | Gain 20 shield |
-| Aegis | Common | free | 6 | Gain 10 shield |
-| Riposte | Uncommon | 1 orb | 4 | Gain 15 shield and wind the attack counter back 3 drops |
-| Bulwark | Rare | 2 orbs | 3 | Gain 8 shield per occupied row on your board |
-| Barricade | Uncommon | 1 orb | 3 | Gain 45 shield, but push a garbage row onto your own board |
-| Ore Vein | Uncommon | 1 orb | 5 | The next piece is an I-piece |
-| Plumb Line | Uncommon | 2 orbs | 3 | Deal 15 damage per occupied row on your board |
-| Frostbite | Uncommon | 1 orb | 5 | Turn the falling piece to ice, then deal 20 damage |
-| **Collapse** | Rare | 3 orbs | burn | Every block falls straight down; rows completed on the way clear normally |
-| **Crucible** | Rare | 3 orbs | burn | Gain 90 shield |
-| **Immolate** | Rare | 2 orbs | burn | Deal 150 damage per garbage block, then purify them all |
-| **Slag** | Rare | 2 orbs | burn | Gain 5 shield per garbage block, then purify them all |
-| **Absolute Zero** | Rare | 3 orbs | burn | Deal 250 damage, then hand the enemy 3 drops of attack progress |
+
+| Spell             | Rarity   | Cost   | CD   | Effect                                                                    |
+| ----------------- | -------- | ------ | ---- | ------------------------------------------------------------------------- |
+| Magic Bolt        | Common   | 1 orb  | —    | Deal 50 damage                                                            |
+| Cinder            | Common   | free   | 3    | Deal 30 damage                                                            |
+| Interrupt         | Uncommon | 1 orb  | 4    | Deal 40 damage and wind the attack counter back 2 drops                   |
+| Shield Bash       | Uncommon | 1 orb  | 4    | Deal damage equal to your shield — the shield is not spent                |
+| Barrier           | Common   | 1 orb  | —    | Gain 20 shield                                                            |
+| Aegis             | Common   | free   | 6    | Gain 10 shield                                                            |
+| Riposte           | Uncommon | 1 orb  | 4    | Gain 15 shield and wind the attack counter back 3 drops                   |
+| Bulwark           | Rare     | 2 orbs | 3    | Gain 8 shield per occupied row on your board                              |
+| Barricade         | Uncommon | 1 orb  | 3    | Gain 45 shield, but push a garbage row onto your own board                |
+| Ore Vein          | Uncommon | 1 orb  | 5    | The next piece is an I-piece                                              |
+| Plumb Line        | Uncommon | 2 orbs | 3    | Deal 15 damage per occupied row on your board                             |
+| Frostbite         | Uncommon | 1 orb  | 5    | Turn the falling piece to ice, then deal 20 damage                        |
+| Cascade           | Uncommon | 1 orb  | 3    | Deal 25 damage per step of your current combo                             |
+| Chainmail         | Uncommon | 2 orbs | 3    | Gain 6 shield per step of your current combo                              |
+| **Collapse**      | Rare     | 3 orbs | burn | Every block falls straight down; rows completed on the way clear normally |
+| **Crucible**      | Rare     | 3 orbs | burn | Gain 90 shield                                                            |
+| **Immolate**      | Rare     | 2 orbs | burn | Deal 150 damage per garbage block, then purify them all                   |
+| **Slag**          | Rare     | 2 orbs | burn | Gain 5 shield per garbage block, then purify them all                     |
+| **Absolute Zero** | Rare     | 3 orbs | burn | Deal 250 damage, then hand the enemy 3 drops of attack progress           |
+| **Attrition**     | Rare     | 2 orbs | burn | Deal 20 damage per line you have cleared this battle                      |
+
+
+
 
 ## Authoring
+
+Rarity (`common` / `uncommon` / `rare`) is currently **descriptive only**. Both the
+post-victory draft and the shop pick uniformly at random from the character's
+`abilityPool`, so a `rare` is no harder to be offered than a `common` — the restriction
+on a card has to come from its orb cost, cooldown and `burn` flag.
 
 Spells are data — one `.tres` per spell under `Data/Abilities/`, assembled from a
 vocabulary of effect types. Adding one usually needs no code at all.

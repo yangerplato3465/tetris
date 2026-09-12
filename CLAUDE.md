@@ -181,9 +181,11 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `damage_per_combo` | `amount` damage per step of the combo held right now |
 | `damage_per_garbage` | `amount` damage per garbage block on the board (0 on a clean board — not floored at 1) |
 | `damage_per_shield` | `amount` damage per point of current shield; the shield is **not** consumed |
+| `damage_per_line_cleared` | `amount` damage per line cleared so far *this battle* (`Grid.linesThisBattle`, reset in `resetGrid`); not floored, so an opening cast does nothing |
 | `shield` | gain shield |
 | `shield_per_row` | `amount` shield per occupied row on the board (floored at 1 row, like `damage_per_row`) |
 | `shield_per_garbage` | `amount` shield per garbage block on the board (0 on a clean board — not floored, like `damage_per_garbage`) |
+| `shield_per_combo` | `amount` shield per step of the combo held right now (floored at 1, like `damage_per_combo`) |
 | `heal` | restore HP, capped at `maxPlayerHealth` |
 | `magic` | refund orbs, capped at `maxMagicMeter` |
 | `charge` | bank flat damage onto the next line clear (`pendingElementalBonus`) |
@@ -213,7 +215,7 @@ skill panel shows `BURNED` in place of the orb cost. `_resetSlotState` (called
 from `_ready` and `stageReady`) is the only thing that clears it, so a burn is
 per-battle, not per-run. Burn outranks `cooldown` — a burned slot never comes
 back this fight — so a burn ability should leave `cooldown` at 0 rather than
-carry both. `Collapse`, `Crucible`, `Immolate` and `Slag` are the burn abilities; card tooltips
+carry both. `Collapse`, `Crucible`, `Immolate`, `Slag`, `Absolute Zero` and `Attrition` are the burn abilities; card tooltips
 append the note via `AbilityData.burnLabel`.
 
 To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres`. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.
