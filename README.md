@@ -191,12 +191,12 @@ balance.
 
 **Working:** the full Tetris engine (SRS rotation with kick tables, hold, next queue,
 ghost piece, 7-bag), the battle loop, the 15-floor run structure, the ability system
-(20 spells, cooldowns, burn, drafting and swapping), keepsakes, events, the shop, class
+(23 spells, cooldowns, burn, drafting and swapping), keepsakes, events, the shop, class
 passives, key rebinding and audio.
 
 **Known gaps:**
 
-- **Classes barely differ.** Weaver and Monk share the same 20-spell pool, the same
+- **Classes barely differ.** Weaver and Monk share the same 23-spell pool, the same
   starting kit and the same orb cap. Only the passive separates them.
 - **Enemies differ by numbers only.** 17 of the 20 carry no debuff at all, though the
   data supports them — only Shadow Lord (halves your damage) and two hold-lockers use it.

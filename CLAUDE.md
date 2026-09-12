@@ -188,6 +188,9 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `shield_per_combo` | `amount` shield per step of the combo held right now (floored at 1, like `damage_per_combo`) |
 | `heal` | restore HP, capped at `maxPlayerHealth` |
 | `magic` | refund orbs, capped at `maxMagicMeter` |
+| `spell_power` | every damaging ability effect deals `amount` **extra flat damage** for the rest of the battle (`Main._spellDamageBonus`, added before the enemy's reduction, reset in `_resetSlotState`) |
+| `echo_next_cast` | the **next** ability cast runs its whole effect list twice for one orb cost; never doubles the cast that grants it |
+| `self_damage` | lose `amount` HP, bypassing shield like `overload`; **can kill**, and the `battleActive` guard then stops the remaining effects |
 | `charge` | bank flat damage onto the next line clear (`pendingElementalBonus`) |
 | `clear_rows` | wipe `amount` rows off the bottom of the board |
 | `holy_beam` | clear the fullest row — no damage, no combo |
@@ -215,7 +218,7 @@ skill panel shows `BURNED` in place of the orb cost. `_resetSlotState` (called
 from `_ready` and `stageReady`) is the only thing that clears it, so a burn is
 per-battle, not per-run. Burn outranks `cooldown` — a burned slot never comes
 back this fight — so a burn ability should leave `cooldown` at 0 rather than
-carry both. `Collapse`, `Crucible`, `Immolate`, `Slag`, `Absolute Zero` and `Attrition` are the burn abilities; card tooltips
+carry both. `Collapse`, `Crucible`, `Immolate`, `Slag`, `Absolute Zero`, `Attrition` and `Echo Chamber` are the burn abilities; card tooltips
 append the note via `AbilityData.burnLabel`.
 
 To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres`. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.

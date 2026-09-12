@@ -63,6 +63,15 @@ var _slotBurned: Array[bool] = []
 # Skill presses recorded this frame, resolved at end-of-frame by _resolvePendingCasts
 # so a coincident piece drop has already ticked cooldowns before the cast is decided.
 var _pendingCasts: Array[int] = []
+# Flat damage added to every damaging ability effect for the rest of the battle,
+# applied in _dealAbilityDamage before the enemy's reduction. Additive and
+# uncapped, so two buffs stack by simple addition. Cleared by _resetSlotState.
+# Flat rather than a multiplier, so it lifts cheap spells far more than big ones.
+var _spellDamageBonus: int = 0
+# Set by the echo_next_cast effect: the *next* ability cast runs its whole effect
+# list twice for one orb cost. Consumed by useSkill on that next cast, and never
+# by the cast that grants it — see the capture-before-run note there.
+var _echoNextCast: bool = false
 
 func _ready():
 	_buildSkillRows()
@@ -174,6 +183,8 @@ func _resetSlotState():
 		_slotCooldown.append(0)
 		_slotBurned.append(false)
 	_pendingCasts.clear() # drop any press left unresolved across a battle boundary
+	_spellDamageBonus = 0
+	_echoNextCast = false
 
 # Mirror the equipped ability slots into the skill panel rows. Slot order maps
 # skill_1 -> Skill1, skill_2 -> Skill2, ... Empty slots show a placeholder.
@@ -214,13 +225,22 @@ func useSkill(slot: int):
 	# multi-effect ability is charged for one cast, not one charge per effect.
 	PlayerManager.magicMeter -= ability.cost
 	updateMagicMeterUI()
-	for effect in ability.get("effects", []):
-		# Stop if the battle ended part-way through a multi-effect ability: the
-		# enemy died on an earlier effect, or self-inflicted garbage topped the
-		# player out. Running on would fire victory()/gameover() a second time.
+	# Capture and clear the echo flag *before* running anything, so a cast can only
+	# be doubled by an echo granted on an earlier cast — never by the one it grants
+	# itself. Echo Chamber setting the flag during its own effect loop therefore
+	# leaves it armed for the next spell, which is the whole point of the card.
+	var repeats := 2 if _echoNextCast else 1
+	_echoNextCast = false
+	for _pass in repeats:
+		for effect in ability.get("effects", []):
+			# Stop if the battle ended part-way through a multi-effect ability: the
+			# enemy died on an earlier effect, or self-inflicted garbage topped the
+			# player out. Running on would fire victory()/gameover() a second time.
+			if not battleActive:
+				break
+			_applyAbilityEffect(effect)
 		if not battleActive:
 			break
-		_applyAbilityEffect(effect)
 	# Start the cooldown; onPieceDropped counts it down one per dropped piece.
 	_slotCooldown[slot] = ability.get("cooldown", 0)
 	# Burn last, and unconditionally: a spell that ended the battle part-way
@@ -264,6 +284,29 @@ func _applyAbilityEffect(effect: Dictionary):
 		# is the mistake the card is built around.
 		"damage_per_line_cleared":
 			_dealAbilityDamage(amount * $Grid.linesThisBattle)
+		# Flat, not a multiplier: a percentage buff rewards stacking it onto the
+		# single biggest spell you own, while a flat bonus lifts cheap spammable
+		# ones far more (Cinder 30 -> 50 is +67%, Absolute Zero 250 -> 270 is +8%).
+		# That deliberately points the buff at a wide kit rather than one finisher.
+		"spell_power":
+			_spellDamageBonus += amount
+			PopupNumbers.displayText("+%d SPELL DMG" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.6, 0.2))
+		# Arms the *next* cast to run twice. See the capture-before-run note in
+		# useSkill for why this never doubles the ability that grants it.
+		"echo_next_cast":
+			_echoNextCast = true
+			PopupNumbers.displayText("ECHO ARMED", Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.8, 0.5, 1.0))
+		# Self-inflicted HP, bypassing shield exactly like the overload passive.
+		# This *can* kill: the battleActive guard in useSkill then stops the rest
+		# of the effect list, the same way a self-topping add_garbage does.
+		"self_damage":
+			PlayerManager.playerHealth -= amount
+			PopupNumbers.displayText("-%d HP" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.4, 0.3))
+			flashPlayer()
+			screenShake()
+			updatePlayerHealthUI()
+			if PlayerManager.playerHealth <= 0:
+				gameover()
 		"shield":
 			_gainShield(amount)
 		# The defensive twin of damage_per_row. A choked board is exactly when
@@ -370,7 +413,9 @@ func _gainShield(amount: int):
 # Shared tail of every damaging ability effect: apply the enemy's reduction,
 # never below zero, then animate.
 func _dealAbilityDamage(raw: int):
-	var damageDealt = maxi(roundi(raw * damageReduction), 0)
+	# The flat spell buff lands *before* damageReduction, so a halved enemy halves
+	# the buff too and it can never out-scale the debuff it is fighting.
+	var damageDealt = maxi(roundi((raw + _spellDamageBonus) * damageReduction), 0)
 	attackAnim()
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)

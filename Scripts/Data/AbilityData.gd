@@ -27,6 +27,11 @@ extends Resource
 #   shield_per_combo  `amount` shield per step of the combo held right now
 #   heal              restore HP (capped at maxPlayerHealth)
 #   magic             refund magic orbs (capped at maxMagicMeter)
+#   spell_power       every damaging ability effect deals `amount` extra damage
+#                     for the rest of the battle (flat, additive, applied before
+#                     the enemy's damage reduction)
+#   echo_next_cast    the *next* ability cast runs its effects twice, one cost
+#   self_damage       lose `amount` HP, bypassing shield; can kill
 #   charge            bank flat damage onto the next line clear
 #   clear_rows        wipe `amount` rows off the bottom of the board
 #   holy_beam         clear the fullest row — no damage, no combo

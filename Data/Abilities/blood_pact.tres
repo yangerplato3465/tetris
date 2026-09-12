@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/AbilityData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "blood_pact"
+name = "Blood Pact"
+type = "attack"
+rarity = "uncommon"
+cost = 1
+costLabel = "1 orb"
+cooldown = 8
+effects = Array[Dictionary]([{ "type": "spell_power", "amount": 35 }, { "type": "self_damage", "amount": 15 }])
+price = 150
+description = "Lose 15 HP. Your spells deal 35 extra damage for the rest of the battle"

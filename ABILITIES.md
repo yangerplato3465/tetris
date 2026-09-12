@@ -16,8 +16,14 @@ slots start filled from your class; the rest you fill during the run.
 - Filled slots can be dragged onto each other to swap or move
 
 Some spells have a **cooldown** (counted in piece drops, shown as `CD n` in place of the
-orb cost). Six are **burn** spells — one cast per battle, then the slot reads `BURNED`
+orb cost). Seven are **burn** spells — one cast per battle, then the slot reads `BURNED`
 until the next fight.
+
+Three spells **buff your other spells** rather than doing anything themselves. Their
+bonuses are **flat damage, not a percentage**, so they lift a cheap spell far more than
+an expensive one — Cinder goes 30 → 50 under Attune (+67%), while Absolute Zero goes
+250 → 270 (+8%). They stack by simple addition, and all of them wear off at the end of
+the battle.
 
 ## Spell List
 
@@ -38,12 +44,15 @@ until the next fight.
 | Frostbite         | Uncommon | 1 orb  | 5    | Turn the falling piece to ice, then deal 20 damage                        |
 | Cascade           | Uncommon | 1 orb  | 3    | Deal 25 damage per step of your current combo                             |
 | Chainmail         | Uncommon | 2 orbs | 3    | Gain 6 shield per step of your current combo                              |
+| Attune            | Uncommon | 2 orbs | 8    | Your spells deal 20 extra damage for the rest of the battle               |
+| Blood Pact        | Uncommon | 1 orb  | 8    | Lose 15 HP; your spells deal 35 extra damage for the rest of the battle   |
 | **Collapse**      | Rare     | 3 orbs | burn | Every block falls straight down; rows completed on the way clear normally |
 | **Crucible**      | Rare     | 3 orbs | burn | Gain 90 shield                                                            |
 | **Immolate**      | Rare     | 2 orbs | burn | Deal 150 damage per garbage block, then purify them all                   |
 | **Slag**          | Rare     | 2 orbs | burn | Gain 5 shield per garbage block, then purify them all                     |
 | **Absolute Zero** | Rare     | 3 orbs | burn | Deal 250 damage, then hand the enemy 3 drops of attack progress           |
 | **Attrition**     | Rare     | 2 orbs | burn | Deal 20 damage per line you have cleared this battle                      |
+| **Echo Chamber**  | Rare     | 2 orbs | burn | Your next spell is cast twice                                             |
 
 
 
