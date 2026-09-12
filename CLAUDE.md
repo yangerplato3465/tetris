@@ -289,4 +289,4 @@ Passives that change a base stat are applied in `selectCharacter`, once, before 
 
 ## README
 
-`README.md` carries the credit for the Tetris base (Juan Cerrone), the block-type table (which elemental is unlocked by what, and what it pays on clear), and a live TODO list of balance/content/code debt. Its **ability table is stale** — it describes the two hardcoded spells from before abilities became data, not the current 5-slot draft system. Check `Data/Abilities/` instead.
+`README.md` carries the credit for the Tetris base (Juan Cerrone), the block-type table (which elemental is unlocked by what, and what it pays on clear), and a live TODO list of balance/content/code debt. The spell catalogue lives in its own file, **`ABILITIES.md`** — slots/drafting, the full spell table, and a pointer back here for authoring. It is hand-maintained, so treat `Data/Abilities/` as the source of truth and update `ABILITIES.md` when you add or retune a spell.

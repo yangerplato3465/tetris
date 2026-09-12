@@ -76,38 +76,12 @@ red when the next drop will trigger it.
 ## Abilities
 
 You have **five ability slots**, cast with keys **1–5**, paid for with magic orbs. Two
-slots start filled from your class; the rest you fill during the run.
+slots start filled from your class; the rest you fill during the run — 3 free spells are
+offered after every victory, and shops sell more for coins. Some spells carry a
+**cooldown** counted in piece drops; a few **burn** on use and are gone for the rest of
+the battle.
 
-- **After every victory** you are offered 3 random spells, free — drag one into a slot
-- **At a shop** you can buy spells for coins; buying one opens the same screen to equip it
-- Filled slots can be dragged onto each other to swap or move
-
-Some spells have a **cooldown** (counted in piece drops, shown as `CD n` in place of the
-orb cost). Four are **burn** spells — one cast per battle, then the slot reads `BURNED`
-until the next fight.
-
-| Spell | Cost | CD | Effect |
-|---|---|---|---|
-| Magic Bolt | 1 orb | — | Deal 50 damage |
-| Cinder | free | 3 | Deal 30 damage |
-| Interrupt | 1 orb | 4 | Deal 40 damage and wind the attack counter back 2 drops |
-| Shield Bash | 1 orb | 4 | Deal damage equal to your shield — the shield is not spent |
-| Barrier | 1 orb | — | Gain 20 shield |
-| Aegis | free | 6 | Gain 10 shield |
-| Riposte | 1 orb | 4 | Gain 15 shield and wind the attack counter back 3 drops |
-| Bulwark | 2 orbs | 3 | Gain 8 shield per occupied row on your board |
-| Barricade | 1 orb | 3 | Gain 45 shield, but push a garbage row onto your own board |
-| Ore Vein | 1 orb | 5 | The next piece is an I-piece |
-| Plumb Line | 2 orbs | 3 | Deal 15 damage per occupied row on your board |
-| Frostbite | 1 orb | 5 | Turn the falling piece to ice, then deal 20 damage |
-| **Collapse** | 3 orbs | burn | Every block falls straight down; rows completed on the way clear normally |
-| **Crucible** | 3 orbs | burn | Gain 90 shield |
-| **Immolate** | 2 orbs | burn | Deal 150 damage per garbage block, then purify them all |
-| **Slag** | 2 orbs | burn | Gain 5 shield per garbage block, then purify them all |
-| **Absolute Zero** | 3 orbs | burn | Deal 250 damage, then hand the enemy 3 drops of attack progress |
-
-Spells are data — one `.tres` per spell under `Data/Abilities/`, assembled from a
-vocabulary of effect types. Adding one usually needs no code at all.
+**See [ABILITIES.md](ABILITIES.md) for the full spell list.**
 
 ---
 
@@ -205,7 +179,8 @@ Scene/              scenes and UI components
 All content — enemies, spells, characters, keepsakes — is authored as `.tres` resources
 and scanned from its directory at startup, so adding or tuning content needs no code
 change. **`CLAUDE.md` documents the architecture in detail**, including the ability effect
-vocabulary, the block value encoding, and how to add a new spell.
+vocabulary, the block value encoding, and how to add a new spell; **`ABILITIES.md`** is
+the spell catalogue.
 
 ---
 
