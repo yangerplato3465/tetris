@@ -6,6 +6,7 @@
 script = ExtResource("1_data")
 id = "rime_shard"
 name = "Rime Shard"
+rarity = "uncommon"
 description = "Ice blocks appear in pieces. Clearing an ice block delays the enemy attack by 1 drop"
 price = 30
 frame = 244

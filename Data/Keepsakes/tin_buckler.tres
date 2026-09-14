@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "dragons_chest"
-name = "Dragon's Chest"
+id = "tin_buckler"
+name = "Tin Buckler"
 rarity = "common"
-description = "Every time you score a Tetris, gain 50 coins"
-price = 60
-frame = 187
-effects = [{"type": "treasure_box"}]
+description = "Start every battle with +10 shield"
+price = 30
+frame = 96
+effects = [{"type": "battle_shield", "amount": 10}]

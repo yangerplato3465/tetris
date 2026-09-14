@@ -6,6 +6,7 @@
 script = ExtResource("1_data")
 id = "magnifying_glass"
 name = "Magnifying Glass"
+rarity = "common"
 description = "See one more upcoming piece"
 price = 30
 frame = 169

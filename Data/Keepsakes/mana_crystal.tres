@@ -6,6 +6,7 @@
 script = ExtResource("1_data")
 id = "mana_crystal"
 name = "Mana Crystal"
+rarity = "common"
 description = "Increase max magic orbs by 2"
 price = 50
 frame = 326

@@ -9,7 +9,7 @@ one.
 
 ## How They Work
 
-The shop rolls **5** of the **8** keepsakes per visit from `Keepsakes.pool`, filtering out
+The shop rolls **5** of the **15** keepsakes per visit from `Keepsakes.pool`, filtering out
 anything you already own, so a keepsake never appears twice in a run. Buying one runs
 `PlayerManager.addKeepsake` → `applyKeepsakeEffect`, which applies the effect on the spot.
 
@@ -25,16 +25,23 @@ do).
 ## Keepsake List
 
 
-| Keepsake             | Price | Effect                                                                          |
-| -------------------- | ----- | ------------------------------------------------------------------------------- |
-| **Magnifying Glass** | 30    | See one more upcoming piece                                                     |
-| **Rime Shard**       | 30    | **Ice blocks** appear in pieces; clearing one delays the enemy attack by 1 drop |
-| **Ember Charm**      | 40    | **Fire blocks** appear in pieces; clearing one deals 15 damage immediately      |
-| **Gilded Idol**      | 40    | **Gold blocks** appear in pieces; clearing one gives 1 coin                     |
-| **Alchemist's Ring** | 40    | Combo multiplier +0.1                                                           |
-| **Heart Locket**     | 50    | +25 max HP                                                                      |
-| **Mana Crystal**     | 50    | +2 max magic orbs                                                               |
-| **Dragon's Chest**   | 60    | Every Tetris (4-line clear) pays 50 coins                                       |
+| Keepsake             | Rarity   | Price | Effect                                                                          |
+| -------------------- | -------- | ----- | ------------------------------------------------------------------------------- |
+| **Spark Vial**       | Common   | 30    | Start every battle with +1 magic orb                                            |
+| **Tin Buckler**      | Common   | 30    | Start every battle with +10 shield                                              |
+| **Coin Pouch**       | Common   | 30    | +8 coins after every victory                                                    |
+| **Whetstone**        | Common   | 30    | Your first line clear each battle deals +50 damage                              |
+| **Hourglass Charm**  | Common   | 35    | The enemy's first attack each battle comes 2 drops later                        |
+| **Bandage Roll**     | Common   | 35    | Heal 3 HP after every victory                                                   |
+| **Worn Gauntlet**    | Common   | 40    | Every Tetris (4-line clear) gives +1 magic orb                                  |
+| **Magnifying Glass** | Common   | 30    | See one more upcoming piece                                                     |
+| **Rime Shard**       | Uncommon | 30    | **Ice blocks** appear in pieces; clearing one delays the enemy attack by 1 drop |
+| **Ember Charm**      | Uncommon | 40    | **Fire blocks** appear in pieces; clearing one deals 15 damage immediately      |
+| **Gilded Idol**      | Uncommon | 40    | **Gold blocks** appear in pieces; clearing one gives 1 coin                     |
+| **Alchemist's Ring** | Common   | 40    | Combo multiplier +0.1                                                           |
+| **Heart Locket**     | Common   | 50    | +25 max HP                                                                      |
+| **Mana Crystal**     | Common   | 50    | +2 max magic orbs                                                               |
+| **Dragon's Chest**   | Common   | 60    | Every Tetris (4-line clear) pays 50 coins                                       |
 
 
 
@@ -64,7 +71,7 @@ The shop's other two cards are not keepsakes — they are services defined inlin
 
 
 | Service           | Price | Effect                                 |
-| ----------------- | ----- | -------------------------------------- |
+| ----------------- | -------- | -------------------------------------- |
 | **Rest**          | 30    | Restore 30 HP                          |
 | **Upgrade Spell** | —     | **Not implemented** — currently a stub |
 
@@ -78,7 +85,9 @@ startup. The effect vocabulary is separate from the ability one and lives entire
 `PlayerManager.applyKeepsakeEffect`:
 
 `combo_mult` · `max_hp` · `heal` · `max_magic` · `next_piece` ·
-`treasure_box` · `fire_blocks` · `ice_blocks` · `gold_blocks`
+`treasure_box` · `fire_blocks` · `ice_blocks` · `gold_blocks` ·
+`battle_orbs` · `battle_shield` · `first_clear_damage` · `first_attack_delay` ·
+`victory_coins` · `victory_heal` · `tetris_orbs`
 
 The boolean unlock types ignore `amount`. `heal` is implemented but no keepsake currently
 uses it. Adding a keepsake needs no code change unless you want a new effect type.

@@ -6,6 +6,7 @@
 script = ExtResource("1_data")
 id = "heart_locket"
 name = "Heart Locket"
+rarity = "common"
 description = "Gain +25 max HP"
 price = 50
 frame = 291

@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "dragons_chest"
-name = "Dragon's Chest"
+id = "hourglass_charm"
+name = "Hourglass Charm"
 rarity = "common"
-description = "Every time you score a Tetris, gain 50 coins"
-price = 60
-frame = 187
-effects = [{"type": "treasure_box"}]
+description = "The enemy's first attack each battle comes 2 drops later"
+price = 35
+frame = 175
+effects = [{"type": "first_attack_delay", "amount": 2}]

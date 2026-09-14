@@ -6,6 +6,7 @@
 script = ExtResource("1_data")
 id = "alchemists_ring"
 name = "Alchemist's Ring"
+rarity = "common"
 description = "Increase combo multiplier by 0.1"
 price = 40
 frame = 331

@@ -22,6 +22,16 @@ var fireBlocks
 var iceBlocks
 var goldBlocks
 var pendingGoldCoins
+# Keepsake per-battle bonuses. Stored as totals so two sources of the same effect
+# stack; Main reads them at battle start (orbs, shield, first-clear damage,
+# first-attack delay) and on victory (coins).
+var battleStartOrbs
+var battleStartShield
+var firstClearBonus
+var firstAttackDelay
+var victoryBonusCoins
+var victoryHeal
+var tetrisOrbs
 var magicMeter
 var maxMagicMeter
 var spawnBag
@@ -76,6 +86,13 @@ func _setDefaults():
 	iceBlocks = false
 	goldBlocks = false
 	pendingGoldCoins = 0
+	battleStartOrbs = 0
+	battleStartShield = 0
+	firstClearBonus = 0
+	firstAttackDelay = 0
+	victoryBonusCoins = 0
+	victoryHeal = 0
+	tetrisOrbs = 0
 	magicMeter = 0
 	maxMagicMeter = 5
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
@@ -237,5 +254,19 @@ func applyKeepsakeEffect(desc: Dictionary):
 			iceBlocks = true
 		"gold_blocks":
 			goldBlocks = true
+		"battle_orbs":
+			battleStartOrbs += desc.amount
+		"battle_shield":
+			battleStartShield += desc.amount
+		"first_clear_damage":
+			firstClearBonus += desc.amount
+		"first_attack_delay":
+			firstAttackDelay += desc.amount
+		"victory_coins":
+			victoryBonusCoins += desc.amount
+		"victory_heal":
+			victoryHeal += desc.amount
+		"tetris_orbs":
+			tetrisOrbs += desc.amount
 		_:
 			push_warning("PlayerManager: unknown keepsake effect '%s'" % desc.type)

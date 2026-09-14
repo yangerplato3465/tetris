@@ -6,6 +6,7 @@
 script = ExtResource("1_data")
 id = "gilded_idol"
 name = "Gilded Idol"
+rarity = "uncommon"
 description = "Gold blocks appear in pieces. Clearing gold blocks gives 1 coin each"
 price = 40
 frame = 246

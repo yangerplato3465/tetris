@@ -6,6 +6,7 @@
 script = ExtResource("1_data")
 id = "ember_charm"
 name = "Ember Charm"
+rarity = "uncommon"
 description = "Fire blocks appear in pieces. Clearing fire blocks deals +15 bonus damage each"
 price = 40
 frame = 242

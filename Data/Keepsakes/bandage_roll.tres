@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "dragons_chest"
-name = "Dragon's Chest"
+id = "bandage_roll"
+name = "Bandage Roll"
 rarity = "common"
-description = "Every time you score a Tetris, gain 50 coins"
-price = 60
-frame = 187
-effects = [{"type": "treasure_box"}]
+description = "Heal 3 HP after every victory"
+price = 35
+frame = 159
+effects = [{"type": "victory_heal", "amount": 3}]

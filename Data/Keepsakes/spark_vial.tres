@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_data")
-id = "dragons_chest"
-name = "Dragon's Chest"
+id = "spark_vial"
+name = "Spark Vial"
 rarity = "common"
-description = "Every time you score a Tetris, gain 50 coins"
-price = 60
-frame = 187
-effects = [{"type": "treasure_box"}]
+description = "Start every battle with +1 magic orb"
+price = 30
+frame = 289
+effects = [{"type": "battle_orbs", "amount": 1}]
