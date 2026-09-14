@@ -10,4 +10,4 @@ rarity = "common"
 description = "See one more upcoming piece"
 price = 30
 frame = 169
-effects = [{"type": "next_piece", "amount": 1}]
+effects = [{"trigger": "acquire", "type": "next_piece", "amount": 1}]

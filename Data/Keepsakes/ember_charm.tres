@@ -10,4 +10,4 @@ rarity = "uncommon"
 description = "Fire blocks appear in pieces. Clearing fire blocks deals +15 bonus damage each"
 price = 40
 frame = 242
-effects = [{"type": "fire_blocks"}]
+effects = [{"trigger": "acquire", "type": "fire_blocks"}]

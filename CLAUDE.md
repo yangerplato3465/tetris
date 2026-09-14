@@ -81,7 +81,7 @@ Defined in `project.godot` and available everywhere without `$`:
 
 **`Scripts/Core/Piece.gd`** — A single tetromino: shape matrix, rotation state, and elemental assignment (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
 
-**`Scripts/Managers/PlayerManager.gd`** — Mutable singleton holding the entire run state. `reset()` (called from `GameplayScene._ready`) restores defaults; `_setDefaults()` is the single list of what a run starts with. Keepsake purchases go through `addKeepsake` → `applyKeepsakeEffect`.
+**`Scripts/Managers/PlayerManager.gd`** — Mutable singleton holding the entire run state. `reset()` (called from `GameplayScene._ready`) restores defaults; `_setDefaults()` is the single list of what a run starts with. Keepsake purchases go through `addKeepsake` → `applyAcquireEffect`; `keepsakeEffects(trigger)` is what `Main` fires everything else from.
 
 ### Content is Data, Not Code
 
@@ -95,6 +95,8 @@ Every content directory under `Data/` is scanned whole at startup and loaded int
 | `Data/Keepsakes/` | `KeepsakeData` | `Keepsakes.keepsakes` / `Keepsakes.pool` |
 
 The `id` field is identity; each file is named for its `id` and nothing else. Boss scheduling lives in `EnemyData.bossFloor`, not in file order.
+
+**Validation.** `Scripts/Data/DataValidator.gd` checks abilities, keepsakes and characters at boot, called from `Consts._init` and `Keepsakes._init`. It reports every problem with `push_error` (the game still runs): an unknown effect `type` or keepsake `trigger`, a missing required key or an unexpected one (catches `"ammount"`), a non-numeric `amount`/`min_lines`/`element`/`shape`, an `id` that doesn't match its filename or is reused, an unknown rarity or passive, and an `abilityPool`/`startingAbilities` id with no ability. The allowed lists are `AbilityData.EFFECT_KEYS`, `KeepsakeData.TRIGGERS`/`ACQUIRE_EFFECTS` and `CharacterData.PASSIVES`, where each type maps to the keys it reads (`"amount?"` = optional). **Adding an effect type, trigger or passive means adding it to that list too**, or every file using it fails validation. Enemies and events are not validated.
 
 **One exception — enemies are not fully data-driven.** `Grid.setStage()` picks the
 battle's starting board with `match enemyInfo.id:` against a hardcoded list of integer
@@ -202,6 +204,9 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `cleanse` | strip the enemy's damage reduction for the rest of the battle |
 | `delay_attack` | wind the enemy attack counter back `amount` drops |
 | `advance_attack` | wind the enemy attack counter *forward* `amount` drops; if that reaches `attackSteps` the enemy attacks immediately, mid-cast |
+| `attack_grace` | the next `amount` drops don't advance the attack counter (`Main._attackGrace`); unlike `delay_attack` it works on a counter at 0, and `enemyAttack` zeroes it |
+| `next_clear_damage` | the next line clear deals `amount` extra damage, before combo and reduction (`Main._nextClearBonus`) |
+| `coins` | gain `amount` coins |
 
 Most effects carry an int `amount`. `enchant_piece` carries `element` (a
 `Constants.Elemental` value) and `queue_piece` carries `shape` (an index into
@@ -220,7 +225,7 @@ back this fight — so a burn ability should leave `cooldown` at 0 rather than
 carry both. `Collapse`, `Crucible`, `Immolate`, `Slag`, `Absolute Zero`, `Attrition` and `Echo Chamber` are the burn abilities; card tooltips
 append the note via `AbilityData.burnLabel`.
 
-To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres`. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect`.
+To add one: copy an existing `.tres`, set `id`/`name`/`rarity`/`cost`/`costLabel`/`cooldown`/`price`/`description`, write its `effects`, then **add the id to `abilityPool`** in `Data/Characters/*.tres`. No code change is needed unless you want a new effect type, which means one new `match` branch in `Main._applyAbilityEffect` plus its entry in `AbilityData.EFFECT_KEYS`.
 
 Four gotchas. `clear_rows` calls `Grid.clearBottomRows`, which emits `clearLines` — wired to `Main.attack()` — so it *also* deals normal line-clear damage and extends the combo; price accordingly. Since that damage is per-block, wiping rows made mostly of garbage pays close to nothing while still extending the combo — `clear_rows` is board relief first and damage second. `compact_board` is the same: it routes completed rows through `checkAndClearFullLines`, so its damage is whatever the collapse happens to clear, which is why it carries no `amount` of its own. `holy_beam` deliberately does *not*: `Grid.holyBeam` emits nothing, so it is pure board relief. And `type` (`attack`/`block`) is descriptive metadata for card visuals only — casting dispatches on `effects`, not on it.
 
@@ -230,7 +235,16 @@ Effects run in order and `useSkill` stops the loop the moment `battleActive` goe
 
 Keepsakes are the shop's bottom row: permanent trinkets bought once, applied immediately, kept for the rest of the run. One `KeepsakeData` `.tres` per keepsake under `Data/Keepsakes/`. Each carries a `rarity` (`common`/`uncommon`/`rare`, same tiers as abilities) that is descriptive only for now — the three elemental unlocks (Rime Shard, Ember Charm, Gilded Idol) are `uncommon`, the rest `common`. `ShopPanell` rolls `KEEPSAKE_COUNT` (5) ids from `Keepsakes.pool`, filtering out anything already in `PlayerManager.ownedKeepsakes`, so an owned keepsake never reappears.
 
-Purchase runs `PlayerManager.addKeepsake` → `applyKeepsakeEffect` per descriptor. The vocabulary is separate from the ability one and lives entirely in that `match`: `combo_mult`, `max_hp`, `heal`, `max_magic`, `next_piece`, `treasure_box`, `fire_blocks`, `ice_blocks`, `gold_blocks` (the boolean unlock types ignore `amount`), plus the per-battle bonuses `battle_orbs`, `battle_shield`, `first_clear_damage`, `first_attack_delay`, `victory_coins`, `victory_heal` and `tetris_orbs`. Those seven only add to a stacking total on `PlayerManager`; `Main` spends them — orbs and shield in `stageReady` (`_applyBattleStartKeepsakes`), the first-clear bonus and attack grace (`_firstClearBonus`, `_attackGrace`) armed in `setStage`, coins in `showReward`, the heal in `victory`, Tetris orbs in `attack` (capped silently, no overload burn). `_attackGrace` absorbs drops before `dropsSinceAttack` moves and is zeroed by `enemyAttack`, so it only ever delays the first attack. `next_piece` emits `PlayerManager.unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
+**A keepsake is a list of effects, each on a trigger:** `{"trigger": ..., "type": ..., "amount": ...}`. `KeepsakeData.TRIGGERS` is the list:
+
+| trigger | fires | vocabulary |
+|---|---|---|
+| `acquire` | once, on purchase (`PlayerManager.addKeepsake` → `applyAcquireEffect`) | `KeepsakeData.ACQUIRE_EFFECTS`: `combo_mult`, `max_hp`, `heal`, `max_magic`, `next_piece`, `fire_blocks`, `ice_blocks`, `gold_blocks` |
+| `battle_start` | `Main.stageReady`, after `battleActive` goes true | the ability vocabulary |
+| `line_clear` | `Main.attack`, before the clear's damage lands; optional `min_lines` (4 = Tetris) | the ability vocabulary |
+| `victory` | `Main.victory` | the ability vocabulary |
+
+Every trigger except `acquire` runs through `Main._fireKeepsakes(trigger, ctx)`, which asks `PlayerManager.keepsakeEffects(trigger)` for the owned keepsakes' matching descriptors and hands each to `Main._applyAbilityEffect` — the same function spells cast with. So Bandage Roll is `{"trigger": "victory", "type": "heal", "amount": 3}` and needs no code, and any ability effect type is automatically a keepsake effect. `acquire` stays separate because it changes run state outside a battle. A new keepsake needs code only for a new trigger (fire it from `Main`, add it to `TRIGGERS`) or a new effect type. `_fireKeepsakes` stops if an effect ends the battle mid-loop, and `attack` returns after firing `line_clear` if the battle ended, so a keepsake can't double-fire `victory()`. Three ability effect types exist mainly for keepsakes: `coins`, `attack_grace` (drops that don't advance the attack counter; works on a counter already at 0, zeroed by `enemyAttack`) and `next_clear_damage` (added to the next clear before combo and reduction). `next_piece` emits `PlayerManager.unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
 
 **Hold is not a keepsake.** It is a default feature for every class: `PlayerManager._setDefaults` sets `canHoldPiece = true`, and the `Old Key` keepsake that used to unlock it has been removed along with its `unlock_hold` effect type. `canHoldPiece` is deliberately kept as the switch a future debuff can turn off — `Grid` gates the hold input on it, and `Main.setStage` re-shows the lock icon when it is false. The existing per-battle enemy debuff is separate and lives in `holdPieceDebuff`, set from `EnemyData.disablesHold` (Death Knight and Slime Body use it). The `PlayerManager.unlockHold` signal is likewise kept but is currently emitted by nothing — `Main.setStage` calls its handler directly.
 

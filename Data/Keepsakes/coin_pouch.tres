@@ -10,4 +10,4 @@ rarity = "common"
 description = "Gain +8 coins after every victory"
 price = 30
 frame = 203
-effects = [{"type": "victory_coins", "amount": 8}]
+effects = [{"trigger": "victory", "type": "coins", "amount": 8}]

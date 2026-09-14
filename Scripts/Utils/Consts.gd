@@ -34,7 +34,11 @@ func _init():
 	BossEnemy = _loadResourceDir("res://Data/Enemies/Boss")
 	characters = _loadResourceDir("res://Data/Characters")
 	for ability in _loadResourceDir("res://Data/Abilities"):
+		if abilities.has(ability.id):
+			push_error("Data: %s reuses ability id '%s'" % [ability.resource_path, ability.id])
 		abilities[ability.id] = ability
+	DataValidator.validateAbilities(abilities.values())
+	DataValidator.validateCharacters(characters, abilities)
 
 # Load every .tres in a directory, sorted by filename. Handles the ".remap"
 # suffix that Godot gives resources in exported builds.

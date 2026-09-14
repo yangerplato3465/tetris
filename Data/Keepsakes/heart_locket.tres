@@ -10,4 +10,4 @@ rarity = "common"
 description = "Gain +25 max HP"
 price = 50
 frame = 291
-effects = [{"type": "max_hp", "amount": 25}]
+effects = [{"trigger": "acquire", "type": "max_hp", "amount": 25}]

@@ -10,4 +10,4 @@ rarity = "common"
 description = "Start every battle with +10 shield"
 price = 30
 frame = 96
-effects = [{"type": "battle_shield", "amount": 10}]
+effects = [{"trigger": "battle_start", "type": "shield", "amount": 10}]

@@ -10,4 +10,4 @@ rarity = "common"
 description = "Heal 3 HP after every victory"
 price = 35
 frame = 159
-effects = [{"type": "victory_heal", "amount": 3}]
+effects = [{"trigger": "victory", "type": "heal", "amount": 3}]

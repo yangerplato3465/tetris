@@ -10,4 +10,4 @@ rarity = "common"
 description = "Every Tetris (4-line clear) gives +1 magic orb"
 price = 40
 frame = 129
-effects = [{"type": "tetris_orbs", "amount": 1}]
+effects = [{"trigger": "line_clear", "min_lines": 4, "type": "magic", "amount": 1}]

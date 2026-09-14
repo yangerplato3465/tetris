@@ -17,12 +17,13 @@ var enemyAttackSteps = 5
 var enemyAttackDamage = 20
 var enemyAttackAddsGarbage = false
 var dropsSinceAttack = 0
-# Hourglass Charm: drops that don't count toward the enemy's first attack. Spent
-# before dropsSinceAttack moves, and cleared by enemyAttack so it only ever
-# delays the first one.
+# Set by attack_grace: drops that don't advance the enemy attack counter. Spent
+# before dropsSinceAttack moves, and zeroed by enemyAttack so it only ever delays
+# the next attack. Cleared per battle by _resetSlotState.
 var _attackGrace = 0
-# Whetstone: flat damage added to the first line clear of the battle, then zeroed.
-var _firstClearBonus = 0
+# Set by next_clear_damage: flat damage added to the next line clear, then zeroed.
+# Cleared per battle by _resetSlotState.
+var _nextClearBonus = 0
 var battleActive = false
 
 @onready var holdLock = $Grid/UI/Hold/TextureRect/Lock
@@ -140,8 +141,7 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	enemyAttackDamage = enemyInfo.attackDamage
 	enemyAttackAddsGarbage = enemyInfo.attackAddsGarbage
 	dropsSinceAttack = 0
-	_attackGrace = PlayerManager.firstAttackDelay
-	_firstClearBonus = PlayerManager.firstClearBonus
+	_attackGrace = 0 # battle_start re-arms it; cleared now so the label isn't stale mid-slide
 	updateAttackStepsUI()
 	# Debuffs now travel with the enemy (see EnemyData). Every stage sets them
 	# from the enemy's own data, so nothing leaks from the previous fight.
@@ -197,6 +197,8 @@ func _resetSlotState():
 	_pendingCasts.clear() # drop any press left unresolved across a battle boundary
 	_spellDamageBonus = 0
 	_echoNextCast = false
+	_attackGrace = 0
+	_nextClearBonus = 0
 
 # Mirror the equipped ability slots into the skill panel rows. Slot order maps
 # skill_1 -> Skill1, skill_2 -> Skill2, ... Empty slots show a placeholder.
@@ -406,6 +408,23 @@ func _applyAbilityEffect(effect: Dictionary):
 			PopupNumbers.displayText("HASTENED +%d" % amount, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(1.0, 0.5, 0.3))
 			if dropsSinceAttack >= enemyAttackSteps:
 				enemyAttack()
+		# Drops the attack counter ignores. Unlike delay_attack this still does
+		# something on a counter already at 0, so it can be armed at battle start
+		# (Hourglass Charm). Spent before dropsSinceAttack moves; enemyAttack zeroes
+		# it, so it only ever delays the next attack.
+		"attack_grace":
+			_attackGrace += amount
+			updateAttackStepsUI()
+			PopupNumbers.displayText("DELAYED +%d" % amount, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.5, 0.8, 1.0))
+		# Rides on the next line clear itself (see attack), so combo and the enemy's
+		# damageReduction scale it like the blocks. Spent by that clear even if it
+		# paid nothing, and not boosted by spell_power — it isn't a spell hit.
+		"next_clear_damage":
+			_nextClearBonus += amount
+			PopupNumbers.displayText("+%d NEXT CLEAR" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.6, 0.2))
+		"coins":
+			PlayerManager.coin += amount
+			PopupNumbers.displayText("+$%d" % amount, Vector2(620, 220), Color(1.0, 0.85, 0.0))
 		_:
 			push_warning("Main: unknown ability effect type '%s'" % effect.get("type", ""))
 
@@ -459,22 +478,30 @@ func stageReady():
 	enemyAttackLabel.modulate = Color.WHITE
 	enemy.self_modulate = Color.WHITE
 	player.self_modulate = Color.WHITE
-	_applyBattleStartKeepsakes()
 	battleActive = true
+	# After battleActive and _resetSlotState: effects like attack_grace arm
+	# per-battle state that the reset would otherwise wipe.
+	_fireKeepsakes("battle_start")
 	_updateSkillAvailability()
 
-# Spark Vial / Tin Buckler. Orbs cap silently like the `magic` ability effect —
-# never an overflow burn. Shield just adds to whatever carried over.
-func _applyBattleStartKeepsakes():
-	const POPUP_POS = Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60)
-	if PlayerManager.battleStartOrbs > 0:
-		PlayerManager.magicMeter = mini(PlayerManager.magicMeter + PlayerManager.battleStartOrbs, PlayerManager.maxMagicMeter)
-		PopupNumbers.displayText("+%d ORB" % PlayerManager.battleStartOrbs, POPUP_POS, Color(0.6, 0.4, 1.0))
-		updateMagicMeterUI()
-	if PlayerManager.battleStartShield > 0:
-		PlayerManager.shieldNum += PlayerManager.battleStartShield
-		PopupNumbers.displayText("+%d SHIELD" % PlayerManager.battleStartShield, POPUP_POS + Vector2(0, 40), Color(0.4, 0.8, 1.0))
-		updateShieldUI()
+# --- Keepsakes ---
+
+# Runs every owned keepsake effect listening for `trigger` through
+# _applyAbilityEffect — the same vocabulary abilities cast with, so a keepsake is
+# effectively a spell that casts itself. `ctx` carries what the trigger knows, for
+# effects that filter on it (line_clear passes "lines" for min_lines). "acquire"
+# effects never come through here: PlayerManager applies them at purchase.
+# A keepsake damage effect would pick up _spellDamageBonus like any spell.
+func _fireKeepsakes(trigger: String, ctx: Dictionary = {}):
+	# Stop if an effect ends the battle part-way, as useSkill does. "victory" fires
+	# with the battle already over, so only a change during the loop counts.
+	var wasActive = battleActive
+	for desc in PlayerManager.keepsakeEffects(trigger):
+		if wasActive and not battleActive:
+			break
+		if desc.get("min_lines", 0) > ctx.get("lines", 0):
+			continue
+		_applyAbilityEffect(desc)
 
 func updateAttackStepsUI():
 	enemyAttackLabel.text = "attack : %d / %d" % [dropsSinceAttack, enemyAttackSteps]
@@ -549,18 +576,11 @@ func attack(clearedLines, combo, payingBlocks):
 		return
 	attackAnim()
 	var damageDealt = payingBlocks * DAMAGE_PER_BLOCK
-	# Whetstone rides on the clear itself, so combo and damageReduction scale it
-	# like the blocks. Spent by the first clear even if that clear paid nothing.
-	if _firstClearBonus > 0:
-		damageDealt += _firstClearBonus
-		_firstClearBonus = 0
-	if clearedLines == 4 and PlayerManager.treasureBox:
-		showTreasureboxReward()
-	# Worn Gauntlet. Caps silently like the `magic` ability effect — these orbs
-	# come from a keepsake, not the board, so they never trigger an overload burn.
-	if clearedLines == 4 and PlayerManager.tetrisOrbs > 0:
-		PlayerManager.magicMeter = mini(PlayerManager.magicMeter + PlayerManager.tetrisOrbs, PlayerManager.maxMagicMeter)
-		updateMagicMeterUI()
+	# next_clear_damage (Whetstone) rides on the clear itself, so combo and
+	# damageReduction scale it like the blocks.
+	if _nextClearBonus > 0:
+		damageDealt += _nextClearBonus
+		_nextClearBonus = 0
 	match combo:
 		1:
 			AudioManager.combo_1.play()
@@ -591,6 +611,13 @@ func attack(clearedLines, combo, payingBlocks):
 	PlayerManager.linesCleared += clearedLines
 	if (combo > PlayerManager.highestCombo):
 		PlayerManager.highestCombo = combo
+	# Before the damage lands, so a killing clear still pays its keepsakes (Dragon's
+	# Chest, Worn Gauntlet). Their orbs cap silently like the `magic` ability — they
+	# never count as board overflow. If one of them ends the battle, stop here so
+	# updateEnemyHealth can't call victory() a second time.
+	_fireKeepsakes("line_clear", {"lines": clearedLines})
+	if not battleActive:
+		return
 	updateEnemyHealth(damageDealt)
 
 func flashEnemy():
@@ -646,7 +673,7 @@ func enemyAttack():
 		gameover()
 		return
 	dropsSinceAttack = 0
-	_attackGrace = 0 # only the first attack is delayed, even if advance_attack forced it early
+	_attackGrace = 0 # grace only delays the next attack, even one advance_attack forced early
 	updateAttackStepsUI()
 
 # Ice blocks pay in tempo rather than damage: each one cleared winds the enemy
@@ -691,10 +718,7 @@ func victory():
 	battleActive = false
 	_updateSkillAvailability()
 	PlayerManager.currentLevel += 1
-	if PlayerManager.victoryHeal > 0: # Bandage Roll
-		PlayerManager.playerHealth = mini(PlayerManager.playerHealth + PlayerManager.victoryHeal, PlayerManager.maxPlayerHealth)
-		PopupNumbers.displayText("+%d HP" % PlayerManager.victoryHeal, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 1.0, 0.5))
-		updatePlayerHealthUI()
+	_fireKeepsakes("victory")
 	animationPlayer.play("EnemyDeath")
 	$Grid.stopGrid()
 	showVictory()
@@ -725,29 +749,15 @@ func showVictory():
 func showReward():
 	await get_tree().create_timer(0.7).timeout
 	AudioManager.kaching.play()
-	var total = reward + PlayerManager.victoryBonusCoins # Coin Pouch
-	PlayerManager.coin += total
+	PlayerManager.coin += reward
 	var tween = create_tween()
 	rewardLabel.scale = Vector2(0.5, 0.5)
 	rewardLabel.visible = true
-	rewardLabel.text = "+$%d" % total
+	rewardLabel.text = "+$%d" % reward
 	tween.set_trans(Tween.TRANS_ELASTIC)
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 2)
 	tween.finished.connect(func():
 		rewardLabel.visible = false
 		stage_victory.emit()
-	)
-
-func showTreasureboxReward():
-	PlayerManager.coin += 50
-	var tween = create_tween()
-	rewardLabel.scale = Vector2(0.5, 0.5)
-	rewardLabel.visible = true
-	rewardLabel.text = "+$%d" % 50
-	tween.set_trans(Tween.TRANS_ELASTIC)
-	tween.set_ease(Tween.EASE_OUT)
-	tween.tween_property(rewardLabel, "scale", Vector2(1, 1), 2)
-	tween.finished.connect(func():
-		rewardLabel.visible = false
 	)

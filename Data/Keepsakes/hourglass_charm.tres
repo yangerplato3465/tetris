@@ -10,4 +10,4 @@ rarity = "common"
 description = "The enemy's first attack each battle comes 2 drops later"
 price = 35
 frame = 175
-effects = [{"type": "first_attack_delay", "amount": 2}]
+effects = [{"trigger": "battle_start", "type": "attack_grace", "amount": 2}]

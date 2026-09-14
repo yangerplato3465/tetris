@@ -17,21 +17,10 @@ var canHoldPiece
 var comboMult
 var numberStoreItem
 var coin
-var treasureBox
 var fireBlocks
 var iceBlocks
 var goldBlocks
 var pendingGoldCoins
-# Keepsake per-battle bonuses. Stored as totals so two sources of the same effect
-# stack; Main reads them at battle start (orbs, shield, first-clear damage,
-# first-attack delay) and on victory (coins).
-var battleStartOrbs
-var battleStartShield
-var firstClearBonus
-var firstAttackDelay
-var victoryBonusCoins
-var victoryHeal
-var tetrisOrbs
 var magicMeter
 var maxMagicMeter
 var spawnBag
@@ -81,18 +70,10 @@ func _setDefaults():
 	comboMult = BASE_COMBO_MULT
 	numberStoreItem = 6
 	coin = 50
-	treasureBox = false
 	fireBlocks = false
 	iceBlocks = false
 	goldBlocks = false
 	pendingGoldCoins = 0
-	battleStartOrbs = 0
-	battleStartShield = 0
-	firstClearBonus = 0
-	firstAttackDelay = 0
-	victoryBonusCoins = 0
-	victoryHeal = 0
-	tetrisOrbs = 0
 	magicMeter = 0
 	maxMagicMeter = 5
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
@@ -225,14 +206,26 @@ func getCharacterDescription(charId: String) -> String:
 # --- Keepsakes ---
 
 func addKeepsake(keepsake: KeepsakeData):
-	# Pay for a keepsake and apply its data-driven effects (see KeepsakeData
-	# for the schema). Owned keepsakes are excluded from future shop rolls.
+	# Pay for a keepsake, own it, and apply its "acquire" effects now. Every other
+	# trigger is fired later by Main, which finds it via keepsakeEffects — owning
+	# the keepsake is all it takes. Owned keepsakes are excluded from shop rolls.
 	coin -= keepsake.price
 	ownedKeepsakes.append(keepsake.id)
-	for desc in keepsake.effects:
-		applyKeepsakeEffect(desc)
+	for desc in keepsake.effectsFor("acquire"):
+		applyAcquireEffect(desc)
 
-func applyKeepsakeEffect(desc: Dictionary):
+# Every effect on `trigger` across the keepsakes owned this run, in purchase order.
+func keepsakeEffects(trigger: String) -> Array:
+	var out = []
+	for id in ownedKeepsakes:
+		var keepsake = Keepsakes.getKeepsake(id)
+		if keepsake:
+			out.append_array(keepsake.effectsFor(trigger))
+	return out
+
+# The "acquire" vocabulary (KeepsakeData.ACQUIRE_EFFECTS): permanent run-state
+# changes, applied once at purchase.
+func applyAcquireEffect(desc: Dictionary):
 	match desc.type:
 		"combo_mult":
 			comboMult += desc.amount
@@ -246,27 +239,11 @@ func applyKeepsakeEffect(desc: Dictionary):
 		"next_piece":
 			visibleNextPiece += desc.get("amount", 1)
 			unlockNextPiece.emit()
-		"treasure_box":
-			treasureBox = true
 		"fire_blocks":
 			fireBlocks = true
 		"ice_blocks":
 			iceBlocks = true
 		"gold_blocks":
 			goldBlocks = true
-		"battle_orbs":
-			battleStartOrbs += desc.amount
-		"battle_shield":
-			battleStartShield += desc.amount
-		"first_clear_damage":
-			firstClearBonus += desc.amount
-		"first_attack_delay":
-			firstAttackDelay += desc.amount
-		"victory_coins":
-			victoryBonusCoins += desc.amount
-		"victory_heal":
-			victoryHeal += desc.amount
-		"tetris_orbs":
-			tetrisOrbs += desc.amount
 		_:
-			push_warning("PlayerManager: unknown keepsake effect '%s'" % desc.type)
+			push_warning("PlayerManager: unknown acquire effect '%s'" % desc.type)

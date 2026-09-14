@@ -10,4 +10,4 @@ rarity = "uncommon"
 description = "Ice blocks appear in pieces. Clearing an ice block delays the enemy attack by 1 drop"
 price = 30
 frame = 244
-effects = [{"type": "ice_blocks"}]
+effects = [{"trigger": "acquire", "type": "ice_blocks"}]

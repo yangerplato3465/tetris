@@ -44,6 +44,12 @@ extends Resource
 #   cleanse           strip the enemy's damage reduction for this battle
 #   delay_attack      wind the enemy attack counter back `amount` drops
 #   advance_attack    wind it *forward* `amount` drops; can trigger the attack now
+#   attack_grace      the next `amount` drops don't advance the attack counter
+#   next_clear_damage the next line clear deals `amount` extra damage
+#   coins             gain `amount` coins
+#
+# Keepsakes run their non-acquire effects through the same function, so every
+# type here is also a keepsake effect (see KeepsakeData).
 #
 # Most effects carry an int `amount`. enchant_piece and queue_piece are the
 # exceptions: they carry `element` (a Constants.Elemental value) and `shape` (an
@@ -53,6 +59,42 @@ extends Resource
 # The names match Events.gd / EventScene._applyEffect where the meaning is the
 # same, so the two vocabularies read alike. The exception is damage_enemy:
 # an event's "damage" hurts the *player*, so it gets a distinct name here.
+
+# Every effect type Main._applyAbilityEffect implements, mapped to the keys it
+# reads (a trailing "?" marks a key optional). DataValidator rejects any type or
+# key not listed here, so a new effect type needs its entry here as well as its
+# match branch in Main.
+const EFFECT_KEYS := {
+	"damage_enemy": ["amount"],
+	"damage_per_row": ["amount"],
+	"damage_per_combo": ["amount"],
+	"damage_per_garbage": ["amount"],
+	"damage_per_shield": ["amount"],
+	"damage_per_line_cleared": ["amount"],
+	"spell_power": ["amount"],
+	"echo_next_cast": [],
+	"self_damage": ["amount"],
+	"shield": ["amount"],
+	"shield_per_row": ["amount"],
+	"shield_per_garbage": ["amount"],
+	"shield_per_combo": ["amount"],
+	"heal": ["amount"],
+	"magic": ["amount"],
+	"coins": ["amount"],
+	"clear_rows": ["amount"],
+	"holy_beam": [],
+	"purify_garbage": [],
+	"shuffle_rows": ["amount"],
+	"compact_board": [],
+	"queue_piece": ["shape"],
+	"add_garbage": ["amount"],
+	"enchant_piece": ["element"],
+	"cleanse": [],
+	"delay_attack": ["amount"],
+	"advance_attack": ["amount"],
+	"attack_grace": ["amount"],
+	"next_clear_damage": ["amount"],
+}
 
 @export var id: String = ""
 @export var name: String = ""

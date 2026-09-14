@@ -10,4 +10,4 @@ rarity = "common"
 description = "Increase max magic orbs by 2"
 price = 50
 frame = 326
-effects = [{"type": "max_magic", "amount": 2}]
+effects = [{"trigger": "acquire", "type": "max_magic", "amount": 2}]

@@ -12,6 +12,6 @@ cost = 2
 costLabel = "2 orbs"
 cooldown = 0
 burn = true
-effects = Array[Dictionary]([{ "type": "echo_next_cast", "amount": 1 }])
+effects = Array[Dictionary]([{ "type": "echo_next_cast" }])
 price = 200
 description = "Your next spell is cast twice"

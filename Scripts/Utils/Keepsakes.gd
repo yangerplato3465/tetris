@@ -7,7 +7,7 @@ extends Node
 # Each keepsake is authored as a typed KeepsakeData .tres under Data/Keepsakes/
 # and loaded here at startup (in _init, mirroring Consts). To add/tune one, edit
 # or add a .tres in the Inspector — no code change. Effect descriptors on each
-# keepsake are interpreted by PlayerManager.applyKeepsakeEffect.
+# keepsake run on a trigger — see KeepsakeData for the schema.
 
 # id -> KeepsakeData, and the list of ids eligible for the shop's bottom row
 # (the shop filters out ids already in PlayerManager.ownedKeepsakes).
@@ -16,8 +16,12 @@ var pool: Array = []
 
 func _init():
 	for keepsake in _loadResourceDir("res://Data/Keepsakes"):
+		if keepsakes.has(keepsake.id):
+			push_error("Data: %s reuses keepsake id '%s'" % [keepsake.resource_path, keepsake.id])
+			continue
 		keepsakes[keepsake.id] = keepsake
 		pool.append(keepsake.id)
+	DataValidator.validateKeepsakes(keepsakes.values())
 
 func _loadResourceDir(path: String) -> Array:
 	var out: Array = []

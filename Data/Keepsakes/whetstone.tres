@@ -10,4 +10,4 @@ rarity = "common"
 description = "Your first line clear each battle deals +50 damage"
 price = 30
 frame = 273
-effects = [{"type": "first_clear_damage", "amount": 50}]
+effects = [{"trigger": "battle_start", "type": "next_clear_damage", "amount": 50}]

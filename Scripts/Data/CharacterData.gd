@@ -15,6 +15,10 @@ extends Resource
 #                     (PlayerManager.selectCharacter)
 # An empty passive means the class has none.
 
+# Every passive id some system implements. DataValidator rejects anything else,
+# so add the id here when you add the hasPassive check that gives it meaning.
+const PASSIVES := ["", "overload", "combo_mastery"]
+
 @export var id: String = ""
 @export var name: String = ""
 @export var frame: int = 0           # icon frame in the character spritesheet

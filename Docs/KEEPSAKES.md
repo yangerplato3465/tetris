@@ -11,7 +11,8 @@ one.
 
 The shop rolls **5** of the **15** keepsakes per visit from `Keepsakes.pool`, filtering out
 anything you already own, so a keepsake never appears twice in a run. Buying one runs
-`PlayerManager.addKeepsake` → `applyKeepsakeEffect`, which applies the effect on the spot.
+`PlayerManager.addKeepsake`, which applies its permanent effects on the spot; the rest fire
+on their trigger (battle start, line clear, victory) for as long as you own it.
 
 Keepsakes are the only way to unlock two of the game's systems — the **next piece**
 preview and the three **elemental block** types. Until you buy the relevant keepsake,
@@ -81,13 +82,21 @@ The shop's other two cards are not keepsakes — they are services defined inlin
 ## Authoring
 
 Keepsakes are data — one `.tres` per keepsake under `Data/Keepsakes/`, scanned whole at
-startup. The effect vocabulary is separate from the ability one and lives entirely in
-`PlayerManager.applyKeepsakeEffect`:
+startup. Each effect names **when** it runs and **what** it does:
 
-`combo_mult` · `max_hp` · `heal` · `max_magic` · `next_piece` ·
-`treasure_box` · `fire_blocks` · `ice_blocks` · `gold_blocks` ·
-`battle_orbs` · `battle_shield` · `first_clear_damage` · `first_attack_delay` ·
-`victory_coins` · `victory_heal` · `tetris_orbs`
+```
+{"trigger": "victory", "type": "heal", "amount": 3}                       # Bandage Roll
+{"trigger": "line_clear", "min_lines": 4, "type": "coins", "amount": 50}  # Dragon's Chest
+```
 
-The boolean unlock types ignore `amount`. `heal` is implemented but no keepsake currently
-uses it. Adding a keepsake needs no code change unless you want a new effect type.
+| Trigger        | When                                  | Effect types                                     |
+| -------------- | ------------------------------------- | ------------------------------------------------ |
+| `acquire`      | once, when bought                     | `combo_mult` · `max_hp` · `heal` · `max_magic` · `next_piece` · `fire_blocks` · `ice_blocks` · `gold_blocks` |
+| `battle_start` | every battle, as it begins            | any spell effect (`shield`, `magic`, `attack_grace`, …) |
+| `line_clear`   | every line clear; `min_lines` filters | any spell effect (`coins`, `magic`, …)           |
+| `victory`      | every enemy killed                    | any spell effect (`heal`, `coins`, …)            |
+
+Everything except `acquire` uses the same effect types as spells (see `CLAUDE.md` for the
+full table), so a new keepsake built from existing triggers and types needs no code. The
+game checks every keepsake at startup and prints a red error for an unknown trigger or
+type, or a missing or misspelled key.

@@ -10,4 +10,4 @@ rarity = "common"
 description = "Increase combo multiplier by 0.1"
 price = 40
 frame = 331
-effects = [{"type": "combo_mult", "amount": 0.1}]
+effects = [{"trigger": "acquire", "type": "combo_mult", "amount": 0.1}]

@@ -10,4 +10,4 @@ rarity = "common"
 description = "Every time you score a Tetris, gain 50 coins"
 price = 60
 frame = 187
-effects = [{"type": "treasure_box"}]
+effects = [{"trigger": "line_clear", "min_lines": 4, "type": "coins", "amount": 50}]

@@ -10,4 +10,4 @@ rarity = "common"
 description = "Start every battle with +1 magic orb"
 price = 30
 frame = 289
-effects = [{"type": "battle_orbs", "amount": 1}]
+effects = [{"trigger": "battle_start", "type": "magic", "amount": 1}]
