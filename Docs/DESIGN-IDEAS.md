@@ -10,6 +10,18 @@ suggested numbers. Numbers are tagged by tuning-knob category where it matters:
 *feel* (tuned by playtest intuition), *curve* (tuned by math), *gate* (tuned by
 session-length targets).
 
+> **⚠️ Outdated premise (2026-09-12).** This document was written while fire blocks
+> *banked* damage into `PlayerManager.pendingElementalBonus`, paid out on the next line
+> clear. **That mechanic has been removed.** Fire blocks now deal their damage immediately
+> on clear, the `charge` ability effect is gone, and `pendingElementalBonus` no longer
+> exists. Delayed damage is a rejected design direction, so every proposal below that
+> builds on banking — the *resonance* Weaver passive, **Kindle**, **Transmute**, and the
+> garbage-banks-charge rule — no longer applies as written. The rest of the analysis still
+> stands. Kept as-is for the reasoning, not as a to-do list.
+>
+> This also retires the **[verified]** finding that `pendingElementalBonus` leaked between
+> battles: the variable it described is deleted.
+
 ---
 
 ## 0. The damage budget — the arithmetic everything else is sized to

@@ -404,6 +404,7 @@ texture = ExtResource("7_u34xh")
 expand_mode = 1
 
 [node name="Lock" type="TextureRect" parent="Grid/UI/Hold/TextureRect" unique_id=615725611]
+visible = false
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 102.0

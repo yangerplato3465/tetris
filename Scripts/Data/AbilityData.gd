@@ -32,7 +32,6 @@ extends Resource
 #                     the enemy's damage reduction)
 #   echo_next_cast    the *next* ability cast runs its effects twice, one cost
 #   self_damage       lose `amount` HP, bypassing shield; can kill
-#   charge            bank flat damage onto the next line clear
 #   clear_rows        wipe `amount` rows off the bottom of the board
 #   holy_beam         clear the fullest row — no damage, no combo
 #   purify_garbage    turn every garbage block back into a normal block

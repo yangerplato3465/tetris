@@ -7,7 +7,7 @@ extends Resource
 # "effects" is an ordered list of effect descriptors applied on purchase, each a
 # Dictionary {"type": String, "amount": int/float}. They are interpreted by
 # PlayerManager.applyKeepsakeEffect — add new effect types there. Types in use:
-# combo_mult, max_hp, heal, max_magic, unlock_hold, next_piece, treasure_box,
+# combo_mult, max_hp, heal, max_magic, next_piece, treasure_box,
 # fire_blocks, ice_blocks, gold_blocks (boolean/unlock types ignore "amount").
 
 @export var id: String = ""

@@ -45,6 +45,9 @@ const ENERGY_OVERFLOW_DAMAGE = 5 # HP burned per overflowed orb, "overload" pass
 # still counts for the combo, so clearing garbage sets up the next hit rather
 # than wasting the multiplier.
 const DAMAGE_PER_BLOCK = 10
+# Damage dealt the instant a fire block is cleared. Paid immediately rather than
+# banked onto a later clear — there is no delayed-damage mechanic in the game.
+const FIRE_BLOCK_DAMAGE = 15
 # An enemy's attackDamage is a hit against *shield*, not against HP. Only what
 # leaks past the shield touches HP, and it is divided down by this before it
 # does. HP is a single pool spent across all 15 floors (nothing refills it but
@@ -96,6 +99,7 @@ func connectSignals():
 	$Grid.clearLines.connect(attack)
 	$Grid.magicMeterChanged.connect(updateMagicMeterUI)
 	$Grid.energyOverflow.connect(onEnergyOverflow)
+	$Grid.fireCleared.connect(onFireCleared)
 	$Grid.iceCleared.connect(onIceCleared)
 	PlayerManager.unlockHold.connect(unlockHold)
 	PlayerManager.unlockNextPiece.connect(unlockNextPiece)
@@ -373,11 +377,6 @@ func _applyAbilityEffect(effect: Dictionary):
 		# rather than `amount` so card UI doesn't print the enum as a headline number.
 		"enchant_piece":
 			$Grid.enchantCurrentPiece(effect.get("element", 0))
-		# Banks flat damage onto the next line clear, the same pot fire blocks
-		# fill. Setup now, payoff on the clear.
-		"charge":
-			PlayerManager.pendingElementalBonus += amount
-			PopupNumbers.displayText("+%d CHARGED" % amount, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.7, 0.2))
 		# Strips the enemy's damage reduction for the rest of the fight. setStage
 		# re-reads it from EnemyData, so this never leaks to the next one.
 		"cleanse":
@@ -415,7 +414,13 @@ func _gainShield(amount: int):
 func _dealAbilityDamage(raw: int):
 	# The flat spell buff lands *before* damageReduction, so a halved enemy halves
 	# the buff too and it can never out-scale the debuff it is fighting.
-	var damageDealt = maxi(roundi((raw + _spellDamageBonus) * damageReduction), 0)
+	_dealFlatDamage(raw + _spellDamageBonus)
+
+# Damage that is not a line clear and not a spell — currently fire blocks. Applies
+# the enemy's reduction and animates, but deliberately skips _spellDamageBonus,
+# which belongs to cast abilities only.
+func _dealFlatDamage(raw: int):
+	var damageDealt = maxi(roundi(raw * damageReduction), 0)
 	attackAnim()
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
@@ -509,6 +514,12 @@ func _updateSkillAvailability():
 			costNode.remove_theme_color_override("font_color")
 
 func attack(clearedLines, combo, payingBlocks):
+	# Fire damage resolves before this (Grid emits fireCleared inside
+	# checkAndClearFullLines, before clearLines), so the enemy can already be dead
+	# by the time the clear itself is billed. Without this guard updateEnemyHealth
+	# would call victory() a second time and advance the floor twice.
+	if not battleActive:
+		return
 	attackAnim()
 	var damageDealt = payingBlocks * DAMAGE_PER_BLOCK
 	if clearedLines == 4 and PlayerManager.treasureBox:
@@ -525,14 +536,12 @@ func attack(clearedLines, combo, payingBlocks):
 		_:
 			AudioManager.combo_5.play()
 
-	var elementalBonus = PlayerManager.pendingElementalBonus
-	PlayerManager.pendingElementalBonus = 0
 	var goldCoins = PlayerManager.pendingGoldCoins
 	PlayerManager.pendingGoldCoins = 0
 	if goldCoins > 0:
 		PlayerManager.coin += goldCoins
 		PopupNumbers.displayText("+$%d" % goldCoins, Vector2(620, 220), Color(1.0, 0.85, 0.0))
-	damageDealt = roundi(damageDealt * pow(PlayerManager.comboMult, combo - 1) * damageReduction + elementalBonus)
+	damageDealt = roundi(damageDealt * pow(PlayerManager.comboMult, combo - 1) * damageReduction)
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	const ANNOUNCE_POS = Vector2(620, 160)
 	match clearedLines:
@@ -608,6 +617,15 @@ func enemyAttack():
 # emits pieceDropped. So the delay always resolves ahead of onPieceDropped's
 # increment: clearing one ice block on the drop that would have triggered an
 # attack cancels that attack rather than arriving one step too late.
+# Fire pays on the spot: the damage lands as the block clears, in the same frame,
+# before the line-clear damage for that row. Routed through _dealFlatDamage so it
+# respects the enemy's damage reduction like every other damage source, but does
+# NOT pick up the spell_power buff — a fire block is not a spell.
+func onFireCleared(count):
+	if not battleActive:
+		return
+	_dealFlatDamage(count * FIRE_BLOCK_DAMAGE)
+
 func onIceCleared(count):
 	if not battleActive:
 		return

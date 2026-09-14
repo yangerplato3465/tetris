@@ -21,7 +21,6 @@ var treasureBox
 var fireBlocks
 var iceBlocks
 var goldBlocks
-var pendingElementalBonus
 var pendingGoldCoins
 var magicMeter
 var maxMagicMeter
@@ -64,7 +63,11 @@ func _ready():
 
 func _setDefaults():
 	visibleNextPiece = 1
-	canHoldPiece = false
+	# Hold is a default feature for every class. canHoldPiece is kept as the
+	# switch a future debuff can turn off — Grid gates the hold input on it, and
+	# Main.setStage re-shows the lock icon when it is false. The per-battle enemy
+	# debuff already has its own flag in holdPieceDebuff (EnemyData.disablesHold).
+	canHoldPiece = true
 	comboMult = BASE_COMBO_MULT
 	numberStoreItem = 6
 	coin = 50
@@ -72,7 +75,6 @@ func _setDefaults():
 	fireBlocks = false
 	iceBlocks = false
 	goldBlocks = false
-	pendingElementalBonus = 0
 	pendingGoldCoins = 0
 	magicMeter = 0
 	maxMagicMeter = 5
@@ -224,9 +226,6 @@ func applyKeepsakeEffect(desc: Dictionary):
 			playerHealth = mini(playerHealth + desc.amount, maxPlayerHealth)
 		"max_magic":
 			maxMagicMeter += desc.amount
-		"unlock_hold":
-			canHoldPiece = true
-			unlockHold.emit(false)
 		"next_piece":
 			visibleNextPiece += desc.get("amount", 1)
 			unlockNextPiece.emit()

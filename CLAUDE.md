@@ -123,13 +123,13 @@ Example: `23` = ice (2×10) + L piece (3). `grid[x][y] % 10` gives the piece typ
 
 Line-clear damage in `Main.attack()`:
 ```
-damage = payingBlocks * DAMAGE_PER_BLOCK * comboMult^(combo-1) * damageReduction + elementalBonus
+damage = payingBlocks * DAMAGE_PER_BLOCK * comboMult^(combo-1) * damageReduction
 ```
 
 - `payingBlocks` is billed **per block, not per row**: every cleared cell except garbage, counted by `Grid.payingBlockCount` and carried on the `clearLines(cleared, combo, paying)` signal. A clean row is 10 blocks × `DAMAGE_PER_BLOCK` (10) = the same 100 a line has always been worth, so a clean board is unchanged — what differs is that a row dug out of the enemy's rubble pays only for the blocks the player placed. Garbage still completes and clears rows normally and **still counts for the combo**, so digging out is a setup move rather than a wasted multiplier. This is the only mechanical difference between a garbage block and a plain one; everything else in `Grid.gd` tests `!= 0` and cannot tell them apart
 - `comboMult` starts flat at `PlayerManager.BASE_COMBO_MULT` (1.0) — a combo adds nothing by itself. The Monk's `combo_mastery` passive sets it to `COMBO_MASTERY_MULT` (1.1) at character select, and `combo_mult` keepsakes raise it from there
 - `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5) and is the only damage debuff an enemy carries — it scales, so it never punishes small hits disproportionately. `EnemyData.disablesHold` is the other debuff
-- `elementalBonus` accumulates from fire blocks cleared this drop, consumed on the next line clear. Ice does **not** feed it — see Elemental Blocks below
+- There is **no** elemental bonus term any more. Fire blocks deal their damage immediately on clear via `fireCleared` rather than being banked into the next clear — see Elemental Blocks below
 
 Incoming damage in `Main.enemyAttack()` runs on a different scale from outgoing damage:
 
@@ -191,7 +191,6 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `spell_power` | every damaging ability effect deals `amount` **extra flat damage** for the rest of the battle (`Main._spellDamageBonus`, added before the enemy's reduction, reset in `_resetSlotState`) |
 | `echo_next_cast` | the **next** ability cast runs its whole effect list twice for one orb cost; never doubles the cast that grants it |
 | `self_damage` | lose `amount` HP, bypassing shield like `overload`; **can kill**, and the `battleActive` guard then stops the remaining effects |
-| `charge` | bank flat damage onto the next line clear (`pendingElementalBonus`) |
 | `clear_rows` | wipe `amount` rows off the bottom of the board |
 | `holy_beam` | clear the fullest row — no damage, no combo |
 | `purify_garbage` | turn every garbage block back into a normal block |
@@ -231,7 +230,9 @@ Effects run in order and `useSkill` stops the loop the moment `battleActive` goe
 
 Keepsakes are the shop's bottom row: permanent trinkets bought once, applied immediately, kept for the rest of the run. One `KeepsakeData` `.tres` per keepsake under `Data/Keepsakes/`. `ShopPanell` rolls `KEEPSAKE_COUNT` (5) ids from `Keepsakes.pool`, filtering out anything already in `PlayerManager.ownedKeepsakes`, so an owned keepsake never reappears.
 
-Purchase runs `PlayerManager.addKeepsake` → `applyKeepsakeEffect` per descriptor. The vocabulary is separate from the ability one and lives entirely in that `match`: `combo_mult`, `max_hp`, `heal`, `max_magic`, `unlock_hold`, `next_piece`, `treasure_box`, `fire_blocks`, `ice_blocks`, `gold_blocks` (the boolean unlock types ignore `amount`). `unlock_hold` and `next_piece` emit `PlayerManager.unlockHold` / `unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
+Purchase runs `PlayerManager.addKeepsake` → `applyKeepsakeEffect` per descriptor. The vocabulary is separate from the ability one and lives entirely in that `match`: `combo_mult`, `max_hp`, `heal`, `max_magic`, `next_piece`, `treasure_box`, `fire_blocks`, `ice_blocks`, `gold_blocks` (the boolean unlock types ignore `amount`). `next_piece` emits `PlayerManager.unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
+
+**Hold is not a keepsake.** It is a default feature for every class: `PlayerManager._setDefaults` sets `canHoldPiece = true`, and the `Old Key` keepsake that used to unlock it has been removed along with its `unlock_hold` effect type. `canHoldPiece` is deliberately kept as the switch a future debuff can turn off — `Grid` gates the hold input on it, and `Main.setStage` re-shows the lock icon when it is false. The existing per-battle enemy debuff is separate and lives in `holdPieceDebuff`, set from `EnemyData.disablesHold` (Death Knight and Slime Body use it). The `PlayerManager.unlockHold` signal is likewise kept but is currently emitted by nothing — `Main.setStage` calls its handler directly.
 
 The shop's other two cards are services defined inline as constants at the top of `ShopPanell.gd`: `HEAL_OPTION` (Rest, 30 coins for 30 HP) and `UPGRADE_OPTION` (not implemented).
 
@@ -250,7 +251,7 @@ place that pays them out:
 
 | Element | Value | Payout | Keepsake |
 |---|---|---|---|
-| Fire | 1 | `pendingElementalBonus += n * 15` — banked onto the next clear | Ember Charm |
+| Fire | 1 | emits `fireCleared(n)` — deals `n * FIRE_BLOCK_DAMAGE` (15) damage **immediately** | Ember Charm |
 | Ice | 2 | emits `iceCleared(n)` — winds the enemy attack counter back `n` drops | Rime Shard |
 | Gold | 4 | `pendingGoldCoins += n` | Gilded Idol |
 | Orb | 5 | `magicMeter += n`, overflow emits `energyOverflow` | (automatic) |
@@ -263,8 +264,22 @@ which calls `printClearedBlockTypes` and emits `iceCleared` — **before** it em
 cancels that attack instead of arriving a step late. Do not reorder those two calls in
 `afterDrop()`, and do not move the ice payout to a `pieceDropped` handler.
 
-Ice counts wherever `printClearedBlockTypes` runs, so `clear_rows` and `compact_board`
-also collect it. `holy_beam` does **not** — `Grid.holyBeam` emits nothing, consistent with
+**Fire pays immediately too, and there is no banking anywhere in the game.** `Main.onFireCleared`
+deals its damage the moment the block clears — in the same frame, and *before* the
+line-clear damage for that row, since `fireCleared` is emitted inside
+`checkAndClearFullLines` and `clearLines` is emitted after it. That ordering means fire can
+kill the enemy before the clear that produced it is billed, which is why `Main.attack()`
+opens with a `battleActive` guard: without it `updateEnemyHealth` would call `victory()` a
+second time and advance the floor twice. Fire routes through `Main._dealFlatDamage`, so it
+respects the enemy's `damageReduction` like every other damage source but does **not** pick
+up `_spellDamageBonus` — a fire block is not a spell.
+
+The old `charge` effect and `PlayerManager.pendingElementalBonus` that fire used to fill
+have both been deleted. Delayed damage is a rejected mechanic: do not reintroduce a
+bank-now-pay-later effect.
+
+Fire and ice both count wherever `printClearedBlockTypes` runs, so `clear_rows` and `compact_board`
+also collect them. `holy_beam` does **not** — `Grid.holyBeam` emits nothing, consistent with
 it paying no damage and no combo either.
 
 ### Magic Orbs
@@ -294,4 +309,4 @@ Passives that change a base stat are applied in `selectCharacter`, once, before 
 
 ## README
 
-`README.md` carries the credit for the Tetris base (Juan Cerrone), the block-type table (which elemental is unlocked by what, and what it pays on clear), and a live TODO list of balance/content/code debt. The spell catalogue lives in its own file, **`ABILITIES.md`** — slots/drafting, the full spell table, and a pointer back here for authoring. It is hand-maintained, so treat `Data/Abilities/` as the source of truth and update `ABILITIES.md` when you add or retune a spell.
+`README.md` carries the credit for the Tetris base (Juan Cerrone), the block-type table (which elemental is unlocked by what, and what it pays on clear), and a live TODO list of balance/content/code debt. The player-facing catalogues live under **`Docs/`**: **`Docs/ABILITIES.md`** (slots/drafting and the full spell table) and **`Docs/KEEPSAKES.md`** (keepsakes and the shop services), alongside `Docs/DESIGN-IDEAS.md`. Both are hand-maintained, so treat `Data/Abilities/` and `Data/Keepsakes/` as the source of truth and update the matching file in `Docs/` when you add or retune content. `README.md` and `CLAUDE.md` stay at the repo root.

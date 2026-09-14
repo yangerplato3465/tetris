@@ -81,7 +81,7 @@ offered after every victory, and shops sell more for coins. Some spells carry a
 **cooldown** counted in piece drops; a few **burn** on use and are gone for the rest of
 the battle.
 
-**See [ABILITIES.md](ABILITIES.md) for the full spell list.**
+**See [Docs/ABILITIES.md](Docs/ABILITIES.md) for the full spell list.**
 
 ---
 
@@ -114,13 +114,13 @@ Overload above.
 ## Block Types
 
 Once an elemental is unlocked by its keepsake, **every piece** gets one random block of an
-unlocked type. Every 3rd piece gets an orb block instead. Fire banks onto your *next* line
-clear; ice pays immediately in tempo instead of damage.
+unlocked type. Every 3rd piece gets an orb block instead. Fire and ice both pay the moment
+they clear — fire in damage, ice in tempo.
 
 | Block | Colour | How it appears | On clear |
 |---|---|---|---|
 | Normal | White | Always | — |
-| Fire | Red | Ember Charm keepsake | +15 bonus damage per block |
+| Fire | Red | Ember Charm keepsake | +15 damage per block, dealt immediately |
 | Ice | Pale blue | Rime Shard keepsake | Delays the enemy attack by 1 drop per block |
 | Gold | Yellow | Gilded Idol keepsake | +1 coin per block |
 | Orb | Teal | Every 3rd piece | +1 magic orb |
@@ -131,19 +131,14 @@ clear; ice pays immediately in tempo instead of damage.
 ## Keepsakes
 
 The shop's bottom row: permanent trinkets, bought once, kept for the rest of the run.
-Five of the nine are offered per visit, and anything you already own never reappears.
+Five of the eight are offered per visit, and anything you already own never reappears.
 
-| Keepsake | Price | Effect |
-|---|---|---|
-| Old Key | 30 | Unlocks holding pieces |
-| Magnifying Glass | 30 | See one more upcoming piece |
-| Rime Shard | 30 | Unlocks ice blocks |
-| Ember Charm | 40 | Unlocks fire blocks |
-| Gilded Idol | 40 | Unlocks gold blocks |
-| Alchemist's Ring | 40 | +0.1 combo multiplier |
-| Heart Locket | 50 | +25 max HP |
-| Mana Crystal | 50 | +2 max orb capacity |
-| Dragon's Chest | 60 | Every Tetris pays 50 extra coins |
+They cost 30–60 coins and cover stat boosts (max HP, orb capacity, combo multiplier),
+economy (coins per Tetris) and — most importantly — the unlocks for **hold**, the **next
+piece** preview and the three **elemental block** types, none of which appear in a run
+until the matching keepsake is bought.
+
+**See [Docs/KEEPSAKES.md](Docs/KEEPSAKES.md) for the full list.**
 
 The shop also sells spells and a **Rest** (30 coins for 30 HP).
 
@@ -179,8 +174,9 @@ Scene/              scenes and UI components
 All content — enemies, spells, characters, keepsakes — is authored as `.tres` resources
 and scanned from its directory at startup, so adding or tuning content needs no code
 change. **`CLAUDE.md` documents the architecture in detail**, including the ability effect
-vocabulary, the block value encoding, and how to add a new spell; **`ABILITIES.md`** is
-the spell catalogue.
+vocabulary, the block value encoding, and how to add a new spell. The player-facing
+catalogues live in **`Docs/`** — `ABILITIES.md` for spells, `KEEPSAKES.md` for keepsakes,
+plus `DESIGN-IDEAS.md`.
 
 ---
 

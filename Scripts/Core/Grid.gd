@@ -7,6 +7,7 @@ signal clearLines(cleared, combo, paying)
 signal pieceDropped
 signal magicMeterChanged
 signal energyOverflow(count) # orbs collected past the energy cap
+signal fireCleared(count)    # fire blocks cleared this row — each deals damage immediately
 signal iceCleared(count)     # ice blocks cleared this row — each winds the attack counter back 1
 signal grid_gameover
 
@@ -416,7 +417,10 @@ func printClearedBlockTypes(y):
 			Constants.Elemental.GOLD: gold += 1
 			Constants.Elemental.ORB: orb += 1
 	if fire > 0:
-		PlayerManager.pendingElementalBonus += fire * 15
+		# Paid out immediately, exactly like ice's tempo refund — there is no
+		# banking step. Main owns the per-block damage number (FIRE_BLOCK_DAMAGE),
+		# the same way it owns what an ice block is worth.
+		fireCleared.emit(fire)
 	if ice > 0:
 		# Not a damage bonus like fire — ice pays in tempo. Emitted here, inside
 		# checkAndClearFullLines, which afterDrop() runs *before* pieceDropped: the
