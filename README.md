@@ -71,6 +71,8 @@ costs at least 1 HP, so shaving an attack down to a sliver is a win but never fr
 The enemy attacks every `attackSteps` piece drops — the counter is on screen and pulses
 red when the next drop will trigger it.
 
+**See [Docs/ENEMIES.md](Docs/ENEMIES.md) for every enemy and boss, with stats.**
+
 ---
 
 ## Abilities
@@ -176,7 +178,7 @@ and scanned from its directory at startup, so adding or tuning content needs no 
 change. **`CLAUDE.md` documents the architecture in detail**, including the ability effect
 vocabulary, the block value encoding, and how to add a new spell. The player-facing
 catalogues live in **`Docs/`** — `ABILITIES.md` for spells, `KEEPSAKES.md` for keepsakes,
-plus `DESIGN-IDEAS.md`.
+`ENEMIES.md` for enemies, plus `DESIGN-IDEAS.md`.
 
 ---
 
