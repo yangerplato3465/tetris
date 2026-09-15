@@ -13,9 +13,25 @@ signal stage_gameover
 @onready var rewardLabel = $RewardLabel
 @onready var enemyAttackLabel = $EnemyAttackBar/StepsLabel
 @onready var playerHealthLabel = $PlayerHealthLabel
+# The move the enemy is winding up: EnemyBrain picks it, enemyAttack performs it
+# and picks the next. enemyAttackSteps is its steps, kept as its own var because
+# the attack counter, delay/advance effects and the pulse all read it.
 var enemyAttackSteps = 5
-var enemyAttackDamage = 20
-var enemyAttackAddsGarbage = false
+var currentMove: Dictionary = {}
+var _brain: EnemyBrain
+var _enemyScript = null # an instance of the enemy's own file, for call moves (fresh per battle)
+# Built by _buildEnemyLabels, copied from the scene's labels.
+var enemyIntentLabel: Label # what the wound-up move will do
+var enemyStatusLabel: Label # the enemy's timed debuffs on the player
+var enemyShieldLabel: Label # above the enemy's HP
+# enemy_shield: absorbed before the enemy's HP (updateEnemyHealth), kept until broken.
+var enemyShield = 0
+# Timed enemy debuffs, each counted down one per piece drop (_tickEnemyDebuffs).
+var _weakenMult = 1.0
+var _weakenDrops = 0
+var _holdLockDrops = 0
+var _previewHiddenDrops = 0
+var _enemyDisablesHold = false # the disable_hold passive, which a timed lock_hold must not lift
 var dropsSinceAttack = 0
 # Set by attack_grace: drops that don't advance the enemy attack counter. Spent
 # before dropsSinceAttack moves, and zeroed by enemyAttack so it only ever delays
@@ -85,6 +101,7 @@ var _echoNextCast: bool = false
 
 func _ready():
 	_buildSkillRows()
+	_buildEnemyLabels()
 	_resetSlotState()
 	populateSkillPanel()
 	updateUI()
@@ -101,6 +118,25 @@ func _buildSkillRows():
 		row.get_node("Key").text = "[%d]" % (slot + 1)
 		$SkillPanel.add_child(row)
 		_skill_rows.append(row)
+
+# Enemy readouts built from the scene's own labels, for their font and outline.
+# Intent and status sit under the attack counter, in the gap above Stats/Shield;
+# the shield sits above the enemy's HP.
+func _buildEnemyLabels():
+	enemyIntentLabel = _copyLabel(enemyAttackLabel, "IntentLabel", $EnemyAttackBar, Vector2(0, 36), 22, Color(1.0, 0.8, 0.65))
+	enemyStatusLabel = _copyLabel(enemyAttackLabel, "StatusLabel", $EnemyAttackBar, Vector2(0, 64), 20, Color(0.85, 0.6, 1.0))
+	enemyShieldLabel = _copyLabel(enemyHealth, "EnemyShieldLabel", self, enemyHealth.position + Vector2(0, -50), 30, Color(0.45, 0.8, 1.0))
+	enemyShieldLabel.visible = false
+
+func _copyLabel(source: Label, labelName: String, parent: Node, pos: Vector2, fontSize: int, color: Color) -> Label:
+	var label: Label = source.duplicate()
+	label.name = labelName
+	label.position = pos
+	label.add_theme_font_size_override("font_size", fontSize)
+	label.add_theme_color_override("font_color", color)
+	label.text = ""
+	parent.add_child(label)
+	return label
 
 func connectSignals():
 	$Grid.clearLines.connect(attack)
@@ -137,28 +173,33 @@ func setStage(enemyInfo): # Set stage base on enemy abilities and stats
 	currentEnemyHealth = enemyInfo.health
 	currentEnemyMaxHealth = enemyInfo.health
 	enemyHealth.text = str(currentEnemyHealth) + " / " + str(currentEnemyMaxHealth)
-	enemyAttackSteps = enemyInfo.attackSteps
-	enemyAttackDamage = enemyInfo.attackDamage
-	enemyAttackAddsGarbage = enemyInfo.attackAddsGarbage
 	dropsSinceAttack = 0
 	_attackGrace = 0 # battle_start re-arms it; cleared now so the label isn't stale mid-slide
-	updateAttackStepsUI()
+	# Everything an enemy's moves change is cleared here, so nothing leaks from the
+	# previous fight.
+	enemyShield = 0
+	_weakenMult = 1.0
+	_weakenDrops = 0
+	_holdLockDrops = 0
+	_previewHiddenDrops = 0
+	$Grid/UI/NextPieces.setConcealed(false)
+	_enemyScript = enemyInfo.fileScript.new() if enemyInfo.fileScript else null
+	_brain = EnemyBrain.new(enemyInfo)
+	_setMove(_brain.pickMove())
+	updateEnemyShieldUI()
+	_updateEnemyStatusUI()
 	# Debuffs now travel with the enemy (see EnemyData). Every stage sets them
 	# from the enemy's own data, so nothing leaks from the previous fight.
 	damageReduction = enemyInfo.damageReduction
-	if enemyInfo.disablesHold:
-		PlayerManager.holdPieceDebuff = true
-		unlockHold(true)
-	else:
-		PlayerManager.holdPieceDebuff = false
-		if PlayerManager.canHoldPiece:
-			unlockHold(false)
+	_enemyDisablesHold = enemyInfo.disablesHold
+	_refreshHoldLock()
 
 
 # --- Dev helpers (called from the GameplayScene dev panel) ---
 
 func devKillEnemy():
 	if battleActive:
+		enemyShield = 0
 		updateEnemyHealth(currentEnemyHealth)
 
 func _input(event):
@@ -391,6 +432,9 @@ func _applyAbilityEffect(effect: Dictionary):
 		# re-reads it from EnemyData, so this never leaks to the next one.
 		"cleanse":
 			damageReduction = 1
+			_weakenMult = 1.0
+			_weakenDrops = 0
+			_updateEnemyStatusUI()
 			PopupNumbers.displayText("DISPELLED", Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60), Color(0.6, 1.0, 1.0))
 		"delay_attack":
 			dropsSinceAttack = maxi(dropsSinceAttack - amount, 0)
@@ -447,7 +491,7 @@ func _dealAbilityDamage(raw: int):
 # the enemy's reduction and animates, but deliberately skips _spellDamageBonus,
 # which belongs to cast abilities only.
 func _dealFlatDamage(raw: int):
-	var damageDealt = maxi(roundi(raw * damageReduction), 0)
+	var damageDealt = maxi(roundi(raw * _outgoingMult()), 0)
 	attackAnim()
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	updateEnemyHealth(damageDealt)
@@ -504,9 +548,11 @@ func _fireKeepsakes(trigger: String, ctx: Dictionary = {}):
 		_applyAbilityEffect(desc)
 
 func updateAttackStepsUI():
-	enemyAttackLabel.text = "attack : %d / %d" % [dropsSinceAttack, enemyAttackSteps]
+	enemyAttackLabel.text = "%s : %d / %d" % [currentMove.get("name", "attack"), dropsSinceAttack, enemyAttackSteps]
 	if _attackGrace > 0:
 		enemyAttackLabel.text += " (+%d)" % _attackGrace
+	if enemyIntentLabel:
+		enemyIntentLabel.text = EnemyData.describeMove(currentMove)
 
 func onPieceDropped():
 	if not battleActive:
@@ -517,8 +563,58 @@ func onPieceDropped():
 		dropsSinceAttack += 1
 	updateAttackStepsUI()
 	_tickCooldowns()
+	_tickEnemyDebuffs()
 	if dropsSinceAttack >= enemyAttackSteps:
 		enemyAttack()
+
+# One drop off every timed enemy debuff. Runs before the attack check, so a debuff
+# a move applies on this drop lasts its full count starting with the next piece.
+func _tickEnemyDebuffs():
+	if _weakenDrops == 0 and _holdLockDrops == 0 and _previewHiddenDrops == 0:
+		return
+	if _weakenDrops > 0:
+		_weakenDrops -= 1
+	if _holdLockDrops > 0:
+		_holdLockDrops -= 1
+		if _holdLockDrops == 0:
+			_refreshHoldLock()
+	if _previewHiddenDrops > 0:
+		_previewHiddenDrops -= 1
+		if _previewHiddenDrops == 0:
+			$Grid/UI/NextPieces.setConcealed(false)
+	_updateEnemyStatusUI()
+
+# Everything the player's damage is multiplied by: the enemy's damage_reduction
+# passive and any weaken it has cast. cleanse clears both.
+func _outgoingMult() -> float:
+	return damageReduction * (_weakenMult if _weakenDrops > 0 else 1.0)
+
+# Hold is locked by the disable_hold passive for the whole fight, or by a timed
+# lock_hold; lifting the timed one must leave the passive's lock in place.
+func _refreshHoldLock():
+	var locked = _enemyDisablesHold or _holdLockDrops > 0
+	PlayerManager.holdPieceDebuff = locked
+	if locked:
+		unlockHold(true)
+	elif PlayerManager.canHoldPiece:
+		unlockHold(false)
+
+func updateEnemyShieldUI():
+	if enemyShieldLabel:
+		enemyShieldLabel.text = "shield %d" % enemyShield
+		enemyShieldLabel.visible = enemyShield > 0
+
+func _updateEnemyStatusUI():
+	if enemyStatusLabel == null:
+		return
+	var parts := []
+	if _weakenDrops > 0:
+		parts.append("weak x%s (%d)" % [_weakenMult, _weakenDrops])
+	if _holdLockDrops > 0:
+		parts.append("no hold (%d)" % _holdLockDrops)
+	if _previewHiddenDrops > 0:
+		parts.append("blind (%d)" % _previewHiddenDrops)
+	enemyStatusLabel.text = "  ".join(parts)
 
 # One dropped piece = one tick off every active cooldown.
 func _tickCooldowns():
@@ -598,7 +694,7 @@ func attack(clearedLines, combo, payingBlocks):
 	if goldCoins > 0:
 		PlayerManager.coin += goldCoins
 		PopupNumbers.displayText("+$%d" % goldCoins, Vector2(620, 220), Color(1.0, 0.85, 0.0))
-	damageDealt = roundi(damageDealt * pow(PlayerManager.comboMult, combo - 1) * damageReduction)
+	damageDealt = roundi(damageDealt * pow(PlayerManager.comboMult, combo - 1) * _outgoingMult())
 	PopupNumbers.displayNumber(damageDealt, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60))
 	const ANNOUNCE_POS = Vector2(620, 160)
 	match clearedLines:
@@ -647,34 +743,119 @@ func screenShake():
 func updateEnemyHealth(damageDealt):
 	Utilities.shakeNode(enemyHealth, Vector2(862, 85))
 	flashEnemy()
+	# enemy_shield soaks the hit before HP. The popup already showed the full number;
+	# the shield readout shows what it ate.
+	if enemyShield > 0 and damageDealt > 0:
+		var absorbed = min(enemyShield, damageDealt)
+		enemyShield -= absorbed
+		damageDealt -= absorbed
+		updateEnemyShieldUI()
+		if enemyShield == 0:
+			PopupNumbers.displayText("SHIELD BROKEN", Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 100), Color(0.45, 0.8, 1.0))
 	currentEnemyHealth -= damageDealt
 	enemyHealth.text = str(Utilities.floorNum(currentEnemyHealth)) + " / " + str(currentEnemyMaxHealth)
 	if currentEnemyHealth <= 0:
 		victory()
-
-func enemyAttack():
-	var overflow = enemyAttackDamage - PlayerManager.shieldNum
-	PlayerManager.shieldNum = maxi(PlayerManager.shieldNum - enemyAttackDamage, 0)
-	if overflow > 0:
-		# Rounded up, so a hit that gets through always costs at least 1 HP —
-		# shaving an attack down to a 1-point leak is a win, not a free pass.
-		var hpLost = ceili(overflow / ATTACK_DAMAGE_PER_HP)
-		PlayerManager.playerHealth -= hpLost
-		PopupNumbers.displayText("-%d HP" % hpLost, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.3, 0.3))
 	else:
-		PopupNumbers.displayText("BLOCKED", Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
-	flashPlayer()
-	screenShake()
-	updateShieldUI()
-	updatePlayerHealthUI()
-	if enemyAttackAddsGarbage:
-		$Grid.addGarbageRows(1)
+		_checkPhase()
+
+# --- Enemy moves ---
+
+# Performs the move the enemy wound up, then commits to the next one.
+func enemyAttack():
+	# Stop if an effect ends the battle part-way (garbage topping the player out),
+	# as _fireKeepsakes does; only a change during the loop counts.
+	var wasActive = battleActive
+	for effect in currentMove.get("effects", []):
+		if wasActive and not battleActive:
+			break
+		_applyEnemyEffect(effect)
 	if PlayerManager.playerHealth <= 0:
 		gameover()
 		return
 	dropsSinceAttack = 0
 	_attackGrace = 0 # grace only delays the next attack, even one advance_attack forced early
+	_checkPhase()
+	_setMove(_brain.pickMove())
+
+# One entry of a move's effects, per EnemyData.EFFECT_KEYS. Timed effects keep the
+# longer of the running count and the new one rather than stacking.
+func _applyEnemyEffect(effect: Dictionary):
+	var amount = effect.get("amount", 0)
+	var drops = effect.get("drops", 0)
+	var enemyPopup = Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 60)
+	var playerPopup = Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60)
+	match effect.get("type", ""):
+		"enemy_shield":
+			enemyShield += amount
+			updateEnemyShieldUI()
+			PopupNumbers.displayText("+%d SHIELD" % amount, enemyPopup, Color(0.45, 0.8, 1.0))
+		# Capped at max HP. Phases only move forward (EnemyBrain), so healing back
+		# over a threshold doesn't replay one.
+		"heal":
+			var healed = mini(amount, currentEnemyMaxHealth - currentEnemyHealth)
+			currentEnemyHealth += healed
+			enemyHealth.text = str(Utilities.floorNum(currentEnemyHealth)) + " / " + str(currentEnemyMaxHealth)
+			PopupNumbers.displayText("+%d HP" % healed, enemyPopup, Color(0.4, 1.0, 0.45))
+		# A new weaken replaces the multiplier; it never compounds with a running one.
+		"weaken":
+			_weakenMult = amount
+			_weakenDrops = maxi(_weakenDrops, drops)
+			PopupNumbers.displayText("WEAKENED", playerPopup, Color(0.85, 0.6, 1.0))
+		"lock_hold":
+			_holdLockDrops = maxi(_holdLockDrops, drops)
+			_refreshHoldLock()
+			PopupNumbers.displayText("HOLD LOCKED", playerPopup, Color(0.85, 0.6, 1.0))
+		"hide_preview":
+			_previewHiddenDrops = maxi(_previewHiddenDrops, drops)
+			$Grid/UI/NextPieces.setConcealed(true)
+			PopupNumbers.displayText("BLINDED", playerPopup, Color(0.85, 0.6, 1.0))
+		"curse_piece":
+			if $Grid.cursePieces(effect.get("amount", 1)) > 0:
+				PopupNumbers.displayText("CURSED", playerPopup, Color(0.7, 0.2, 1.0))
+		# A function in the enemy's own file, given this battle. A returned String
+		# pops up over the enemy.
+		"call":
+			if _enemyScript == null or not _enemyScript.has_method(effect.method):
+				push_error("Main: enemy call to '%s' has no enemy script that defines it" % effect.method)
+			else:
+				var note = _enemyScript.call(effect.method, self)
+				if note is String and note != "":
+					PopupNumbers.displayText(note, Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 100), Color(1.0, 0.8, 0.65))
+		"attack":
+			var overflow = amount - PlayerManager.shieldNum
+			PlayerManager.shieldNum = maxi(PlayerManager.shieldNum - amount, 0)
+			if overflow > 0:
+				# Rounded up, so a hit that gets through always costs at least 1 HP —
+				# shaving an attack down to a 1-point leak is a win, not a free pass.
+				var hpLost = ceili(overflow / ATTACK_DAMAGE_PER_HP)
+				PlayerManager.playerHealth -= hpLost
+				PopupNumbers.displayText("-%d HP" % hpLost, Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(1.0, 0.3, 0.3))
+			else:
+				PopupNumbers.displayText("BLOCKED", Vector2(PLAYER_ORIGINAL_POS.x, PLAYER_ORIGINAL_POS.y - 60), Color(0.4, 0.8, 1.0))
+			flashPlayer()
+			screenShake()
+			updateShieldUI()
+			updatePlayerHealthUI()
+		"add_garbage":
+			$Grid.addGarbageRows(amount)
+		_:
+			push_warning("Main: unknown enemy effect type '%s'" % effect.get("type", ""))
+	_updateEnemyStatusUI()
+
+func _setMove(move: Dictionary):
+	currentMove = move
+	enemyAttackSteps = maxi(move.get("steps", 1), 1)
 	updateAttackStepsUI()
+
+# Announces a phase change the moment damage crosses its threshold. The move already
+# wound up is kept (the player has seen it); the new pattern starts on the next pick.
+func _checkPhase():
+	if _brain == null or currentEnemyMaxHealth <= 0:
+		return
+	if _brain.updatePhase(float(currentEnemyHealth) / currentEnemyMaxHealth):
+		var phaseName = _brain.currentPhase().get("name", "phase %d" % (_brain.phaseIndex + 1))
+		PopupNumbers.displayText(phaseName.to_upper(), Vector2(ENEMY_ORIGINAL_POS.x, ENEMY_ORIGINAL_POS.y - 100), Color(1.0, 0.35, 0.35))
 
 # Ice blocks pay in tempo rather than damage: each one cleared winds the enemy
 # attack counter back a drop. Grid emits this from printClearedBlockTypes, which

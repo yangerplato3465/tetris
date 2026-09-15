@@ -3,6 +3,11 @@ extends Node2D
 var positionInGrid:Vector2
 var rotationState = 0
 var shape
+# Set by an enemy's curse_piece: every block is Constants.GARBAGE, so the piece pays
+# nothing when cleared. The cells no longer say which tetromino it is, so
+# baseColorIndex remembers it for Hold, which rebuilds the shape from it.
+var cursed := false
+var baseColorIndex := 0
 
 func getColorIndex():
 	for i in range(shape.size()):
@@ -11,9 +16,21 @@ func getColorIndex():
 				return shape[i][j] % 10
 	return 0
 
+# Turns every block to garbage. Safe to call again (Hold re-applies it to a rebuilt shape).
+func curse():
+	if not cursed:
+		baseColorIndex = getColorIndex()
+	cursed = true
+	for x in range(shape.size()):
+		for y in range(shape[0].size()):
+			if shape[x][y] != 0:
+				shape[x][y] = Constants.GARBAGE
+
 # Assigns a random elemental type to one random block in the piece.
 # Elementals only appear once unlocked via upgrades.
 func assignRandomElemental():
+	if cursed:
+		return
 	var available = []
 	if PlayerManager.fireBlocks:
 		available.append(Constants.Elemental.FIRE)
@@ -34,13 +51,19 @@ func assignRandomElemental():
 	var elemental_type = available[randi() % available.size()]
 	shape[chosen.x][chosen.y] += elemental_type * Constants.ELEMENTAL_MUL
 
+# A cursed piece is left alone: garbage plus an elemental would be a cell value no
+# texture or payout handles.
 func assignAllElemental(elemental_type: int):
+	if cursed:
+		return
 	for x in range(shape.size()):
 		for y in range(shape[0].size()):
 			if shape[x][y] != 0:
 				shape[x][y] = (shape[x][y] % Constants.ELEMENTAL_MUL) + elemental_type * Constants.ELEMENTAL_MUL
 
 func assignOrb():
+	if cursed:
+		return
 	var cells = []
 	for x in range(shape.size()):
 		for y in range(shape[0].size()):
@@ -53,7 +76,7 @@ func assignOrb():
 
 func getShapeWithoutBorders():
 	var newShape = shape.duplicate(true)
-	
+
 	#Check and remove empty rows
 	var rowsToRemove = []
 	for i in range(shape.size()):
@@ -65,7 +88,7 @@ func getShapeWithoutBorders():
 		if empty:
 			rowsToRemove.append(i)
 	MatrixOperations.removeRowsFromMatrix(newShape,rowsToRemove)
-	
+
 	#Check and remove empty columns
 	var columnsToRemove = []
 	for j in range(newShape.size()):
@@ -76,7 +99,7 @@ func getShapeWithoutBorders():
 				break;
 		if empty:
 			columnsToRemove.append(j)
-	
+
 	MatrixOperations.removeColumnsFromMatrix(newShape, columnsToRemove)
 	return newShape
 

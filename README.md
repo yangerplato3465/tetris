@@ -60,7 +60,7 @@ so digging out is a setup move, not a wasted turn.
 **Defending.** Enemy attack damage is denominated in *shield*, not HP:
 
 ```
-overflow = enemyAttackDamage - yourShield     # shield eats the hit first
+overflow = enemyAttack - yourShield           # shield eats the hit first
 hpLost   = ceil(overflow / 10)                # only the leak reaches HP
 ```
 
@@ -68,8 +68,11 @@ Shield is your moment-to-moment defense and it **persists between battles**, so 
 before a boss is a real play. HP is the run's attrition clock. A hit that leaks always
 costs at least 1 HP, so shaving an attack down to a sliver is a win but never free.
 
-The enemy attacks every `attackSteps` piece drops — the counter is on screen and pulses
-red when the next drop will trigger it.
+Enemies wind up one move at a time: its name and drop counter are on screen with what it
+will do underneath, and the counter pulses red when the next drop will trigger it. Most
+enemies loop a learnable pattern, some pick at random, and bosses change pattern as their
+HP falls — shielding, healing, weakening you, locking hold, hiding the preview or cursing
+upcoming pieces along the way.
 
 **See [Docs/ENEMIES.md](Docs/ENEMIES.md) for every enemy and boss, with stats.**
 
@@ -173,8 +176,9 @@ Data/               the actual content, as .tres files
 Scene/              scenes and UI components
 ```
 
-All content — enemies, spells, characters, keepsakes — is authored as `.tres` resources
-and scanned from its directory at startup, so adding or tuning content needs no code
+Spells, characters and keepsakes are authored as `.tres` resources, and enemies and
+events as `.gd` files holding a `const` dictionary. All of it is scanned from its
+directory at startup and checked for mistakes, so adding or tuning content needs no code
 change. **`CLAUDE.md` documents the architecture in detail**, including the ability effect
 vocabulary, the block value encoding, and how to add a new spell. The player-facing
 catalogues live in **`Docs/`** — `ABILITIES.md` for spells, `KEEPSAKES.md` for keepsakes,
@@ -196,8 +200,9 @@ passives, key rebinding and audio.
 
 - **Classes barely differ.** Weaver and Monk share the same 23-spell pool, the same
   starting kit and the same orb cap. Only the passive separates them.
-- **Enemies differ by numbers only.** 17 of the 20 carry no debuff at all, though the
-  data supports them — only Shadow Lord (halves your damage) and two hold-lockers use it.
+- **Enemy patterns are unplaytested.** All 20 enemies now have move patterns, and every
+  boss has phases, written to keep average pressure near the old single attacks — but none
+  of it has been played through a real run yet.
 - **Balance is unverified.** Enemy HP climbs from 600 to 12,000 across the run while the
   player's damage scaling is thin, especially with the combo multiplier flat at 1.0 by
   default. A full run needs playtesting before the numbers can be trusted.

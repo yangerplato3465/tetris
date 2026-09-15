@@ -15,7 +15,7 @@ var scripts: Dictionary = {}  # id -> the event's GDScript; EventScene instances
 
 func _init():
 	var paths := {}
-	for path in _eventScriptPaths("res://Data/Events"):
+	for path in DataFiles.scriptPaths("res://Data/Events"):
 		var script = load(path)
 		var event = script.get_script_constant_map().get("EVENT") if script else null
 		if not event is Dictionary:
@@ -40,22 +40,3 @@ func rollEvent() -> String:
 
 func hasEligibleEvent() -> bool:
 	return pool.any(func(id): return RunConditions.met(events[id].get("requires", [])))
-
-# Every event script in `dirPath`, sorted. Exported builds may store scripts as
-# .gdc (binary tokens) or behind a .remap; both are mapped back to the .gd path,
-# which is what load() expects.
-func _eventScriptPaths(dirPath: String) -> Array:
-	var out: Array = []
-	var dir = DirAccess.open(dirPath)
-	if dir == null:
-		push_error("Events: could not open data directory " + dirPath)
-		return out
-	for file in dir.get_files():
-		var fileName = file.trim_suffix(".remap")
-		if fileName.ends_with(".gdc"):
-			fileName = fileName.trim_suffix(".gdc") + ".gd"
-		var path = dirPath + "/" + fileName
-		if fileName.ends_with(".gd") and not out.has(path):
-			out.append(path)
-	out.sort()
-	return out

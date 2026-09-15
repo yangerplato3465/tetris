@@ -102,16 +102,13 @@ func _initSprites():
 		_ghost_sprites.append(ghost)
 
 func setStage(enemyInfo): # Set stage base on enemy abilities and stats
-	match enemyInfo.id:
-		3, 16:
+	# The enemy's authored `board` (EnemyData.BOARDS); DataValidator rejects any other value.
+	match enemyInfo.board:
+		"small":
 			startingBoard = Utilities.generateSmallMessyBoard()
-		6, 8, 9, 10, 17, 18, 12, 13, 15:
+		"medium":
 			startingBoard = Utilities.generateMediumMessyBoard()
-		11, 20:
-			startingBoard = Utilities.generateLargeMessyBoard()
-		14:
-			startingBoard = Utilities.generateMediumMessyBoard()
-		19:
+		"large":
 			startingBoard = Utilities.generateLargeMessyBoard()
 		_:
 			startingBoard = PlayerManager.startGrid
@@ -729,6 +726,22 @@ func occupiedRowCount() -> int:
 # Recolour every block of the falling piece to one elemental type (see
 # Constants.Elemental). The piece is already stamped into `grid`, so it has to be
 # lifted out, retyped and re-stamped for the change to show.
+# An enemy's curse_piece: the next `count` uncursed pieces in the queue turn to
+# garbage (Piece.curse). The falling piece is never touched, so a curse always
+# shows up in the preview first. Returns how many were cursed.
+func cursePieces(count: int) -> int:
+	var queue = (currentBag if currentBag else []) + (nextBag if nextBag else [])
+	var done = 0
+	for piece in queue:
+		if done >= count:
+			break
+		if piece.cursed:
+			continue
+		piece.curse()
+		done += 1
+	$UI/NextPieces.drawPieces(currentBag, nextBag)
+	return done
+
 func enchantCurrentPiece(elemental: int):
 	if currentPiece == null:
 		return

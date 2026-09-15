@@ -77,7 +77,7 @@ Defined in `project.godot` and available everywhere without `$`:
 
 **`Scripts/Core/Grid.gd`** — The Tetris engine (~850 lines). Owns the 10×23 grid array (3-row vanish zone), piece movement, SRS rotation with kick tables, line clearing, and every board-mutation method skills call (`clearBottomRows`, `addGarbageRows`, `purifyGarbage`, `shuffleBottomRows`, `holyBeam`, `compactBoard`, `enchantCurrentPiece`, `queuePiece`) plus the board queries they scale off (`occupiedRowCount`, `garbageBlockCount`, `payingBlockCount`). Emits: `clearLines(cleared, combo, paying)`, `pieceDropped`, `magicMeterChanged`, `energyOverflow(count)`, `grid_gameover`.
 
-**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). All combat math: line-clear damage, enemy attacks every `attackSteps` drops, ability casting (`useSkill` → `_applyAbilityEffect`), the skill panel, win/loss. Connects to Grid's signals.
+**`Scripts/Core/Main.gd`** — The battle controller (attached to `Main.tscn` inside `GameplayScene`). All combat math: line-clear damage, enemy moves (picked by `EnemyBrain`, landing every `enemyAttackSteps` drops), ability casting (`useSkill` → `_applyAbilityEffect`), the skill panel, win/loss. Connects to Grid's signals.
 
 **`Scripts/Core/Piece.gd`** — A single tetromino: shape matrix, rotation state, and elemental assignment (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
 
@@ -89,23 +89,37 @@ Every content directory under `Data/` is scanned whole at startup and loaded int
 
 | Directory | Class | Loaded into |
 |---|---|---|
-| `Data/Enemies/{Tier1,Tier2,Tier3,Boss}/` | `EnemyData` | `Consts.tier1Enemy` … `Consts.BossEnemy` |
+| `Data/Enemies/{Tier1,Tier2,Tier3,Boss}/` | `.gd` files with `const ENEMY`, built into `EnemyData` | `Consts.tier1Enemy` … `Consts.BossEnemy` |
 | `Data/Abilities/` | `AbilityData` | `Consts.abilities` (keyed by `id`) |
 | `Data/Characters/` | `CharacterData` | `Consts.characters` |
 | `Data/Keepsakes/` | `KeepsakeData` | `Keepsakes.keepsakes` / `Keepsakes.pool` |
 | `Data/Events/` | `.gd` files with `const EVENT` (schema in `EventData`) | `Events.events` / `Events.pool` |
 
-The `id` field is identity; each file is named for its `id` and nothing else. Boss scheduling lives in `EnemyData.bossFloor`, not in file order.
+The `id` field is identity; each file is named for its `id` and nothing else. Boss scheduling lives in each boss's `boss_floor`, not in file order.
 
-**Validation.** `Scripts/Data/DataValidator.gd` checks abilities, keepsakes, characters and events at boot, called from `Consts._init`, `Keepsakes._init` and `Events._init`. It reports every problem with `push_error` (the game still runs): an unknown effect `type` or keepsake `trigger`, a missing required key or an unexpected one (catches `"ammount"`), a non-numeric `amount`/`min_lines`/`element`/`shape`, an `id` that doesn't match its filename or is reused, an unknown rarity or passive, and an `abilityPool`/`startingAbilities` id with no ability. The allowed lists are `AbilityData.EFFECT_KEYS`, `RunEffects.EFFECT_KEYS`, `KeepsakeData.TRIGGERS`, `CharacterData.PASSIVES` and the `EventData` key lists, where each type maps to the keys it reads (`"amount?"` = optional). **Adding an effect type, trigger or passive means adding it to that list too**, or every file using it fails validation. Beyond key shape it checks what an effect points at: a `shape` inside `Constants.SHAPES`, a `gain_keepsake` id that exists, a `gain_random_keepsake` rarity, and a `call` method the event file defines. Event and option `requires` are checked for known condition names, one key per entry, the right value type, and keepsake and class ids that exist; `locked_text` without `requires` is an error, and a `flag`/`not_flag` naming a flag no `set_flag` anywhere writes is a warning (usually a typo). Enemies are not validated.
+**Validation.** `Scripts/Data/DataValidator.gd` checks abilities, keepsakes, characters and events at boot, called from `Consts._init`, `Keepsakes._init` and `Events._init`. It reports every problem with `push_error` (the game still runs): an unknown effect `type` or keepsake `trigger`, a missing required key or an unexpected one (catches `"ammount"`), a non-numeric `amount`/`min_lines`/`element`/`shape`, an `id` that doesn't match its filename or is reused, an unknown rarity or passive, and an `abilityPool`/`startingAbilities` id with no ability. The allowed lists are `AbilityData.EFFECT_KEYS`, `RunEffects.EFFECT_KEYS`, `KeepsakeData.TRIGGERS`, `CharacterData.PASSIVES` and the `EventData` key lists, where each type maps to the keys it reads (`"amount?"` = optional). **Adding an effect type, trigger or passive means adding it to that list too**, or every file using it fails validation. Beyond key shape it checks what an effect points at: a `shape` inside `Constants.SHAPES`, a `gain_keepsake` id that exists, a `gain_random_keepsake` rarity, and a `call` method the event file defines. Event and option `requires` are checked for known condition names, one key per entry, the right value type, and keepsake and class ids that exist; `locked_text` without `requires` is an error, and a `flag`/`not_flag` naming a flag no `set_flag` anywhere writes is a warning (usually a typo). Enemies are checked by `validateEnemies` (called from `Consts._init`): keys and types, id matching the filename and unique across tiers, a known `board`, passives and move effects against `EnemyData.PASSIVE_KEYS` / `EFFECT_KEYS`, `steps` of at least 1, a known pattern `type`, pattern move ids that exist, `drops` a whole number of at least 1, a `weaken` multiplier above 0, a `call` method the enemy's file defines with one argument, phase thresholds (the opening phase has no `hp_below`, every later one has one, each strictly below the one before and above 0), and `boss_floor` present on every `Boss/` enemy, absent everywhere else and not shared. A move no pattern uses is a warning.
 
-**One exception — enemies are not fully data-driven.** `Grid.setStage()` picks the
-battle's starting board with `match enemyInfo.id:` against a hardcoded list of integer
-ids (`3, 16` → small messy board, `6, 8, 9, ...` → medium, `11, 20` → large). A new
-enemy `.tres` whose `id` is not in that list silently falls through to `_` and gets a
-clean board, and renumbering an existing enemy silently changes its opening board. This
-is the only place enemy behaviour is keyed by id rather than by an exported field;
-replacing it with a `startingGarbageRows: int` export on `EnemyData` would close the gap.
+**Enemies are `.gd` files, like events.** Each file in `Data/Enemies/<Tier>/` holds a `const ENEMY` dictionary (schema in `Scripts/Data/EnemyData.gd`); the folder is the tier. `Consts._loadEnemyDir` reads it via `DataFiles.loadConstant` and builds an `EnemyData` with `EnemyData.fromDict`, which is still what `Main`, `PrepareScene` and `GameoverPanel` read. An enemy has a `board` (`clean`/`small`/`medium`/`large`, matched in `Grid.setStage`), `passives` (`damage_reduction`, `disable_hold`, derived into `EnemyData.damageReduction` / `disablesHold`), named `moves` (`steps` to wind up, `effects` run in order — see the table below — and an optional `intent` string overriding the generated intent line) and `phases`, each holding a `pattern` (`cycle` loops its move list, `random` picks uniformly — list a move twice to weight it) and, after the first, an `hp_below` fraction plus an optional `name`. `DataFiles.scriptPaths` is the folder scan both enemies and events use.
+
+**Enemy turns.** `Scripts/Data/EnemyBrain.gd` decides, `Main` performs. `Main.setStage` creates one `EnemyBrain` per battle and takes its first `pickMove()` into `currentMove`; `enemyAttackSteps` is that move's `steps` and is what the attack counter, `delay_attack`/`advance_attack`/`attack_grace` and the red pulse all keep reading. When the counter fills, `enemyAttack` runs the move's effects through `_applyEnemyEffect` (stopping if one tops the player out), resets the counter and grace, and picks the next move. The phase is the last one whose `hp_below` the enemy's HP fraction is under: `updateEnemyHealth` calls `_checkPhase` after every hit, so the phase name pops up the moment the threshold is crossed — but **the move already wound up is committed**, since the player has seen it telegraphed; the new pattern starts on the next pick. A big hit can skip phases, entering a phase starts its cycle at the top, and phases **only move forward** — an enemy that heals back over a threshold stays in the later phase. The HUD shows the move as `"<name> : n / steps"` in `StepsLabel` and what it will do (`EnemyData.describeMove`, e.g. `40 dmg, +1 garbage`) in `IntentLabel`, which `Main._buildIntentLabel` copies from `StepsLabel` at `_ready`. A new enemy effect type needs a branch in `Main._applyEnemyEffect`, an entry in `EnemyData.EFFECT_KEYS`, and a line in `describeMove` if the player should see it coming. `EnemyBrain.rng` can be seeded for a repeatable fight.
+
+Enemy effects (`EnemyData.EFFECT_KEYS`, applied by `Main._applyEnemyEffect`):
+
+| type | effect |
+|---|---|
+| `attack` | hit shield, then HP (see Combat & Damage Formula) |
+| `add_garbage` | `amount` garbage rows onto the player's board |
+| `enemy_shield` | `Main.enemyShield += amount`; `updateEnemyHealth` soaks every damage source with it before HP, and it lasts until broken (shown above the enemy's HP by `EnemyShieldLabel`) |
+| `heal` | enemy regains `amount` HP, capped at max; never moves the phase back |
+| `weaken` | the player's damage × `amount` for `drops` drops, through `Main._outgoingMult()` alongside the `damage_reduction` passive; a new one replaces the multiplier rather than compounding; `cleanse` lifts it |
+| `lock_hold` | no hold for `drops` drops; `_refreshHoldLock` keeps a `disable_hold` passive's lock when it expires |
+| `hide_preview` | `NextPieces.setConcealed(true)` for `drops` drops — the queue draws empty |
+| `curse_piece` | the next `amount` (default 1) uncursed queued pieces become all garbage (`Grid.cursePieces` → `Piece.curse`); the falling piece is never touched, so it always shows in the preview first |
+| `call` | run `func <method>(battle)` from the enemy's own file, passed `Main`; a returned String pops up over the enemy |
+
+Timed effects (`drops`) count down in `Main._tickEnemyDebuffs`, called from `onPieceDropped` *before* the attack check, so a debuff a move applies lasts its full count from the next piece; re-applying one keeps the longer count. The `StatusLabel` under the intent line lists what's running (`weak x0.5 (2)  no hold (1)`). `setStage` clears all of it, plus the enemy shield. For `call`, `Consts` keeps each enemy file's GDScript on `EnemyData.fileScript` and `setStage` instances it fresh each battle (`Main._enemyScript`), so a boss function can keep per-fight state; the validator checks the method exists and takes one argument.
+
+A cursed `Piece` keeps `baseColorIndex`, since its cells are all `Constants.GARBAGE`; `assignOrb`/`assignAllElemental`/`assignRandomElemental` skip it, and holding it keeps the curse. `Hold.swapPiece` now rebuilds a held piece from a **copy** of its `Constants.SHAPES` entry — it used to assign the shared array itself, so writing to a piece that had been held (an enchant, a curse) wrote into the shape table.
 
 ### Block Value Encoding
 
@@ -131,17 +145,17 @@ damage = payingBlocks * DAMAGE_PER_BLOCK * comboMult^(combo-1) * damageReduction
 
 - `payingBlocks` is billed **per block, not per row**: every cleared cell except garbage, counted by `Grid.payingBlockCount` and carried on the `clearLines(cleared, combo, paying)` signal. A clean row is 10 blocks × `DAMAGE_PER_BLOCK` (10) = the same 100 a line has always been worth, so a clean board is unchanged — what differs is that a row dug out of the enemy's rubble pays only for the blocks the player placed. Garbage still completes and clears rows normally and **still counts for the combo**, so digging out is a setup move rather than a wasted multiplier. This is the only mechanical difference between a garbage block and a plain one; everything else in `Grid.gd` tests `!= 0` and cannot tell them apart
 - `comboMult` starts flat at `PlayerManager.BASE_COMBO_MULT` (1.0) — a combo adds nothing by itself. The Monk's `combo_mastery` passive sets it to `COMBO_MASTERY_MULT` (1.1) at character select, and `combo_mult` keepsakes raise it from there
-- `damageReduction` set per-enemy (e.g. Shadow Lord = 0.5) and is the only damage debuff an enemy carries — it scales, so it never punishes small hits disproportionately. `EnemyData.disablesHold` is the other debuff
+- `damageReduction` set per-enemy by a `damage_reduction` passive (e.g. Shadow Lord = 0.5) and is the only damage debuff an enemy carries — it scales, so it never punishes small hits disproportionately. The `disable_hold` passive (`EnemyData.disablesHold`) is the other debuff
 - There is **no** elemental bonus term any more. Fire blocks deal their damage immediately on clear via `fireCleared` rather than being banked into the next clear — see Elemental Blocks below
 
-Incoming damage in `Main.enemyAttack()` runs on a different scale from outgoing damage:
+Incoming damage — an enemy move's `attack` effect, in `Main._applyEnemyEffect` — runs on a different scale from outgoing damage:
 
 ```
-overflow = enemyAttackDamage - shieldNum      # shield eats the hit first
+overflow = amount - shieldNum                      # shield eats the hit first
 hpLost   = ceil(overflow / ATTACK_DAMAGE_PER_HP)   # only the leak reaches HP
 ```
 
-`enemyAttackDamage` (10–60) is denominated in *shield*, not HP. HP is a single
+An `attack` `amount` (10–60 today) is denominated in *shield*, not HP. HP is a single
 100-point pool spent across the whole 15-floor run — nothing refills it but Rest
 (30 HP at a shop), `heal` effects and events — while a late fight can eat a
 dozen-plus attacks, so raw attack damage would end a run on floor 3. Dividing by
@@ -157,7 +171,7 @@ so banking it before a boss is a real play.
 ### Roguelike Progression
 
 15 floors (`PrepareScene.FLOOR_COUNT`) across the enemy tiers. Each floor is one choice on `PrepareScene`, generated by `_rollOptions()`:
-- Boss floors (`BOSS_FLOORS` = 3, 6, 9, 12, 15): a single mandatory boss, found by matching `EnemyData.bossFloor` (`PrepareScene._bossForFloor`). To move a boss to a different floor, edit that field
+- Boss floors (`BOSS_FLOORS` = 3, 6, 9, 12, 15): a single mandatory boss, found by matching `EnemyData.bossFloor` (`PrepareScene._bossForFloor`). To move a boss to a different floor, edit its `boss_floor` (the validator refuses two bosses on one floor)
 - `SHOP_FLOORS` (= 7): a single mandatory shop
 - Every other floor: 2–3 cards, each an enemy, a `?` event or a `$` shop
 
@@ -204,7 +218,7 @@ What an ability *does* is the `effects` array: `{"type": ..., "amount": ...}` di
 | `queue_piece` | put the tetromino in `shape` (index into `Constants.SHAPES`) at the front of the queue |
 | `cleanse` | strip the enemy's damage reduction for the rest of the battle |
 | `delay_attack` | wind the enemy attack counter back `amount` drops |
-| `advance_attack` | wind the enemy attack counter *forward* `amount` drops; if that reaches `attackSteps` the enemy attacks immediately, mid-cast |
+| `advance_attack` | wind the enemy attack counter *forward* `amount` drops; if that reaches `enemyAttackSteps` the wound-up move lands immediately, mid-cast |
 | `attack_grace` | the next `amount` drops don't advance the attack counter (`Main._attackGrace`); unlike `delay_attack` it works on a counter at 0, and `enemyAttack` zeroes it |
 | `next_clear_damage` | the next line clear deals `amount` extra damage, before combo and reduction (`Main._nextClearBonus`) |
 | `coins` | gain `amount` coins |

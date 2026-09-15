@@ -9,10 +9,10 @@ extends Node
 # instantiation — before any autoload's _ready — so the data is guaranteed
 # populated regardless of autoload ordering.
 
-# Enemy rosters. Files are read in sorted filename order, but nothing depends on
-# that order — PrepareScene finds a boss by its EnemyData.bossFloor, and the tier
-# arrays are rolled from at random. Filenames carry no meaning beyond naming the
-# enemy, so a file can be added, renamed or dropped without touching code.
+# Enemy rosters (Array[EnemyData]), one per folder under Data/Enemies/. Each enemy
+# is a .gd file holding `const ENEMY` (schema in EnemyData), named for its id.
+# Nothing depends on file order — PrepareScene finds a boss by its boss_floor, and
+# the tier arrays are rolled from at random.
 var tier1Enemy: Array = []
 var tier2Enemy: Array = []
 var tier3Enemy: Array = []
@@ -28,10 +28,14 @@ var abilities: Dictionary = {}
 var characters: Array = []
 
 func _init():
-	tier1Enemy = _loadResourceDir("res://Data/Enemies/Tier1")
-	tier2Enemy = _loadResourceDir("res://Data/Enemies/Tier2")
-	tier3Enemy = _loadResourceDir("res://Data/Enemies/Tier3")
-	BossEnemy = _loadResourceDir("res://Data/Enemies/Boss")
+	var enemyTiers := {}
+	for tier in ["Tier1", "Tier2", "Tier3", "Boss"]:
+		enemyTiers[tier] = _loadEnemyDir("res://Data/Enemies/" + tier)
+	tier1Enemy = enemyTiers.Tier1
+	tier2Enemy = enemyTiers.Tier2
+	tier3Enemy = enemyTiers.Tier3
+	BossEnemy = enemyTiers.Boss
+	DataValidator.validateEnemies(enemyTiers)
 	characters = _loadResourceDir("res://Data/Characters")
 	for ability in _loadResourceDir("res://Data/Abilities"):
 		if abilities.has(ability.id):
@@ -39,6 +43,17 @@ func _init():
 		abilities[ability.id] = ability
 	DataValidator.validateAbilities(abilities.values())
 	DataValidator.validateCharacters(characters, abilities)
+
+# Every enemy file in a tier folder, as EnemyData.
+func _loadEnemyDir(path: String) -> Array:
+	var out: Array = []
+	for scriptPath in DataFiles.scriptPaths(path):
+		var data = DataFiles.loadConstant(scriptPath, "ENEMY")
+		if data != null:
+			var enemy = EnemyData.fromDict(data, scriptPath)
+			enemy.fileScript = load(scriptPath) # for call moves; loadConstant already cached it
+			out.append(enemy)
+	return out
 
 # Load every .tres in a directory, sorted by filename. Handles the ".remap"
 # suffix that Godot gives resources in exported builds.

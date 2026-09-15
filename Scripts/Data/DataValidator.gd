@@ -13,9 +13,9 @@ extends RefCounted
 
 const RARITIES := ["common", "uncommon", "rare"]
 # Keys that must hold a number wherever they appear in an effect descriptor.
-const NUMERIC_KEYS := ["amount", "min_lines", "element", "shape"]
+const NUMERIC_KEYS := ["amount", "min_lines", "element", "shape", "drops"]
 # Keys that must hold text wherever they appear in an event.
-const STRING_KEYS := ["id", "title", "start", "body", "text", "result", "next", "locked_text", "speaker"]
+const STRING_KEYS := ["id", "title", "start", "body", "text", "result", "next", "locked_text", "speaker", "name", "description", "board", "intent"]
 # Keys that must hold text wherever they appear in an effect descriptor.
 const EFFECT_STRING_KEYS := ["id", "rarity", "method", "flag"]
 const Constants = preload("res://Scripts/Utils/Constants.gd")
@@ -72,6 +72,131 @@ static func validateCharacters(characters: Array, abilities: Dictionary) -> int:
 			for abilityId in character.get(field):
 				if not abilities.has(abilityId):
 					errors += _fail(where, "%s lists unknown ability id '%s'" % [field, abilityId])
+	return errors
+
+# `tiers` maps each Data/Enemies/ folder name to its Array[EnemyData]; each enemy's
+# `source` is the authored dictionary checked here.
+static func validateEnemies(tiers: Dictionary) -> int:
+	var errors := 0
+	var seenIds := {}
+	var bossFloors := {}
+	for tier in tiers:
+		for enemy in tiers[tier]:
+			var data: Dictionary = enemy.source
+			var where: String = enemy.path
+			errors += _checkKeys(data, EnemyData.ENEMY_KEYS, where)
+			var id = data.get("id", "")
+			if id is String and id != "":
+				if where.get_file().get_basename() != id:
+					errors += _fail(where, "has id '%s', which does not match its filename" % id)
+				if seenIds.has(id):
+					errors += _fail(where, "reuses enemy id '%s' (also %s)" % [id, seenIds[id]])
+				seenIds[id] = where
+			for key in ["health", "reward", "frame", "boss_floor"]:
+				if data.has(key) and typeof(data[key]) != TYPE_INT:
+					errors += _fail(where, "key '%s' must be an integer" % key)
+			if data.get("health") is int and data.health <= 0:
+				errors += _fail(where, "health must be above 0")
+			if data.get("board") is String and not data.board in EnemyData.BOARDS:
+				errors += _fail(where, "has unknown board '%s' (expected one of %s)" % [data.board, EnemyData.BOARDS])
+			# Boss/ is what makes an enemy a boss; boss_floor is which floor it owns.
+			if tier == "Boss":
+				if not data.get("boss_floor") is int:
+					errors += _fail(where, "is in Boss/ but has no boss_floor")
+				elif bossFloors.has(data.boss_floor):
+					errors += _fail(where, "shares boss_floor %d with %s" % [data.boss_floor, bossFloors[data.boss_floor]])
+				else:
+					bossFloors[data.boss_floor] = where
+			elif data.has("boss_floor"):
+				errors += _fail(where, "has boss_floor but is not in Boss/")
+			errors += _checkEffectList(data.get("passives", []), EnemyData.PASSIVE_KEYS, where + " passives")
+			errors += _checkEnemyMoves(data, where, enemy.fileScript)
+	return errors
+
+# `fileScript` is the enemy file's GDScript, which call moves run a function from.
+static func _checkEnemyMoves(data: Dictionary, where: String, fileScript = null) -> int:
+	var errors := 0
+	var moves = data.get("moves", {})
+	if not moves is Dictionary or moves.is_empty():
+		return _fail(where, "has no moves")
+	for moveId in moves:
+		var move = moves[moveId]
+		var at := "%s move '%s'" % [where, moveId]
+		if not move is Dictionary:
+			errors += _fail(at, "is not a Dictionary")
+			continue
+		errors += _checkKeys(move, EnemyData.MOVE_KEYS, at)
+		if typeof(move.get("steps")) != TYPE_INT or move.get("steps") < 1:
+			errors += _fail(at, "steps must be an integer of at least 1")
+		var effects = move.get("effects", [])
+		errors += _checkEffectList(effects, EnemyData.EFFECT_KEYS, at + " effects")
+		if effects is Array:
+			for j in effects.size():
+				if effects[j] is Dictionary:
+					errors += _checkEnemyEffectRefs(effects[j], fileScript, "%s effects[%d]" % [at, j])
+	var phases = data.get("phases", [])
+	if not phases is Array or phases.is_empty():
+		return errors + _fail(where, "has no phases")
+	var usedMoves := {}
+	var threshold := 1.0   # the previous phase's hp_below; each one must go lower
+	for i in phases.size():
+		var phase = phases[i]
+		var at := "%s phases[%d]" % [where, i]
+		if not phase is Dictionary:
+			errors += _fail(at, "is not a Dictionary")
+			continue
+		errors += _checkKeys(phase, EnemyData.PHASE_KEYS, at)
+		# EnemyBrain uses the last phase whose hp_below HP is under, so the opening
+		# phase needs none and the rest must step down in order.
+		if i == 0:
+			if phase.has("hp_below"):
+				errors += _fail(at, "is the opening phase and can't have hp_below")
+		elif not phase.has("hp_below"):
+			errors += _fail(at, "needs hp_below (the HP fraction it starts under, e.g. 0.5)")
+		elif typeof(phase.hp_below) != TYPE_FLOAT and typeof(phase.hp_below) != TYPE_INT:
+			errors += _fail(at, "hp_below must be a number")
+		elif phase.hp_below <= 0 or phase.hp_below >= threshold:
+			errors += _fail(at, "hp_below must be above 0 and below %s (the phase before it)" % threshold)
+		else:
+			threshold = phase.hp_below
+		var pattern = phase.get("pattern")
+		if not pattern is Dictionary:
+			errors += _fail(at, "pattern must be a Dictionary")
+			continue
+		errors += _checkKeys(pattern, EnemyData.PATTERN_KEYS, at + " pattern")
+		if pattern.get("type") is String and not pattern.type in EnemyData.PATTERN_TYPES:
+			errors += _fail(at, "has unknown pattern type '%s'" % pattern.type)
+		var ids = pattern.get("moves", [])
+		if not ids is Array or ids.is_empty():
+			errors += _fail(at, "pattern needs at least one move")
+			continue
+		for moveId in ids:
+			usedMoves[moveId] = true
+			if not moves.has(moveId):
+				errors += _fail(at, "pattern names unknown move '%s'" % moveId)
+	for moveId in moves:
+		if not usedMoves.has(moveId):
+			push_warning("Data: %s move '%s' is in no phase's pattern, so it is never used" % [where, moveId])
+	return errors
+
+# What an enemy effect's values mean, beyond their keys and types: a whole number
+# of drops, a weaken multiplier that can't zero damage out, and a call target the
+# enemy's file defines taking the battle as its one argument.
+static func _checkEnemyEffectRefs(effect: Dictionary, fileScript, where: String) -> int:
+	var errors := 0
+	var type = effect.get("type", "")
+	var drops = effect.get("drops")
+	if (drops is float or drops is int) and (not drops is int or drops < 1):
+		errors += _fail(where, "'%s' drops must be a whole number of at least 1" % type)
+	var amount = effect.get("amount")
+	if type == "weaken" and (amount is float or amount is int) and amount <= 0:
+		errors += _fail(where, "'weaken' amount multiplies the player's damage and must be above 0")
+	if type == "call" and effect.get("method") is String:
+		var methods = fileScript.get_script_method_list().filter(func(m): return m.name == effect.method) if fileScript else []
+		if methods.is_empty():
+			errors += _fail(where, "calls '%s', which this enemy file does not define" % effect.method)
+		elif methods[0].args.size() != 1:
+			errors += _fail(where, "calls '%s', which must take exactly one argument: func %s(battle)" % [effect.method, effect.method])
 	return errors
 
 # Events are nested dictionaries rather than Resources, so this walks the whole
@@ -257,7 +382,8 @@ static func _checkEffectRefs(desc: Dictionary, refs: Dictionary, where: String) 
 		errors += _fail(where, "gains unknown keepsake id '%s'" % desc.id)
 	if type == "gain_random_keepsake" and desc.get("rarity") is String and not desc.rarity in RARITIES:
 		errors += _fail(where, "has unknown rarity '%s'" % desc.rarity)
-	if type == "call" and desc.get("method") is String:
+	# Events only: enemy call moves are checked by _checkEnemyEffectRefs, against the enemy's file.
+	if type == "call" and refs.has("script") and desc.get("method") is String:
 		var script = refs.get("script")
 		if script == null or not script.get_script_method_list().any(func(m): return m.name == desc.method):
 			errors += _fail(where, "calls '%s', which this event file does not define" % desc.method)
