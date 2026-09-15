@@ -9,8 +9,9 @@ extends Node
 # or add a .tres in the Inspector — no code change. Effect descriptors on each
 # keepsake run on a trigger — see KeepsakeData for the schema.
 
-# id -> KeepsakeData, and the list of ids eligible for the shop's bottom row
-# (the shop filters out ids already in PlayerManager.ownedKeepsakes).
+# id -> KeepsakeData for every keepsake, and the ids eligible for the shop's bottom
+# row and gain_random_keepsake — every keepsake with inShop, so event-only ones are
+# in `keepsakes` but not `pool`. The shop also filters out ids already owned.
 var keepsakes: Dictionary = {}
 var pool: Array = []
 
@@ -20,7 +21,8 @@ func _init():
 			push_error("Data: %s reuses keepsake id '%s'" % [keepsake.resource_path, keepsake.id])
 			continue
 		keepsakes[keepsake.id] = keepsake
-		pool.append(keepsake.id)
+		if keepsake.inShop:
+			pool.append(keepsake.id)
 	DataValidator.validateKeepsakes(keepsakes.values())
 
 func _loadResourceDir(path: String) -> Array:

@@ -56,9 +56,10 @@ extends Resource
 # index into Constants.SHAPES) instead, so headlineAmount doesn't print an id as
 # a card's headline number.
 #
-# The names match Events.gd / EventScene._applyEffect where the meaning is the
-# same, so the two vocabularies read alike. The exception is damage_enemy:
-# an event's "damage" hurts the *player*, so it gets a distinct name here.
+# The names match the out-of-battle vocabulary (RunEffects.EFFECT_KEYS, used by
+# events and keepsake acquire effects) where the meaning is the same, so the two
+# read alike. Damage is named by who takes it: damage_enemy here, self_damage in
+# battle, lose_hp out of battle.
 
 # Every effect type Main._applyAbilityEffect implements, mapped to the keys it
 # reads (a trailing "?" marks a key optional). DataValidator rejects any type or

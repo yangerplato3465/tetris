@@ -25,6 +25,10 @@ var magicMeter
 var maxMagicMeter
 var spawnBag
 var ownedKeepsakes   # Array of keepsake ids bought this run
+# Named facts an event or keepsake has recorded this run (RunEffects set_flag /
+# clear_flag), read back by RunConditions "flag" / "not_flag". Only presence
+# matters — the value is always true. This is how events remember each other.
+var runFlags
 var holdPieceDebuff
 var shieldNum
 var playerHealth
@@ -78,6 +82,7 @@ func _setDefaults():
 	maxMagicMeter = 5
 	spawnBag = [0,1,2,3,4,5,6,0,1,2,3,4,5,6]
 	ownedKeepsakes = []
+	runFlags = {}
 	holdPieceDebuff = false
 	shieldNum = 0
 	playerHealth = 100
@@ -205,14 +210,16 @@ func getCharacterDescription(charId: String) -> String:
 
 # --- Keepsakes ---
 
-func addKeepsake(keepsake: KeepsakeData):
-	# Pay for a keepsake, own it, and apply its "acquire" effects now. Every other
-	# trigger is fired later by Main, which finds it via keepsakeEffects — owning
-	# the keepsake is all it takes. Owned keepsakes are excluded from shop rolls.
-	coin -= keepsake.price
+func addKeepsake(keepsake: KeepsakeData, pay: bool = true):
+	# Own a keepsake and apply its "acquire" effects now — paying for it unless an
+	# event is granting it (RunEffects gain_keepsake passes pay = false). Every
+	# other trigger is fired later by Main, which finds it via keepsakeEffects, so
+	# owning the keepsake is all it takes. Owned keepsakes are excluded from rolls.
+	if pay:
+		coin -= keepsake.price
 	ownedKeepsakes.append(keepsake.id)
 	for desc in keepsake.effectsFor("acquire"):
-		applyAcquireEffect(desc)
+		RunEffects.apply(desc)
 
 # Every effect on `trigger` across the keepsakes owned this run, in purchase order.
 func keepsakeEffects(trigger: String) -> Array:
@@ -222,28 +229,3 @@ func keepsakeEffects(trigger: String) -> Array:
 		if keepsake:
 			out.append_array(keepsake.effectsFor(trigger))
 	return out
-
-# The "acquire" vocabulary (KeepsakeData.ACQUIRE_EFFECTS): permanent run-state
-# changes, applied once at purchase.
-func applyAcquireEffect(desc: Dictionary):
-	match desc.type:
-		"combo_mult":
-			comboMult += desc.amount
-		"max_hp":
-			maxPlayerHealth += desc.amount
-			playerHealth += desc.amount
-		"heal":
-			playerHealth = mini(playerHealth + desc.amount, maxPlayerHealth)
-		"max_magic":
-			maxMagicMeter += desc.amount
-		"next_piece":
-			visibleNextPiece += desc.get("amount", 1)
-			unlockNextPiece.emit()
-		"fire_blocks":
-			fireBlocks = true
-		"ice_blocks":
-			iceBlocks = true
-		"gold_blocks":
-			goldBlocks = true
-		_:
-			push_warning("PlayerManager: unknown acquire effect '%s'" % desc.type)

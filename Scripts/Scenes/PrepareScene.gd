@@ -90,8 +90,11 @@ func _rollOptions(floorNum: int) -> Array:
 	var count = randi_range(MIN_OPTIONS, MAX_OPTIONS)
 	var types: Array = []
 	var events = 0
+	# Events carry `requires` (floor, flags, keepsakes...), so a "?" card is only
+	# offered when at least one of them could actually be rolled right now.
+	var eventAvailable = Events.hasEligibleEvent()
 	for i in count:
-		if events < MAX_EVENTS and floorNum >= FIRST_EVENT_FLOOR and randf() < EVENT_CHANCE:
+		if eventAvailable and events < MAX_EVENTS and floorNum >= FIRST_EVENT_FLOOR and randf() < EVENT_CHANCE:
 			types.append("event")
 			events += 1
 		elif floorNum >= FIRST_SHOP_FLOOR and randf() < SHOP_CHANCE:

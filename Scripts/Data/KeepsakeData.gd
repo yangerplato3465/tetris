@@ -7,9 +7,9 @@ extends Resource
 # A keepsake is a list of effects, each of which runs on a trigger:
 #   {"trigger": String, "type": String, "amount": ..., ...}
 #
-#   acquire       once, on purchase. Changes run state, so it uses its own small
-#                 vocabulary (ACQUIRE_EFFECTS below), applied by
-#                 PlayerManager.applyAcquireEffect.
+#   acquire       once, when gained — bought, or granted by an event. Changes run
+#                 state outside a battle, so it uses the out-of-battle vocabulary
+#                 (RunEffects.EFFECT_KEYS, minus the event-only `call`).
 #   battle_start  when a battle begins (Main.stageReady)
 #   line_clear    after any line clear is billed (Main.attack). May carry
 #                 "min_lines" to fire only on bigger clears — 4 means a Tetris.
@@ -23,19 +23,6 @@ extends Resource
 
 const TRIGGERS := ["acquire", "battle_start", "line_clear", "victory"]
 
-# Effect types valid on the "acquire" trigger, mapped to the keys each one reads
-# (a trailing "?" marks a key as optional). The boolean unlocks read nothing.
-const ACQUIRE_EFFECTS := {
-	"combo_mult": ["amount"],
-	"max_hp": ["amount"],
-	"heal": ["amount"],
-	"max_magic": ["amount"],
-	"next_piece": ["amount?"],
-	"fire_blocks": [],
-	"ice_blocks": [],
-	"gold_blocks": [],
-}
-
 @export var id: String = ""
 @export var name: String = ""
 # Descriptive only, same tiers as AbilityData.rarity: nothing rolls or prices off
@@ -44,6 +31,9 @@ const ACQUIRE_EFFECTS := {
 @export_multiline var description: String = ""   # shown as the shop tooltip
 @export var price: int = 0
 @export var frame: int = 0                        # icon frame in Sprite/Cards/Icons.png
+# False makes this an event-only keepsake: never rolled in the shop or by
+# gain_random_keepsake, obtainable only from an event that grants it by id.
+@export var inShop: bool = true
 @export var effects: Array = []                   # Array of effect descriptors
 
 # The descriptors that run on `trigger`, in authored order.

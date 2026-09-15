@@ -95,12 +95,15 @@ startup. Each effect names **when** it runs and **what** it does:
 
 | Trigger        | When                                  | Effect types                                     |
 | -------------- | ------------------------------------- | ------------------------------------------------ |
-| `acquire`      | once, when bought                     | `combo_mult` · `max_hp` · `heal` · `max_magic` · `next_piece` · `fire_blocks` · `ice_blocks` · `gold_blocks` |
+| `acquire`      | once, when bought or granted          | the same effects events use: `max_hp` · `combo_mult` · `max_magic` · `next_piece` · `fire_blocks` · `ice_blocks` · `gold_blocks` · `coins` · `heal` · `gain_keepsake` · `add_piece` · … |
 | `battle_start` | every battle, as it begins            | any spell effect (`shield`, `magic`, `attack_grace`, …) |
 | `line_clear`   | every line clear; `min_lines` filters | any spell effect (`coins`, `magic`, …)           |
 | `victory`      | every enemy killed                    | any spell effect (`heal`, `coins`, …)            |
 
 Everything except `acquire` uses the same effect types as spells (see `CLAUDE.md` for the
-full table), so a new keepsake built from existing triggers and types needs no code. The
+full table), so a new keepsake built from existing triggers and types needs no code.
+
+Set `inShop = false` to make an **event-only** keepsake: it never appears in the shop or
+from a random keepsake roll, and can only be granted by an event that names it. The
 game checks every keepsake at startup and prints a red error for an unknown trigger or
 type, or a missing or misspelled key.

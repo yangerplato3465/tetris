@@ -56,7 +56,7 @@ func _connectFlow():
 func onFloorOptionSelected(option):
 	match option.type:
 		"event":
-			flow.goto(EventScene, EventScene.showEvent.bind(Events.pool.pick_random()))
+			flow.goto(EventScene, EventScene.showEvent.bind(Events.rollEvent()))
 		"shop":
 			flow.goto(ShopPanel, ShopPanel.generateItems)
 		_:

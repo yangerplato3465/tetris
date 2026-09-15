@@ -66,7 +66,7 @@ Defined in `project.godot` and available everywhere without `$`:
 | `Keepsakes` | `Scripts/Utils/Keepsakes.gd` | loads `Data/Keepsakes`; `keepsakes` (id → data) and `pool` |
 | `PlayerManager` | `Scripts/Managers/PlayerManager.gd` | all persistent run state |
 | `PopupNumbers` | `Scripts/Managers/PopupNumbers.gd` | floating damage/text popups |
-| `Events` | `Scripts/Utils/Events.gd` | `?` event definitions and the `pool` of valid starting pages |
+| `Events` | `Scripts/Utils/Events.gd` | loads `Data/Events/*.gd`; `events` (id → event) and `pool` |
 | `AudioManager` | `Scene/AudioManager.tscn` | central audio node with named players |
 
 `Consts` and `Keepsakes` load their `.tres` files in `_init()`, not `_ready()` — `PlayerManager._ready` reads `Consts.abilities` and `_init` runs before any autoload's `_ready`, so the data is populated regardless of autoload order. Preserve that if you add a data singleton.
@@ -81,7 +81,7 @@ Defined in `project.godot` and available everywhere without `$`:
 
 **`Scripts/Core/Piece.gd`** — A single tetromino: shape matrix, rotation state, and elemental assignment (`assignRandomElemental`, `assignOrb`, `assignAllElemental`).
 
-**`Scripts/Managers/PlayerManager.gd`** — Mutable singleton holding the entire run state. `reset()` (called from `GameplayScene._ready`) restores defaults; `_setDefaults()` is the single list of what a run starts with. Keepsake purchases go through `addKeepsake` → `applyAcquireEffect`; `keepsakeEffects(trigger)` is what `Main` fires everything else from.
+**`Scripts/Managers/PlayerManager.gd`** — Mutable singleton holding the entire run state. `reset()` (called from `GameplayScene._ready`) restores defaults; `_setDefaults()` is the single list of what a run starts with. Keepsakes are gained through `addKeepsake(keepsake, pay)`, which applies `acquire` effects via `RunEffects.apply`; `keepsakeEffects(trigger)` is what `Main` fires everything else from.
 
 ### Content is Data, Not Code
 
@@ -93,10 +93,11 @@ Every content directory under `Data/` is scanned whole at startup and loaded int
 | `Data/Abilities/` | `AbilityData` | `Consts.abilities` (keyed by `id`) |
 | `Data/Characters/` | `CharacterData` | `Consts.characters` |
 | `Data/Keepsakes/` | `KeepsakeData` | `Keepsakes.keepsakes` / `Keepsakes.pool` |
+| `Data/Events/` | `.gd` files with `const EVENT` (schema in `EventData`) | `Events.events` / `Events.pool` |
 
 The `id` field is identity; each file is named for its `id` and nothing else. Boss scheduling lives in `EnemyData.bossFloor`, not in file order.
 
-**Validation.** `Scripts/Data/DataValidator.gd` checks abilities, keepsakes and characters at boot, called from `Consts._init` and `Keepsakes._init`. It reports every problem with `push_error` (the game still runs): an unknown effect `type` or keepsake `trigger`, a missing required key or an unexpected one (catches `"ammount"`), a non-numeric `amount`/`min_lines`/`element`/`shape`, an `id` that doesn't match its filename or is reused, an unknown rarity or passive, and an `abilityPool`/`startingAbilities` id with no ability. The allowed lists are `AbilityData.EFFECT_KEYS`, `KeepsakeData.TRIGGERS`/`ACQUIRE_EFFECTS` and `CharacterData.PASSIVES`, where each type maps to the keys it reads (`"amount?"` = optional). **Adding an effect type, trigger or passive means adding it to that list too**, or every file using it fails validation. Enemies and events are not validated.
+**Validation.** `Scripts/Data/DataValidator.gd` checks abilities, keepsakes, characters and events at boot, called from `Consts._init`, `Keepsakes._init` and `Events._init`. It reports every problem with `push_error` (the game still runs): an unknown effect `type` or keepsake `trigger`, a missing required key or an unexpected one (catches `"ammount"`), a non-numeric `amount`/`min_lines`/`element`/`shape`, an `id` that doesn't match its filename or is reused, an unknown rarity or passive, and an `abilityPool`/`startingAbilities` id with no ability. The allowed lists are `AbilityData.EFFECT_KEYS`, `RunEffects.EFFECT_KEYS`, `KeepsakeData.TRIGGERS`, `CharacterData.PASSIVES` and the `EventData` key lists, where each type maps to the keys it reads (`"amount?"` = optional). **Adding an effect type, trigger or passive means adding it to that list too**, or every file using it fails validation. Beyond key shape it checks what an effect points at: a `shape` inside `Constants.SHAPES`, a `gain_keepsake` id that exists, a `gain_random_keepsake` rarity, and a `call` method the event file defines. Event and option `requires` are checked for known condition names, one key per entry, the right value type, and keepsake and class ids that exist; `locked_text` without `requires` is an error, and a `flag`/`not_flag` naming a flag no `set_flag` anywhere writes is a warning (usually a typo). Enemies are not validated.
 
 **One exception — enemies are not fully data-driven.** `Grid.setStage()` picks the
 battle's starting board with `match enemyInfo.id:` against a hardcoded list of integer
@@ -160,7 +161,7 @@ so banking it before a boss is a real play.
 - `SHOP_FLOORS` (= 7): a single mandatory shop
 - Every other floor: 2–3 cards, each an enemy, a `?` event or a `$` shop
 
-Taking *any* card spends the floor, so a shop or event replaces a fight rather than being extra. Tuning knobs live at the top of `PrepareScene.gd` (`EVENT_CHANCE`, `SHOP_CHANCE`, `MAX_EVENTS`, `FIRST_EVENT_FLOOR`, `FIRST_SHOP_FLOOR`, `MIN_OPTIONS`/`MAX_OPTIONS`). Two invariants are enforced after the roll: at most `MAX_EVENTS` events per floor, and always at least one fight.
+Taking *any* card spends the floor, so a shop or event replaces a fight rather than being extra. Tuning knobs live at the top of `PrepareScene.gd` (`EVENT_CHANCE`, `SHOP_CHANCE`, `MAX_EVENTS`, `FIRST_EVENT_FLOOR`, `FIRST_SHOP_FLOOR`, `MIN_OPTIONS`/`MAX_OPTIONS`). Two invariants are enforced after the roll: at most `MAX_EVENTS` events per floor, and always at least one fight. An event card is only rolled at all when `Events.hasEligibleEvent()` — some event's `requires` hold — so a `?` card never leads to an event that can't be shown.
 
 `PlayerManager.currentLevel` persists across battles; `reset()` puts it back to 1. `Main.victory()` steps it after a win, `GameplayScene.advanceFloor()` after an event or shop.
 
@@ -239,12 +240,12 @@ Keepsakes are the shop's bottom row: permanent trinkets bought once, applied imm
 
 | trigger | fires | vocabulary |
 |---|---|---|
-| `acquire` | once, on purchase (`PlayerManager.addKeepsake` → `applyAcquireEffect`) | `KeepsakeData.ACQUIRE_EFFECTS`: `combo_mult`, `max_hp`, `heal`, `max_magic`, `next_piece`, `fire_blocks`, `ice_blocks`, `gold_blocks` |
+| `acquire` | once, when gained — bought, or granted by an event (`PlayerManager.addKeepsake` → `RunEffects.apply`) | the out-of-battle vocabulary, `RunEffects.EFFECT_KEYS` (minus the event-only `call`) |
 | `battle_start` | `Main.stageReady`, after `battleActive` goes true | the ability vocabulary |
 | `line_clear` | `Main.attack`, before the clear's damage lands; optional `min_lines` (4 = Tetris) | the ability vocabulary |
 | `victory` | `Main.victory` | the ability vocabulary |
 
-Every trigger except `acquire` runs through `Main._fireKeepsakes(trigger, ctx)`, which asks `PlayerManager.keepsakeEffects(trigger)` for the owned keepsakes' matching descriptors and hands each to `Main._applyAbilityEffect` — the same function spells cast with. So Bandage Roll is `{"trigger": "victory", "type": "heal", "amount": 3}` and needs no code, and any ability effect type is automatically a keepsake effect. `acquire` stays separate because it changes run state outside a battle. A new keepsake needs code only for a new trigger (fire it from `Main`, add it to `TRIGGERS`) or a new effect type. `_fireKeepsakes` stops if an effect ends the battle mid-loop, and `attack` returns after firing `line_clear` if the battle ended, so a keepsake can't double-fire `victory()`. Three ability effect types exist mainly for keepsakes: `coins`, `attack_grace` (drops that don't advance the attack counter; works on a counter already at 0, zeroed by `enemyAttack`) and `next_clear_damage` (added to the next clear before combo and reduction). `next_piece` emits `PlayerManager.unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
+Every trigger except `acquire` runs through `Main._fireKeepsakes(trigger, ctx)`, which asks `PlayerManager.keepsakeEffects(trigger)` for the owned keepsakes' matching descriptors and hands each to `Main._applyAbilityEffect` — the same function spells cast with. So Bandage Roll is `{"trigger": "victory", "type": "heal", "amount": 3}` and needs no code, and any ability effect type is automatically a keepsake effect. `acquire` is the exception because it changes run state outside a battle, which is what events do too — both run through `RunEffects` (see Run Effects below). `KeepsakeData.inShop = false` makes an event-only keepsake: it stays in `Keepsakes.keepsakes` but out of `Keepsakes.pool`, so neither the shop nor `gain_random_keepsake` can roll it, and only an event's `gain_keepsake` with its id can grant it. A new keepsake needs code only for a new trigger (fire it from `Main`, add it to `TRIGGERS`) or a new effect type. `_fireKeepsakes` stops if an effect ends the battle mid-loop, and `attack` returns after firing `line_clear` if the battle ended, so a keepsake can't double-fire `victory()`. Three ability effect types exist mainly for keepsakes: `coins`, `attack_grace` (drops that don't advance the attack counter; works on a counter already at 0, zeroed by `enemyAttack`) and `next_clear_damage` (added to the next clear before combo and reduction). `next_piece` emits `PlayerManager.unlockNextPiece`, which `Main` listens to in order to clear the lock icons.
 
 **Hold is not a keepsake.** It is a default feature for every class: `PlayerManager._setDefaults` sets `canHoldPiece = true`, and the `Old Key` keepsake that used to unlock it has been removed along with its `unlock_hold` effect type. `canHoldPiece` is deliberately kept as the switch a future debuff can turn off — `Grid` gates the hold input on it, and `Main.setStage` re-shows the lock icon when it is false. The existing per-battle enemy debuff is separate and lives in `holdPieceDebuff`, set from `EnemyData.disablesHold` (Death Knight and Slime Body use it). The `PlayerManager.unlockHold` signal is likewise kept but is currently emitted by nothing — `Main.setStage` calls its handler directly.
 
@@ -252,9 +253,42 @@ The shop's other two cards are services defined inline as constants at the top o
 
 ### Events
 
-`?` floors run `EventScene.showEvent(id)` with an id picked from `Events.pool`. Every event is one **page** in the `Events.events` dictionary; multi-page events are just more entries reached by an option's `"next"`, and those follow-up pages must **not** be listed in `pool` (it holds valid starting points only). `Events.gd` documents the full schema in its header comment, including the weighted-`outcomes` form and the `cost` array that grays a button out while unaffordable.
+**One GDScript file per event** under `Data/Events/`, named for its id, holding a single `const EVENT` dictionary: `id`, `title`, `start` (first page id) and `pages` (page id → page). Every page of an event lives inside that one file, and page ids are local to it, so an option's `"next": "guardian"` means *this event's* `guardian` page. `Scripts/Data/EventData.gd` documents the full schema in its header comment (a page's optional `title` override, the weighted-`outcomes` form, the `cost` array that grays a button out while unaffordable) and holds the key lists the validator checks.
 
-Event effect descriptors are interpreted by `EventScene._applyEffect` and are a *different* vocabulary from abilities: `coins`, `heal`, `damage`, `max_hp`, `shield`, `magic`, `max_magic`. The names deliberately match the ability ones where the meaning is the same; `damage` is the exception — in an event it hurts the *player*, which is why the ability version is called `damage_enemy`. `_canAfford` handles `coins`, `magic` and `hp` costs (an HP cost can hurt but never kill).
+Events are `.gd` rather than `.tres` on purpose: an event is a tree of prose (event → pages → options → outcomes → effects), and nested sub-resources are painful to write and review in the Inspector. They are still data — `Events._init` scans the folder (handling `.gdc`/`.remap` in exports), reads each file's `EVENT` via `get_script_constant_map()`, and runs `DataValidator.validateEvents`, which checks required/unexpected keys, text fields, costs and effects against `EventData.COST_KEYS`/`RunEffects.EFFECT_KEYS`, positive integer `weight`s, a `start` and every `next` that point at a real page, and options that mix `outcomes` with flat `result`/`effects`/`next`. A page nothing links to is only a warning.
+
+`Events.pool` is every loaded id — follow-up pages can't leak into it because they aren't top-level — so adding a file is all it takes for an event to be rolled. `?` floors call `EventScene.showEvent(Events.rollEvent())`, which picks only from events whose `requires` hold right now; `showEvent()` with no argument does the same (the dev panel's button), falling back to any event with a warning if none qualify. Custom logic lives in the event file itself: define a function there and use `{"type": "call", "method": "name"}`; a returned String is appended to the result text (`strange_shrine.gd`'s `crumble` is the example). Reach for it only for the one-off effect no descriptor covers.
+
+**Conditions and flags.** `requires` is a list of one-key conditions that must all hold, evaluated by `Scripts/Managers/RunConditions.gd` (`RunConditions.met`): `min_floor`, `max_floor`, `min_coins`, `has_keepsake`, `lacks_keepsake`, `class`, `flag`, `not_flag` (`RunConditions.KEYS` maps each to its value type). On an **event** it gates rolling — `Events.rollEvent()` / `hasEligibleEvent()` filter the pool by it. On an **option** it hides the option, unless the option also has `locked_text`, in which case that text is shown on a disabled button. If nothing on a page is usable — hidden, locked or unaffordable — `EventScene` adds a Leave button so the player can't be stranded. Floors compare against `PlayerManager.currentLevel`, which during an event is the floor being spent. Flags are how events remember each other: `set_flag` / `clear_flag` write `PlayerManager.runFlags` (presence only, cleared by `reset()`), and `flag` / `not_flag` read it — `abandoned_cart` sets `robbed_merchant`, and `strange_shrine` shows a hidden Confess option only when it's set.
+
+**Dialogue.** A page may carry `"lines": [{"speaker": "Guardian", "text": "..."}, ...]` (speaker optional), and `body` becomes optional once it does — the validator requires at least one of the two and rejects an empty `lines`. `EventScene` plays the body and then each line as a *beat*: one at a time in the body label, the speaker in a gold label above it, typed out via a `visible_ratio` tween (`TYPE_SECONDS_PER_CHAR`). The Next button finishes the typing first and advances second; after the last beat is fully shown, Next gives way to the options, and that beat's text stays on screen with them. A page with only a body is a single beat and shows instantly with its options, exactly as before `lines` existed. Next and Continue share a spot and are never visible together. Advancing is button-only on purpose: every panel stays in the tree offscreen, so a keyboard shortcut here would also fire mid-battle.
+
+Costs are their own small vocabulary (`EventData.COST_KEYS`: `coins`, `magic`, `hp`), handled by `EventScene._canAfford` / `_payCost`; an HP cost can hurt but never kill.
+
+### Run Effects
+
+`Scripts/Managers/RunEffects.gd` is the **out-of-battle effect vocabulary**, shared by event options and keepsake `acquire` effects — `RunEffects.apply(desc, ctx)` is the only place either is interpreted. It is deliberately separate from the in-battle vocabulary (`Main._applyAbilityEffect`), which needs a live board and enemy.
+
+| type | effect |
+|---|---|
+| `coins`, `heal`, `shield`, `magic` | as in battle; coins and shield never go below 0, magic is capped at `maxMagicMeter` |
+| `lose_hp` | lose `amount` HP, **never below 1** — there is no game-over path outside a battle |
+| `max_hp` | move max *and* current HP by `amount`; a negative amount is a curse, floored at 1 |
+| `max_magic`, `combo_mult` | raise the stat |
+| `next_piece` | reveal `amount` (default 1) more preview slots, capped at `MAX_NEXT_PIECES` (5) |
+| `fire_blocks`, `ice_blocks`, `gold_blocks` | unlock the elemental block |
+| `gain_keepsake` | grant keepsake `id` free (`addKeepsake(k, false)`), applying its `acquire` effects; skipped if already owned |
+| `gain_random_keepsake` | grant a random unowned keepsake from `Keepsakes.pool`, optionally of `rarity` |
+| `add_piece` | append `amount` (default 1) copies of `shape` to `PlayerManager.spawnBag` |
+| `remove_piece` | remove every copy of `shape`, unless that would leave fewer than `MIN_SPAWN_BAG` (3) pieces |
+| `set_flag` / `clear_flag` | set or remove run flag `flag` (`PlayerManager.runFlags`, cleared by `reset()`) |
+| `call` | **events only** — run `method` on the event file's instance |
+
+Damage is named by who takes it: `damage_enemy` in battle, `self_damage` for the player in battle, `lose_hp` out of battle.
+
+`PlayerManager.spawnBag` lists the `Constants.SHAPES` index of every piece in a bag (`I, J, L, O, T, Z, S` = 0–6; the default is two of each). `Grid.newBag` reads it, so a piece change shows up from the next bag drawn, which in practice is the next battle. `MIN_SPAWN_BAG` exists because `NextPieces.drawPieces` indexes into the rest of the current bag plus the whole next bag — at least 2n − 1 pieces right after a draw — and must fill up to 5 preview slots; a bag under 3 would index past the end.
+
+`apply` returns a short note for what an author can't know in advance — which random keepsake was granted, a refused `remove_piece`, a custom function's return value — and `EventScene` appends the notes to the result text. `ctx` carries `"event"`, the instance `call` runs on; `EventScene.showEvent` creates a fresh one per showing (`Events.scripts[id].new()`), so a custom function can keep state across the event's pages without leaking it into the next showing.
 
 ### Elemental Blocks
 
