@@ -9,7 +9,7 @@ one.
 
 ## How They Work
 
-The shop rolls **5** of the **15** keepsakes per visit from `Keepsakes.pool`, filtering out
+The shop rolls **5** of the **19** keepsakes per visit from `Keepsakes.pool`, filtering out
 anything you already own, so a keepsake never appears twice in a run. Buying one runs
 `PlayerManager.addKeepsake`, which applies its permanent effects on the spot; the rest fire
 on their trigger (battle start, line clear, victory) for as long as you own it.
@@ -35,10 +35,14 @@ do).
 | **Hourglass Charm**  | Common   | 35    | The enemy's first attack each battle comes 2 drops later                        |
 | **Bandage Roll**     | Common   | 35    | Heal 3 HP after every victory                                                   |
 | **Worn Gauntlet**    | Common   | 40    | Every Tetris (4-line clear) gives +1 magic orb                                  |
+| **Arcane Focus**     | Common   | 30    | Every battle starts with +3 spell damage                                        |
 | **Magnifying Glass** | Common   | 30    | See one more upcoming piece                                                     |
 | **Rime Shard**       | Uncommon | 30    | **Ice blocks** appear in pieces; clearing one delays the enemy attack by 1 drop |
 | **Ember Charm**      | Uncommon | 40    | **Fire blocks** appear in pieces; clearing one deals 15 damage immediately      |
 | **Gilded Idol**      | Uncommon | 40    | **Gold blocks** appear in pieces; clearing one gives 1 coin                     |
+| **Frost Lantern**    | Uncommon | 45    | Clearing 3+ lines at once delays the enemy attack by 1 drop                     |
+| **Gambler's Coin**   | Uncommon | 45    | +20 coins after every victory, but every battle starts with 1 garbage row       |
+| **Echo Shell**       | Uncommon | 55    | Your first spell each battle is cast twice                                      |
 | **Alchemist's Ring** | Common   | 40    | Combo multiplier +0.1                                                           |
 | **Heart Locket**     | Common   | 50    | +25 max HP                                                                      |
 | **Mana Crystal**     | Common   | 50    | +2 max magic orbs                                                               |

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="KeepsakeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/KeepsakeData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "gamblers_coin"
+name = "Gambler's Coin"
+rarity = "uncommon"
+description = "Gain +20 coins after every victory, but start every battle with 1 garbage row"
+price = 45
+frame = 199
+effects = [{"trigger": "victory", "type": "coins", "amount": 20}, {"trigger": "battle_start", "type": "add_garbage", "amount": 1}]

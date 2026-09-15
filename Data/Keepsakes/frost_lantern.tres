@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="KeepsakeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/KeepsakeData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "frost_lantern"
+name = "Frost Lantern"
+rarity = "uncommon"
+description = "Clearing 3 or more lines at once delays the enemy attack by 1 drop"
+price = 45
+frame = 347
+effects = [{"trigger": "line_clear", "min_lines": 3, "type": "delay_attack", "amount": 1}]

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="KeepsakeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/KeepsakeData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "echo_shell"
+name = "Echo Shell"
+rarity = "uncommon"
+description = "Your first spell each battle is cast twice"
+price = 55
+frame = 269
+effects = [{"trigger": "battle_start", "type": "echo_next_cast"}]

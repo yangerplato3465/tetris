@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="KeepsakeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Data/KeepsakeData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "arcane_focus"
+name = "Arcane Focus"
+rarity = "common"
+description = "Every battle starts with +3 spell damage"
+price = 30
+frame = 214
+effects = [{"trigger": "battle_start", "type": "spell_power", "amount": 3}]
